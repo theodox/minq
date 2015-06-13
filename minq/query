@@ -1,0 +1,161 @@
+from __future__ import print_function
+
+try:
+    import maya.cmds as cmds
+except:
+    cmds = object()
+    setattr(cmds, 'ls', print_function)
+    setattr(cmds, 'listRelatives', print_function)
+import re
+
+
+class QueryMeta(type):
+    _CLASSES = {}
+
+    def __new__(cls, name, bases, dct):
+        kw_dictionary = dict(long=True)
+        for k, v in dct.items():
+            if not callable(v) and not k.startswith("_"):
+                kw_dictionary[k] = v
+                del dct[k]
+        dct['_FLAGS'] = kw_dictionary
+        QueryMeta._CLASSES[name] = type.__new__(cls, name, bases, dct)
+        return QueryMeta._CLASSES[name]
+
+    @staticmethod
+    def get_type(name):
+        return QueryMeta._CLASSES.get(name, None)
+
+
+class QueryBase(object):
+    _CMD = cmds.ls
+    __metaclass__ = QueryMeta
+    _compose = True
+
+
+    def __init__(self, upstream=None):
+        self.upstream = upstream
+        self._instance_flags = dict(self._FLAGS)
+
+    def execute(self):
+
+                
+        if self.upstream is None:
+            return tuple(self._CMD(**self._instance_flags) or [])
+        else:
+            values, incoming = itertools.tee(self.upstream)
+            if values.next():
+                return tuple(self._CMD(*incoming, **self._instance_flags) or [])
+            else:
+                return tuple()
+
+    def __or__(self, other):
+        if isinstance(other, type):
+            if self._compose and other._compose:
+                replacement = type(upstream = self.upstream)
+                kw = dict(self._instance_flags)
+                kw.update(replacement._FLAGS)
+                replacement._instance_flags = kw
+                return replacement
+                
+            return type(upstream=self)
+
+    def __iter__(self):
+        return iter(self.execute())
+
+    def __getattr__(self, name):
+        target_class = QueryMeta.get_type(name)
+        if target_class:
+            return target_class(upstream=self)
+    def __str__(self):
+        return str(self.upstream) + ">" +  str(self._instance_flags)
+
+    def __add__(self, other):
+        result = iter(set(self).union( set(other)))
+        return QueryBase(result)
+
+    def __sub__(self, other):
+        result = iter(set(self).union( set(other)))
+        return QueryBase(result)
+        
+    
+    def __xor__(self, other):
+        result = iter(set(self).symmetric_difference(set(other)))
+        return QueryBase(result)
+    
+    def __and__ (self, other):
+        result = iter(set(self).intersection(set(other)))
+        return QueryBase(result)
+
+
+class Transforms(QueryBase):
+    transforms = True
+    shapes = False
+    objectsOnly = True
+
+
+class Shapes(QueryBase):
+    shapes = True
+    transforms = False
+    objectsOnly = True
+
+
+class Geometry(Shapes):
+    geometry = True
+
+class Lights (Shapes):
+    lights = True
+
+class Cameras(Shapes):
+    cameras = True
+
+class Dag (QueryBase):
+    dag = True
+    objectsOnly = True
+
+class Nodes (QueryBase):
+    dependencyNodes = True
+    objectsOnly = True
+
+
+class HasChildren(QueryBase):
+    ignore = 1
+    _compose = False
+
+    def execute(self):
+        return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is not None])
+
+class Children(QueryBase):
+    _CMD = cmds.listRelatives
+    _compose = False
+    
+    def execute(self):
+        return tuple(self._CMD(*self.upstream, c=True, fullPath = True) or [])
+
+class Filter(QueryBase):
+
+    _filter = lambda p: 1
+    _compose = False
+
+    def __call__(self, filter):
+        self._filter = filter
+        return self
+        
+    def execute(self):
+        return tuple(filter(self._filter, (i for i in self.upstream)))
+
+class StringFilter(Filter):
+    def __call__(self, expr):
+        self._re = re.compile(expr)
+        self._filter = lambda p: self._re.search(p) is not None
+        return self
+
+
+ls = QueryBase(['pCube*']).Shapes
+test = QueryBase(['fred'])
+test.execute()
+cam = Cameras()
+print ((ls + cam).execute())
+print( (ls + test).execute())
+
+
