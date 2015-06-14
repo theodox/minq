@@ -96,7 +96,9 @@ class QueryBase(object):
     __metaclass__ = QueryMeta
 
 
-    def __init__(self, upstream=None):
+    def __init__(self, upstream=None, *additional):
+        if additional:
+            self.upstream = (upstream) + additional
         self.upstream = upstream
         self._instance_flags = dict(self._FLAGS)
 
@@ -177,27 +179,25 @@ class Nodes (QueryBase):
     objectsOnly = True
 
 class ByType(Nodes):
-    _default_types = 'dag'
-
-    def __init__(self, upstream = None, *nodeTypes):
-        super(ByType, self).__init__(upstream = upstream)
-        self._instance_flags['type'] = nodeTypes or self._default_types
-
+    type = 'dag'
 
 
 class Meshes(ByType):
-    _default_types = 'meshes'
+    type = 'mesh'
 
 class Curves(ByType):
-    _default_types = 'nurbsCurves'
+    type = 'nurbsCurve'
 
-class Lights(ByType):
-    _default_types = 'lights'
 
 class Constraint(ByType):
-    _default_types = 'constraints'
+    type = 'constraint'
 
-
+class OfType(ByType):
+    type = 'dag'
+    
+    def __call__(self, *types):
+        self._instance_flags['type'] = types
+        return self
 
 class WithChildren(QueryBase):
     _CMD = cmds.listRelatives
@@ -249,11 +249,10 @@ class Filter(QueryBase):
     def results(self):
         return tuple(filter(self._filter, (i for i in self.upstream)))
 
-class StringFilter(Filter):
+class Named(Filter):
+
     def __call__(self, expr):
         self._re = re.compile(expr)
         self._filter = lambda p: self._re.search(p) is not None
         return self
 
-
-Query('t*').Shapes.StringFilter('o').results()
