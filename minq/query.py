@@ -49,7 +49,7 @@ class Composable(object):
         if target_class is None:
             raise NameError, "No QueryMeta extansion named " + name
         if issubclass(target_class, Composable) \
-            and target_class._CMD == self._CMD:
+                and target_class._CMD == self._CMD:
             return self.compose(target_class)
         else:
             return target_class(upstream=self)
@@ -109,7 +109,6 @@ class QueryBase(object):
 
     def results(self):
 
-
         if self.upstream is None:
             return tuple(self._CMD(**self._instance_flags) or [])
         else:
@@ -121,8 +120,10 @@ class QueryBase(object):
 
     def first(self):
         return self.__iter__().next()
+
     def last(self):
         return self.results()[-1]
+
     def slice(self, *args):
         return itertools.islice(self, *args)
 
@@ -170,8 +171,10 @@ class QueryBase(object):
 class query(Composable, QueryBase):
     pass
 
+
 class shortened(query):
     long = False
+
 
 class selected(query):
     selected = True
@@ -210,6 +213,7 @@ class nodes(QueryBase):
     dependencyNodes = True
     objectsOnly = True
 
+
 class ByTypeBase(nodes):
     type = 'dag'
 
@@ -221,20 +225,26 @@ class meshes(ByTypeBase):
 class curves(ByTypeBase):
     type = 'nurbsCuve'
 
+
 class joints(ByTypeBase):
     type = 'joint'
+
 
 class shaders(ByTypeBase):
     type = 'lambert'
 
+
 class shading_nodes(ByTypeBase):
     type = 'shadingDependNode'
+
 
 class constraint(ByTypeBase):
     type = 'constraint'
 
+
 class IKs(ByTypeBase):
     type = 'ikhandle'
+
 
 class of_type(ByTypeBase):
     type = 'dag'
@@ -298,6 +308,9 @@ class where(QueryBase):
     def results(self):
         return tuple(filter(self._predicate, (i for i in self.upstream)))
 
+    def __iter__(self):
+        return itertools.ifilter(self._predicate, self.upstream)
+    
 
 class named(where):
     def __call__(self, expr):
@@ -329,7 +342,6 @@ class objects(query):
 
 
 class has_attribute(where):
-
     def __call__(self, expr, shortNames=False):
         self._attrib = expr
         if shortNames:
@@ -338,8 +350,8 @@ class has_attribute(where):
             self._predicate = lambda p: self._attrib in cmds.listAttr(p)
         return self
 
-class relative(QueryBase):
 
+class relative(QueryBase):
     def __init__(self, upstream):
         super(relative, self).__init__(upstream)
         self.path = ""
@@ -348,10 +360,10 @@ class relative(QueryBase):
         path = path.replace("/", "|")
         self.path = path.split("|")
         return self
-        
-    def results(self):        
-        return cmds.ls([self.splice_path(p) for p in self.upstream], **self._instance_flags)
-        
+
+    def results(self):
+        return tuple(cmds.ls([self.splice_path(p) for p in self.upstream], **self._instance_flags))
+
     def splice_path(self, pth):
         segs = pth.split("|")
         for p in self.path:
@@ -362,21 +374,35 @@ class relative(QueryBase):
             else:
                 segs.append(p)
         return "|".join(segs)
-        
+
+
 class topmost(QueryBase):
     _CMD = None
-    
+
     def results(self):
         results = [i for i in self.upstream]
         if not results:
             return tuple()
         results.sort()
         output = []
-        for  item in results:
+        for item in results:
             contained = False
             for o in output:
                 contained = contained or o in item
             if not contained:
                 output.append(item)
-             
+
         return output
+
+
+class cast(QueryBase):
+    def __call__(self, cast_fn):
+        self.cast = cast_fn
+        return self
+
+    def results(self):
+        return [self.cast(i) for i in self.upstream]
+
+    def __iter__(self):
+        return itertools.imap(self.cast, self.upstream)
+        
