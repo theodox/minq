@@ -1,6 +1,8 @@
-import maya.cmds as cmds
 import re
 import itertools
+
+import maya.cmds as cmds
+
 
 class QueryMeta(type):
     """
@@ -33,10 +35,10 @@ class QueryMeta(type):
     def get_type(name):
         return QueryMeta._CLASSES.get(name, None)
 
-class Composable(object):
 
+class Composable(object):
     def compose(self, other_type):
-        replacement = other_type(upstream = self.upstream)
+        replacement = other_type(upstream=self.upstream)
         kw = dict(self._instance_flags)
         kw.update(replacement._FLAGS)
         replacement._instance_flags = kw
@@ -46,10 +48,11 @@ class Composable(object):
         target_class = QueryMeta.get_type(name)
         if target_class is None:
             raise NameError, "No QueryMeta extansion named " + name
-        if  issubclass(target_class, Composable):
+        if issubclass(target_class, Composable):
             return self.compose(target_class)
         else:
             return target_class(upstream=self)
+
 
 class QueryBase(object):
     """
@@ -125,14 +128,25 @@ class QueryBase(object):
         return target_class(upstream=self)
 
     def __str__(self):
-        return str(self.upstream) + ">" +  str(self._instance_flags)
+        rpr = {
+            cmds.ls: "cmds.ls( {} )".format,
+            cmds.listRelatives: "cmds.listRelatives( {} )".format,
+            cmds.listHistory: "cmds.listHistory( {} )".format
+        }
+
+        quoted = lambda p: '"{}"'.format(p) if str(p) == p else p
+        contents = lambda k, v: "{} = {}".format(k, quoted(v))
+        args = quoted(self.upstream) if not hasattr(self.upstream, '__iter__') else str(self.upstream)
+        kwargs = ", ".join([contents(k, v) for k, v in self._instance_flags.items()])
+        return rpr[self._CMD](", ".join((args, kwargs)))
+
 
     def __add__(self, other):
-        result = iter(set(self).union( set(other)))
+        result = iter(set(self).union(set(other)))
         return QueryBase(result)
 
     def __sub__(self, other):
-        result = iter(set(self).union( set(other)))
+        result = iter(set(self).union(set(other)))
         return QueryBase(result)
 
 
@@ -140,12 +154,17 @@ class QueryBase(object):
         result = iter(set(self).symmetric_difference(set(other)))
         return QueryBase(result)
 
-    def __and__ (self, other):
+    def __and__(self, other):
         result = iter(set(self).intersection(set(other)))
         return QueryBase(result)
 
-class Query(Composable, Query):
+
+class Query(Composable, QueryBase):
     pass
+
+
+class Selected(Query):
+    selected = True
 
 
 class Transforms(Query):
@@ -163,20 +182,24 @@ class Shapes(Query):
 class Geometry(Query):
     geometry = True
 
-class Lights (Shapes):
+
+class Lights(Shapes):
     lights = True
+
 
 class Cameras(Shapes):
     cameras = True
 
-class Dag (QueryBase):
+
+class Dag(QueryBase):
     dag = True
     objectsOnly = True
 
 
-class Nodes (QueryBase):
+class Nodes(QueryBase):
     dependencyNodes = True
     objectsOnly = True
+
 
 class ByType(Nodes):
     type = 'dag'
@@ -185,6 +208,7 @@ class ByType(Nodes):
 class Meshes(ByType):
     type = 'mesh'
 
+
 class Curves(ByType):
     type = 'nurbsCurve'
 
@@ -192,12 +216,14 @@ class Curves(ByType):
 class Constraint(ByType):
     type = 'constraint'
 
+
 class OfType(ByType):
     type = 'dag'
-    
+
     def __call__(self, *types):
         self._instance_flags['type'] = types
         return self
+
 
 class WithChildren(QueryBase):
     _CMD = cmds.listRelatives
@@ -205,6 +231,7 @@ class WithChildren(QueryBase):
 
     def results(self):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is not None])
+
 
 class WithoutChildren(QueryBase):
     _CMD = cmds.listRelatives
@@ -218,41 +245,81 @@ class Children(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
-        return tuple(self._CMD(*self.upstream, c=True, fullPath = True) or [])
+        return tuple(self._CMD(*self.upstream, c=True, fullPath=True) or [])
+
 
 class Parents(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
-        return tuple(self._CMD(*self.upstream, p=True, fullPath = True) or [])
+        return tuple(self._CMD(*self.upstream, p=True, fullPath=True) or [])
 
-class AllParents(QueryBase):
+
+class Above(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
-        return tuple(self._CMD(*self.upstream, ap=True, fullPath = True) or [])
+        return tuple(self._CMD(*self.upstream, ap=True, fullPath=True) or [])
 
-class AllChildren(QueryBase):
+
+class Below(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
-        return tuple(self._CMD(*self.upstream, ad=True, fullPath = True) or [])
+        return tuple(self._CMD(*self.upstream, ad=True, fullPath=True) or [])
 
-class Filter(QueryBase):
 
-    _filter = lambda p: 1
+class Where(QueryBase):
+    _predicate = lambda p: 1
 
-    def __call__(self, filter):
-        self._filter = filter
+    def __call__(self, predicate):
+        self._predicate = predicate
         return self
 
     def results(self):
-        return tuple(filter(self._filter, (i for i in self.upstream)))
+        return tuple(filter(self._predicate, (i for i in self.upstream)))
 
-class Named(Filter):
 
+class Named(Where):
     def __call__(self, expr):
         self._re = re.compile(expr)
-        self._filter = lambda p: self._re.search(p) is not None
+        self._predicate = lambda p: self._re.search(p) is not None
         return self
 
+
+class Attributes(Composable, QueryBase):
+    objectsOnly = False
+
+    def __init__(self, *args):
+        args = ["*." + i for i in args]
+        super(Attributes, self).__init__(args)
+
+    def results(self):
+        # attribute queries often
+        # return duplicate entries
+        results =  super(Attributes, self).results()
+        return tuple(set(results))
+
+
+class ObjectsWithAttributes(Attributes):
+    objectsOnly = True
+
+class Objects(Query):
+    objectsOnly = True
+
+
+class HasAttribute(Where):
+
+    def __call__(self, expr, shortNames=False):
+        self._attrib = expr
+        if shortNames:
+            self._predicate = lambda p: self._attrib in cmds.listAttr(p, sn=True)
+        else:
+            self._predicate = lambda p: self._attrib in cmds.listAttr(p)
+        return self
+
+
+
+a = Attributes("depth").Objects
+b = Attributes("width").Objects
+print (a & b).results()
