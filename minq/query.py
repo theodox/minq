@@ -96,6 +96,7 @@ class QueryBase(object):
 
     """
     _CMD = cmds.ls
+    long = True
     __metaclass__ = QueryMeta
 
 
@@ -117,6 +118,12 @@ class QueryBase(object):
             else:
                 return tuple()
 
+    def first(self):
+        return self.__iter__().next()
+    def last(self):
+        return self.results()[-1]
+    def slice(self, *args):
+        return itertools.islice(self, *args)
 
     def __iter__(self):
         return iter(self.results())
@@ -159,65 +166,76 @@ class QueryBase(object):
         return QueryBase(result)
 
 
-class Query(Composable, QueryBase):
+class query(Composable, QueryBase):
     pass
 
+class shortened(query):
+    long = False
 
-class Selected(Query):
+class selected(query):
     selected = True
 
 
-class Transforms(Query):
+class xforms(query):
     transforms = True
     shapes = False
     objectsOnly = True
 
 
-class Shapes(Query):
+class shapes(query):
     shapes = True
     transforms = False
     objectsOnly = True
 
 
-class Geometry(Query):
+class geometry(query):
     geometry = True
 
 
-class Lights(Shapes):
+class lights(shapes):
     lights = True
 
 
-class Cameras(Shapes):
+class camera(shapes):
     cameras = True
 
 
-class Dag(QueryBase):
+class dag(QueryBase):
     dag = True
     objectsOnly = True
 
 
-class Nodes(QueryBase):
+class nodes(QueryBase):
     dependencyNodes = True
     objectsOnly = True
 
-
-class ByType(Nodes):
+class ByTypeBase(nodes):
     type = 'dag'
 
 
-class Meshes(ByType):
+class meshes(ByTypeBase):
     type = 'mesh'
 
 
-class Curves(ByType):
-    type = 'nurbsCurve'
+class curves(ByTypeBase):
+    type = 'nurbsCuve'
 
+class joints(ByTypeBase):
+    type = 'joint'
 
-class Constraint(ByType):
+class shaders(ByTypeBase):
+    type = 'lambert'
+
+class shading_nodes(ByTypeBase):
+    type = 'shadingDependNode'
+
+class constraint(ByTypeBase):
     type = 'constraint'
 
+class IKs(ByTypeBase):
+    type = 'ikhandle'
 
-class OfType(ByType):
+class of_type(ByTypeBase):
     type = 'dag'
 
     def __call__(self, *types):
@@ -225,7 +243,7 @@ class OfType(ByType):
         return self
 
 
-class WithChildren(QueryBase):
+class with_children(query):
     _CMD = cmds.listRelatives
     ignore = 1
 
@@ -233,7 +251,7 @@ class WithChildren(QueryBase):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is not None])
 
 
-class WithoutChildren(QueryBase):
+class without_children(query):
     _CMD = cmds.listRelatives
     ignore = 1
 
@@ -241,35 +259,35 @@ class WithoutChildren(QueryBase):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is None])
 
 
-class Children(QueryBase):
+class children(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, c=True, fullPath=True) or [])
 
 
-class Parents(QueryBase):
+class parents(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, p=True, fullPath=True) or [])
 
 
-class Above(QueryBase):
+class above(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, ap=True, fullPath=True) or [])
 
 
-class Below(QueryBase):
+class below(QueryBase):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, ad=True, fullPath=True) or [])
 
 
-class Where(QueryBase):
+class where(QueryBase):
     _predicate = lambda p: 1
 
     def __call__(self, predicate):
@@ -280,36 +298,36 @@ class Where(QueryBase):
         return tuple(filter(self._predicate, (i for i in self.upstream)))
 
 
-class Named(Where):
+class named(where):
     def __call__(self, expr):
         self._re = re.compile(expr)
-        self._predicate = lambda p: self._re.search(p) is not None
+        self._predicate = lambda p: self._re.search(p.split("|")[-1]) is not None
         return self
 
 
-class Attributes(Composable, QueryBase):
+class attributes(Composable, QueryBase):
     objectsOnly = False
 
     def __init__(self, *args):
         args = ["*." + i for i in args]
-        super(Attributes, self).__init__(args)
+        super(attributes, self).__init__(args)
 
     def results(self):
         # attribute queries often
         # return duplicate entries
-        results =  super(Attributes, self).results()
+        results = super(attributes, self).results()
         return tuple(set(results))
 
 
-class ObjectsWithAttributes(Attributes):
-    objectsOnly = True
-
-class Objects(Query):
+class objects_with_attribute(attributes):
     objectsOnly = True
 
 
-class HasAttribute(Where):
+class objects(query):
+    objectsOnly = True
 
+
+class has_attribute(where):
     def __call__(self, expr, shortNames=False):
         self._attrib = expr
         if shortNames:
@@ -318,8 +336,45 @@ class HasAttribute(Where):
             self._predicate = lambda p: self._attrib in cmds.listAttr(p)
         return self
 
+class relative(QueryBase):
 
+    def __init__(self, upstream):
+        super(relative, self).__init__(upstream)
+        self.path = ""
 
-a = Attributes("depth").Objects
-b = Attributes("width").Objects
-print (a & b).results()
+    def __call__(self, path):
+        path = path.replace("/", "|")
+        self.path = path.split("|")
+        return self
+        
+    def results(self):        
+        return cmds.ls([self.splice_path(p) for p in self.upstream], **self._instance_flags)
+        
+    def splice_path(self, pth):
+        segs = pth.split("|")
+        for p in self.path:
+            if p == "..":
+                segs.pop()
+            elif p == ".":
+                continue
+            else:
+                segs.append(p)
+        return "|".join(segs)
+        
+class topmost(QueryBase):
+    
+    def results(self):
+        results = [i for i in self.upstream]
+        if not results:
+            return tuple()
+        results.sort()
+        output = []
+        for  item in results:
+            contained = False
+            for o in output:
+                contained = contained or o in item
+            if not contained:
+                output.append(item)
+             
+        return output
+        
