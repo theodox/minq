@@ -48,7 +48,8 @@ class Composable(object):
         target_class = QueryMeta.get_type(name)
         if target_class is None:
             raise NameError, "No QueryMeta extansion named " + name
-        if issubclass(target_class, Composable):
+        if issubclass(target_class, Composable) \
+            and target_class._CMD == self._CMD:
             return self.compose(target_class)
         else:
             return target_class(upstream=self)
@@ -245,15 +246,14 @@ class of_type(ByTypeBase):
 
 class with_children(query):
     _CMD = cmds.listRelatives
-    ignore = 1
+
 
     def results(self):
-        return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is not None])
+        return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True, fullPath=True) is not None])
 
 
 class without_children(query):
     _CMD = cmds.listRelatives
-    ignore = 1
 
     def results(self):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is None])
@@ -288,6 +288,7 @@ class below(QueryBase):
 
 
 class where(QueryBase):
+    _CMD = None
     _predicate = lambda p: 1
 
     def __call__(self, predicate):
@@ -328,6 +329,7 @@ class objects(query):
 
 
 class has_attribute(where):
+
     def __call__(self, expr, shortNames=False):
         self._attrib = expr
         if shortNames:
@@ -362,6 +364,7 @@ class relative(QueryBase):
         return "|".join(segs)
         
 class topmost(QueryBase):
+    _CMD = None
     
     def results(self):
         results = [i for i in self.upstream]
@@ -377,4 +380,3 @@ class topmost(QueryBase):
                 output.append(item)
              
         return output
-        
