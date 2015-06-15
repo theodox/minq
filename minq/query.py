@@ -168,31 +168,63 @@ class QueryBase(object):
         return QueryBase(result)
 
 
-class query(Composable, QueryBase):
+class Query(Composable, QueryBase):
+    """
+    A default query, similar to ls(). You can restrict it to known items by passing in an iterable (list, tuple or generator) of names:
+
+        Query()  # returns everything in the scene
+        Query(['a', 'b','c'])   # returns a, b and c, can be filtered or expanded
+    """
     pass
 
+class AttrQuery(Composable, QueryBase):
+    """
+    a global search for all instances of the supplied attribute in the scene:
 
-class shortened(query):
+        attributed('filename')
+
+    will find all items with an attribute called 'filename'.
+    """
+
+    objectsOnly = False
+
+    def __init__(self, *args):
+        args = ["*." + i for i in args]
+        super(AttrQuery, self).__init__(args)
+
+    def results(self):
+        # attribute queries often
+        # return duplicate entries
+        results = super(AttrQuery, self).results()
+        return tuple(set(results))
+
+
+class xforms(Query):
+    transforms = True
+    shapes = False
+
+
+class shortened(Query):
     long = False
 
 
-class selected(query):
+class selected(Query):
     selected = True
 
 
-class xforms(query):
+class xforms(Query):
     transforms = True
     shapes = False
     objectsOnly = True
 
 
-class shapes(query):
+class shapes(Query):
     shapes = True
     transforms = False
     objectsOnly = True
 
 
-class geometry(query):
+class geometry(Query):
     geometry = True
 
 
@@ -254,7 +286,7 @@ class of_type(ByTypeBase):
         return self
 
 
-class with_children(query):
+class with_children(Query):
     _CMD = cmds.listRelatives
 
 
@@ -262,7 +294,7 @@ class with_children(query):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True, fullPath=True) is not None])
 
 
-class without_children(query):
+class without_children(Query):
     _CMD = cmds.listRelatives
 
     def results(self):
@@ -310,7 +342,7 @@ class where(QueryBase):
 
     def __iter__(self):
         return itertools.ifilter(self._predicate, self.upstream)
-    
+
 
 class named(where):
     def __call__(self, expr):
@@ -319,29 +351,27 @@ class named(where):
         return self
 
 
-class attributes(Composable, QueryBase):
-    objectsOnly = False
 
-    def __init__(self, *args):
-        args = ["*." + i for i in args]
-        super(attributes, self).__init__(args)
+class objects(Query):
+    """
+    Pass objects only, typically used in conjunction with an attribute query:
 
-    def results(self):
-        # attribute queries often
-        # return duplicate entries
-        results = super(attributes, self).results()
-        return tuple(set(results))
+       Query().attributed('filename').objects
 
+   is equivalent to
 
-class objects_with_attribute(attributes):
+        Query().attributed_objects('filename')
+    """
     objectsOnly = True
 
 
-class objects(query):
-    objectsOnly = True
+class having_attribute(where):
+    """
+    Pass items in the query which have the supplied attribute (by default, attributes use long names: to use
+    short names instead, pass the shortNames =True) flag
 
-
-class has_attribute(where):
+    This call will check the attribute on all items in the query, which will force the query to execute first.  For a global search of all attributed objects use AttrQuery
+    """
     def __call__(self, expr, shortNames=False):
         self._attrib = expr
         if shortNames:
@@ -352,6 +382,11 @@ class has_attribute(where):
 
 
 class relative(QueryBase):
+    '''
+    transform all paths using file style relative paths  For example a query that returns  |A|B|C , with a relative
+    path of "../D/E" , would pass this stage as "|A|B|D|E"
+    '''
+
     def __init__(self, upstream):
         super(relative, self).__init__(upstream)
         self.path = ""
@@ -377,6 +412,10 @@ class relative(QueryBase):
 
 
 class topmost(QueryBase):
+    '''
+    for a set of results, return only those which are not children of any others in the set
+    '''
+
     _CMD = None
 
     def results(self):
@@ -396,6 +435,18 @@ class topmost(QueryBase):
 
 
 class cast(QueryBase):
+    '''
+    return all items in the query as processed by the supplied function, ie:
+
+        query().cast(PyNode)
+
+    would return all of the items int the list as PyNodes, while
+
+        query.cast(lambda p: p.upper())
+
+    would return all of the names in upper case
+    '''
+
     def __call__(self, cast_fn):
         self.cast = cast_fn
         return self
