@@ -2,7 +2,9 @@ import re
 import itertools
 
 import maya.cmds as cmds
-
+import logging
+logging.basicConfig()
+_log = logging.getLogger('minq')
 
 class QueryMeta(type):
     """
@@ -37,6 +39,10 @@ class QueryMeta(type):
 
 
 class Composable(object):
+    """
+    Base class for queries which can be chained together, such as multiple ls flags
+    """
+
     def compose(self, other_type):
         replacement = other_type(upstream=self.upstream)
         kw = dict(self._instance_flags)
@@ -87,14 +93,10 @@ class QueryBase(object):
 
     would find all the transforms in the scene with 'fred' in their names who have children, while
 
-        q = Query('joint1').Children.Shapes
+        q = Query('joint1').children.shapes
 
     would find all of the children of 'joint1' which are shapes.  As with a simple query, the actual values are not
-    retrieved until the query is iterated or results are calledd
-
-
-
-
+    retrieved until the query is iterated or results are called
     """
     _CMD = cmds.ls
     long = True
@@ -102,13 +104,13 @@ class QueryBase(object):
 
 
     def __init__(self, upstream=None, *additional):
-        if additional:
-            self.upstream = (upstream) + additional
         self.upstream = upstream
+        if additional and self.upstream is not None:
+            self.upstream = (self.upstream) + additional
         self._instance_flags = dict(self._FLAGS)
 
     def results(self):
-
+        _log.critical('calling %s' % self.__class__)
         if self.upstream is None:
             return tuple(self._CMD(**self._instance_flags) or [])
         else:
@@ -145,9 +147,12 @@ class QueryBase(object):
 
         quoted = lambda p: '"{}"'.format(p) if str(p) == p else p
         contents = lambda k, v: "{} = {}".format(k, quoted(v))
-        args = quoted(self.upstream) if not hasattr(self.upstream, '__iter__') else str(self.upstream)
         kwargs = ", ".join([contents(k, v) for k, v in self._instance_flags.items()])
-        return rpr[self._CMD](", ".join((args, kwargs)))
+        if self.upstream:
+            args = quoted(self.upstream) if not hasattr(self.upstream, '__iter__') else str(self.upstream)
+            return rpr[self._CMD](", ".join((args, kwargs)))
+        else:
+            return rpr[self._CMD](kwargs)
 
 
     def __add__(self, other):
@@ -167,17 +172,28 @@ class QueryBase(object):
         result = iter(set(self).intersection(set(other)))
         return QueryBase(result)
 
+    def __invert__(self):
+        """
+        shorthand for use in the listener
+        """
+        return self.results()
 
-class Query(Composable, QueryBase):
+class SceneQuery(Composable, QueryBase):
+    pass
+
+
+class Scene(SceneQuery):
     """
     A default query, similar to ls(). You can restrict it to known items by passing in an iterable (list, tuple or generator) of names:
 
         Query()  # returns everything in the scene
         Query(['a', 'b','c'])   # returns a, b and c, can be filtered or expanded
     """
+
     pass
 
-class AttrQuery(Composable, QueryBase):
+
+class Attributes(Composable, QueryBase):
     """
     a global search for all instances of the supplied attribute in the scene:
 
@@ -190,64 +206,67 @@ class AttrQuery(Composable, QueryBase):
 
     def __init__(self, *args):
         args = ["*." + i for i in args]
-        super(AttrQuery, self).__init__(args)
+        super(Attributes, self).__init__(args)
 
     def results(self):
         # attribute queries often
         # return duplicate entries
-        results = super(AttrQuery, self).results()
+        results = super(Attributes, self).results()
         return tuple(set(results))
 
 
-class xforms(Query):
+class Selection(Composable, QueryBase):
+    """
+    A search which begins with the selected object(s)
+    """
+    selected = True
+
+class Shapes(Scene):
+    shapes = True
+
+class Xforms(Scene):
     transforms = True
-    shapes = False
+
+# ----------
+# these classes sub-set the query stream
 
 
-class shortened(Query):
+class shortened(Scene):
     long = False
 
 
-class selected(Query):
+class selected(Scene):
     selected = True
 
 
-class xforms(Query):
-    transforms = True
-    shapes = False
-    objectsOnly = True
 
-
-class shapes(Query):
-    shapes = True
-    transforms = False
-    objectsOnly = True
-
-
-class geometry(Query):
-    geometry = True
-
-
-class lights(shapes):
-    lights = True
-
-
-class camera(shapes):
-    cameras = True
-
-
-class dag(QueryBase):
+class dag(Scene):
     dag = True
     objectsOnly = True
 
 
-class nodes(QueryBase):
+class nodes(Scene):
     dependencyNodes = True
     objectsOnly = True
 
+# ---- type filters. Can't be chained with xforms
 
-class ByTypeBase(nodes):
-    type = 'dag'
+class ByTypeBase(Scene):
+    pass
+
+
+
+
+class geometry(ByTypeBase):
+    geometry = True
+
+
+class lights(ByTypeBase):
+    lights = True
+
+
+class cameras(ByTypeBase):
+    cameras = True
 
 
 class meshes(ByTypeBase):
@@ -270,7 +289,7 @@ class shading_nodes(ByTypeBase):
     type = 'shadingDependNode'
 
 
-class constraint(ByTypeBase):
+class constraints(ByTypeBase):
     type = 'constraint'
 
 
@@ -279,6 +298,12 @@ class IKs(ByTypeBase):
 
 
 class of_type(ByTypeBase):
+    """
+    User specified type:
+
+        Scene().of_type('HIKSkeletonGeneratorNode')
+
+    """
     type = 'dag'
 
     def __call__(self, *types):
@@ -286,7 +311,42 @@ class of_type(ByTypeBase):
         return self
 
 
-class with_children(Query):
+class objects(Scene):
+    """
+    Pass objects only, typically used in conjunction with an attribute query:
+
+       Query().attributed('filename').objects
+
+   is equivalent to
+
+        Query().attributed_objects('filename')
+    """
+    objectsOnly = True
+
+
+# -----
+# these classes filter the query stream, but they generally will force it to evaluate before proceeding
+
+
+class Reprocess(QueryBase):
+    _CMD = None
+
+
+
+class xforms(Reprocess):
+    _CMD = cmds.ls
+    type='transform'
+
+    def __init__(self, upstream, *args):
+        if isinstance(upstream, ByTypeBase):
+            raise AttributeError, "can't chain a transform filter onto a type query"
+        super(xforms, self).__init__(upstream, args)
+            
+    def results(self):
+        return tuple(self._CMD(self.upstream.results(), **self._instance_flags))
+
+
+class with_children(Reprocess):
     _CMD = cmds.listRelatives
 
 
@@ -294,42 +354,42 @@ class with_children(Query):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True, fullPath=True) is not None])
 
 
-class without_children(Query):
+class without_children(Reprocess):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple([i for i in self.upstream if cmds.listRelatives(i, c=True) is None])
 
 
-class children(QueryBase):
+class children(Reprocess):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, c=True, fullPath=True) or [])
 
 
-class parents(QueryBase):
+class parents(Reprocess):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, p=True, fullPath=True) or [])
 
 
-class above(QueryBase):
+class above(Reprocess):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, ap=True, fullPath=True) or [])
 
 
-class below(QueryBase):
+class below(Reprocess):
     _CMD = cmds.listRelatives
 
     def results(self):
         return tuple(self._CMD(*self.upstream, ad=True, fullPath=True) or [])
 
 
-class where(QueryBase):
+class where(Reprocess):
     _CMD = None
     _predicate = lambda p: 1
 
@@ -351,27 +411,14 @@ class named(where):
         return self
 
 
-
-class objects(Query):
-    """
-    Pass objects only, typically used in conjunction with an attribute query:
-
-       Query().attributed('filename').objects
-
-   is equivalent to
-
-        Query().attributed_objects('filename')
-    """
-    objectsOnly = True
-
-
-class having_attribute(where):
+class having(where):
     """
     Pass items in the query which have the supplied attribute (by default, attributes use long names: to use
     short names instead, pass the shortNames =True) flag
 
     This call will check the attribute on all items in the query, which will force the query to execute first.  For a global search of all attributed objects use AttrQuery
     """
+
     def __call__(self, expr, shortNames=False):
         self._attrib = expr
         if shortNames:
@@ -381,7 +428,7 @@ class having_attribute(where):
         return self
 
 
-class relative(QueryBase):
+class relative(Reprocess):
     '''
     transform all paths using file style relative paths  For example a query that returns  |A|B|C , with a relative
     path of "../D/E" , would pass this stage as "|A|B|D|E"
@@ -411,7 +458,7 @@ class relative(QueryBase):
         return "|".join(segs)
 
 
-class topmost(QueryBase):
+class topmost(Reprocess):
     '''
     for a set of results, return only those which are not children of any others in the set
     '''
@@ -434,7 +481,7 @@ class topmost(QueryBase):
         return output
 
 
-class cast(QueryBase):
+class cast(Reprocess):
     '''
     return all items in the query as processed by the supplied function, ie:
 
