@@ -103,22 +103,21 @@ class QueryBase(object):
     __metaclass__ = QueryMeta
 
 
-    def __init__(self, upstream=None, *additional):
-        self.upstream = upstream
-        if additional and self.upstream is not None:
-            self.upstream = (self.upstream) + additional
+    def __init__(self, *args, **kwargs):
+        self.upstream = kwargs.get('upstream', args)
+        self.explicit = self.upstream == args
         self._instance_flags = dict(self._FLAGS)
 
     def results(self):
-        _log.critical('calling %s' % self.__class__)
-        if self.upstream is None:
-            return tuple(self._CMD(**self._instance_flags) or [])
+       
+        values, incoming = itertools.tee(self.upstream)
+            
+        if values.next():
+            _log.info('calling %s' % self.__class__)
+            return tuple(self._CMD(*incoming, **self._instance_flags) or [])
         else:
-            values, incoming = itertools.tee(self.upstream)
-            if values.next():
-                return tuple(self._CMD(*incoming, **self._instance_flags) or [])
-            else:
-                return tuple()
+            _log.info('empty input')
+            return tuple()
 
     def first(self):
         return self.__iter__().next()
@@ -157,20 +156,20 @@ class QueryBase(object):
 
     def __add__(self, other):
         result = iter(set(self).union(set(other)))
-        return QueryBase(result)
+        return QueryBase(upstream = result)
 
     def __sub__(self, other):
         result = iter(set(self).union(set(other)))
-        return QueryBase(result)
+        return QueryBase(upstream = result)
 
 
     def __xor__(self, other):
         result = iter(set(self).symmetric_difference(set(other)))
-        return QueryBase(result)
+        return QueryBase(upstream=result)
 
     def __and__(self, other):
         result = iter(set(self).intersection(set(other)))
-        return QueryBase(result)
+        return QueryBase(upstream=result)
 
     def __invert__(self):
         """
@@ -504,3 +503,8 @@ class cast(Reprocess):
     def __iter__(self):
         return itertools.imap(self.cast, self.upstream)
         
+print ~Scene()
+print ~Scene().cameras
+print ~Scene('top').cameras
+print ~Scene().meshes
+print ~Scene('pCube1').meshes.parents
