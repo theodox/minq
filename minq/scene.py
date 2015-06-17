@@ -1,10 +1,12 @@
 import re
 import itertools
+import logging
 
 import maya.cmds as cmds
-import logging
+
 logging.basicConfig()
 _log = logging.getLogger('minq')
+
 
 class QueryMeta(type):
     """
@@ -109,12 +111,11 @@ class QueryBase(object):
         self._instance_flags = dict(self._FLAGS)
 
     def results(self):
-       
-        values, incoming = itertools.tee(self.upstream)
-            
-        if values.next():
+
+        
+        if self.upstream is not None:
             _log.info('calling %s' % self.__class__)
-            return tuple(self._CMD(*incoming, **self._instance_flags) or [])
+            return tuple(self._CMD(*self.upstream, **self._instance_flags) or [])
         else:
             _log.info('empty input')
             return tuple()
@@ -156,11 +157,11 @@ class QueryBase(object):
 
     def __add__(self, other):
         result = iter(set(self).union(set(other)))
-        return QueryBase(upstream = result)
+        return QueryBase(upstream=result)
 
     def __sub__(self, other):
         result = iter(set(self).union(set(other)))
-        return QueryBase(upstream = result)
+        return QueryBase(upstream=result)
 
 
     def __xor__(self, other):
@@ -176,6 +177,7 @@ class QueryBase(object):
         shorthand for use in the listener
         """
         return self.results()
+
 
 class SceneQuery(Composable, QueryBase):
     pass
@@ -220,11 +222,14 @@ class Selection(Composable, QueryBase):
     """
     selected = True
 
+
 class Shapes(Scene):
     shapes = True
 
+
 class Xforms(Scene):
     transforms = True
+
 
 # ----------
 # these classes sub-set the query stream
@@ -238,7 +243,6 @@ class selected(Scene):
     selected = True
 
 
-
 class dag(Scene):
     dag = True
     objectsOnly = True
@@ -248,12 +252,11 @@ class nodes(Scene):
     dependencyNodes = True
     objectsOnly = True
 
+
 # ---- type filters. Can't be chained with xforms
 
 class ByTypeBase(Scene):
     pass
-
-
 
 
 class geometry(ByTypeBase):
@@ -331,16 +334,15 @@ class Reprocess(QueryBase):
     _CMD = None
 
 
-
 class xforms(Reprocess):
     _CMD = cmds.ls
-    type='transform'
+    type = 'transform'
 
     def __init__(self, upstream, *args):
         if isinstance(upstream, ByTypeBase):
             raise AttributeError, "can't chain a transform filter onto a type query"
         super(xforms, self).__init__(upstream, args)
-            
+
     def results(self):
         return tuple(self._CMD(self.upstream.results(), **self._instance_flags))
 
@@ -365,6 +367,16 @@ class children(Reprocess):
 
     def results(self):
         return tuple(self._CMD(*self.upstream, c=True, fullPath=True) or [])
+
+
+class shapes(Reprocess):
+    _CMD = cmds.listRelatives
+    children = True
+    shapes=True
+
+    def results(self):
+        return tuple(self._CMD(*self.upstream, c=True, fullPath=True) or [])
+
 
 
 class parents(Reprocess):
@@ -502,9 +514,11 @@ class cast(Reprocess):
 
     def __iter__(self):
         return itertools.imap(self.cast, self.upstream)
-        
+
+
+
 print ~Scene()
 print ~Scene().cameras
-print ~Scene('top').cameras
+print ~Scene('top').shapes.cameras
 print ~Scene().meshes
 print ~Scene('pCube1').meshes.parents
