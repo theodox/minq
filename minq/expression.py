@@ -1,5 +1,5 @@
 __author__ = 'stevet'
-
+import maya.cmds as cmds
 
 class Expression(object):
 
@@ -26,8 +26,15 @@ class Expression(object):
             arglist.append("\n\t**" + flags.__repr__()) 
         return "{}({})".format(cmd, ",".join(arglist))
 
+    def __iter__(self):
+        return  iter(self._eval() or tuple())
+
     def __repr__(self):
         return self._format_expression(self.command, self.args, self.flags)
+
+    def __call__(self, *args, **flags):
+        self.args = args
+        self.flags = flags
 
 
 class ChainedExpression(Expression):
@@ -45,12 +52,17 @@ class ChainedExpression(Expression):
     def _eval(self):
         args, flags = self._concat()
         return self.downstream.command(*args, **flags)
-        
+
+
     def __repr__(self):
         args, flags = self._concat()
         cmd = self.upstream.command
         return self._format_expression(cmd, args, flags)
-        
+
+    def __call__(self, *args, **kwargs):
+        self.downstream(*args, **kwargs)
+
+
 
 class DisjointExpression(Expression):
 
@@ -59,40 +71,50 @@ class DisjointExpression(Expression):
         self.downstream = expr2
 
     def _eval(self):
-        return self.downstream.command(*self.upstream.eval(), **self.flags)
+        return self.downstream.command(*self.upstream.eval(), **self.self.downstream.flags)
         
     def __repr__(self):
         flags = self.downstream.flags
         cmd = self.downstream.command
         return self._format_expression(cmd, tuple([self.upstream]), flags)
 
-Pretest = Expression(cmds.ls, l = True)
-PrePreTest = Expression(cmds.ls, 'pCube1', 'top', 'pCubeShape1')
-Test1 = ChainedExpression(Pretest, PrePreTest)
-Test2 = Expression(cmds.listHistory, fl=True)
-Test3 = Expression(cmds.listRelatives, p=True)
-Test4 = Expression(cmds.ls, l=True)
-x = DisjointExpression(Test1, Test2)
-y = DisjointExpression(x, Test3)
-z = DisjointExpression(y, Test4)
-q = DisjointExpression(Test2, Expression(cmds.findType, type='polyCube'))
-print q
-print eval(str(q))
-print maya.cmds.ls(
-    *[maya.cmds.listRelatives(
-        *[maya.cmds.listHistory(
-            *[maya.cmds.ls(
-                *('pCube1',),**{'l': True})],
-            **{'fl': True})],
-        **{'p': True})],
-    **{'l': True})
+    def __call__(self, *args, **kwargs):
+        self.downstream(*args, **kwargs)
 
-print (i for i in (maya.cmds.ls(
-	*[maya.cmds.listRelatives(
-	    *[maya.cmds.listHistory(
-	        *[maya.cmds.ls(
-	            *('pCube1',),
-	            **{'l': True})],
-	        **{'fl': True})],
-	    **{'p': True})],
-	**{'l': True})))
+
+class ChainableBase(Expression):
+    CMD = cmds.ls
+    FLAGS = {}
+
+    def __init__(self, *args, **flags):
+        flags.update(self.FLAGS)
+        super(LSCommand, self).__init__(self.CMD, *args, **flags)
+
+    @classmethod
+    def can_chain(cls, other_cls):
+        return cls.CMD == other_cls.CMD
+
+    def compose(self, other_cls):
+        downstream = other_cls()
+
+        if self.can_chain(other_cls):
+            return ChainedExpression(self, downstream)
+        else:
+            return DisjointExpression(self, downstream)
+
+
+class LSCommand(ChainableBase):
+    CMD = cmds.ls
+    FLAGS = {'long': True}
+
+
+class ListHistoryCommand(ChainableBase):
+    CMD = cmds.listHistory
+
+class ListRelativesCommand(ChainableBase):
+    CMD = cmds.listRelatives
+    FLAGS = {'fullPath': True}
+
+class FindTypeCommand(ChainableBase):
+    CMD = cmds.findType
+    FLAGS = {'deep': True}
