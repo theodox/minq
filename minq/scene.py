@@ -4,6 +4,7 @@ import logging
 
 import maya.cmds as cmds
 
+
 logging.basicConfig()
 _log = logging.getLogger('minq')
 
@@ -101,7 +102,6 @@ class QueryBase(object):
     retrieved until the query is iterated or results are called
     """
     _CMD = cmds.ls
-    long = True
     __metaclass__ = QueryMeta
 
 
@@ -109,34 +109,42 @@ class QueryBase(object):
         self.upstream = kwargs.get('upstream', args)
         self.explicit = self.upstream == args
         self._instance_flags = dict(self._FLAGS)
+        self.upstream = kwargs.get('upstream', args)
+        self.explicit = self.upstream == args
+        self._instance_flags = dict(self._FLAGS)
+
 
     def results(self):
-
-        
         if self.upstream is not None:
             _log.info('calling %s' % self.__class__)
-            return tuple(self._CMD(*self.upstream, **self._instance_flags) or [])
+            return tuple(self._CMD(*[i for i in self.upstream], **self._instance_flags) or [])
         else:
             _log.info('empty input')
             return tuple()
 
+
     def first(self):
         return self.__iter__().next()
+
 
     def last(self):
         return self.results()[-1]
 
+
     def slice(self, *args):
         return itertools.islice(self, *args)
 
+
     def __iter__(self):
         return iter(self.results())
+
 
     def __getattr__(self, name):
         target_class = QueryMeta.get_type(name)
         if target_class is None:
             raise NameError, "No QueryMeta class named " + name
         return target_class(upstream=self)
+
 
     def __str__(self):
         rpr = {
@@ -159,6 +167,7 @@ class QueryBase(object):
         result = iter(set(self).union(set(other)))
         return QueryBase(upstream=result)
 
+
     def __sub__(self, other):
         result = iter(set(self).union(set(other)))
         return QueryBase(upstream=result)
@@ -168,9 +177,11 @@ class QueryBase(object):
         result = iter(set(self).symmetric_difference(set(other)))
         return QueryBase(upstream=result)
 
+
     def __and__(self, other):
         result = iter(set(self).intersection(set(other)))
         return QueryBase(upstream=result)
+
 
     def __invert__(self):
         """
@@ -180,6 +191,8 @@ class QueryBase(object):
 
 
 class SceneQuery(Composable, QueryBase):
+    long = True
+
     pass
 
 
@@ -205,6 +218,7 @@ class Attributes(Composable, QueryBase):
 
     objectsOnly = False
 
+
     def __init__(self, *args):
         args = ["*." + i for i in args]
         super(Attributes, self).__init__(args)
@@ -220,15 +234,18 @@ class Selection(Composable, QueryBase):
     """
     A search which begins with the selected object(s)
     """
-    selected = True
+    selection = True
+    long = True
 
 
 class Shapes(Scene):
+    long = True
     shapes = True
 
 
 class Xforms(Scene):
     transforms = True
+    long = True
 
 
 # ----------
@@ -251,6 +268,10 @@ class dag(Scene):
 class nodes(Scene):
     dependencyNodes = True
     objectsOnly = True
+
+
+class no_intermediates(Scene):
+    noIntermediate = True
 
 
 # ---- type filters. Can't be chained with xforms
@@ -372,11 +393,11 @@ class children(Reprocess):
 class shapes(Reprocess):
     _CMD = cmds.listRelatives
     children = True
-    shapes=True
+    shapes = True
 
     def results(self):
-        return tuple(self._CMD(*self.upstream, c=True, fullPath=True) or [])
-
+        r = [i for i in self.upstream]
+        return tuple(self._CMD(*r, c=True, fullPath=True) or [])
 
 
 class parents(Reprocess):
@@ -510,15 +531,62 @@ class cast(Reprocess):
         return self
 
     def results(self):
-        return [self.cast(i) for i in self.upstream]
+        return tuple([self.cast(i) for i in self.upstream])
 
     def __iter__(self):
         return itertools.imap(self.cast, self.upstream)
 
 
+class history(Reprocess):
+    _CMD = cmds.findType
+    type = 'node'
+    deep = True
+    exact = False
 
-print ~Scene()
-print ~Scene().cameras
-print ~Scene('top').shapes.cameras
-print ~Scene().meshes
-print ~Scene('pCube1').meshes.parents
+
+    def __init__(self, *args, **kwargs):
+        super(history, self).__init__(*args, **kwargs)
+        del self._instance_flags['long']
+
+    def results(self):
+        r = [i for i in self.upstream]
+        if len(r):
+            return tuple((set(self._CMD(*r, **self._instance_flags) or [])))
+        return tuple()
+
+    def __call__(self, type='node', exact=False):
+        self._instance_flags['type'] = type
+        self._instance_flags['exact'] = exact
+        return self
+
+class future(Reprocess):
+    _CMD = cmds.listHistory
+    future = True
+    allFuture = True
+
+    def __init__(self, *args, **kwargs):
+        super(future, self).__init__(*args, **kwargs)
+        del self._instance_flags['long']
+
+    def results(self):
+        r = [i for i in self.upstream]
+        if len(r):
+            return tuple((set(self._CMD(*r, **self._instance_flags) or [])))
+        return tuple()
+
+
+def iter_history(obj, lv=0, interestLevel=0, seen=None, limit=999):
+    if lv < limit:
+        if not seen:
+            seen = set()
+        upstream = (i for i in cmds.listHistory(obj, lv=1, il=interestLevel) if i != obj)
+        for item in upstream:
+            if item[0] not in seen:
+                yield item, lv
+                seen.add(item)
+            for subitem in iter_history(item, lv + 1, seen=seen, limit=limit):
+                yield subitem
+
+
+~Selection().shapes.history
+Scene('polyUnite1').future.last()
