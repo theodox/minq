@@ -67,7 +67,7 @@ class DisjointExpression(Expression):
         return self._format_expression(cmd, tuple([self.upstream]), flags)
 
 Pretest = Expression(cmds.ls, l = True)
-PrePreTest = Expression(cmds.ls, 'pCube1', 'top')
+PrePreTest = Expression(cmds.ls, 'pCube1', 'top', 'pCubeShape1')
 Test1 = ChainedExpression(Pretest, PrePreTest)
 Test2 = Expression(cmds.listHistory, fl=True)
 Test3 = Expression(cmds.listRelatives, p=True)
@@ -75,3 +75,24 @@ Test4 = Expression(cmds.ls, l=True)
 x = DisjointExpression(Test1, Test2)
 y = DisjointExpression(x, Test3)
 z = DisjointExpression(y, Test4)
+q = DisjointExpression(Test2, Expression(cmds.findType, type='polyCube'))
+print q
+print eval(str(q))
+print maya.cmds.ls(
+    *[maya.cmds.listRelatives(
+        *[maya.cmds.listHistory(
+            *[maya.cmds.ls(
+                *('pCube1',),**{'l': True})],
+            **{'fl': True})],
+        **{'p': True})],
+    **{'l': True})
+
+print (i for i in (maya.cmds.ls(
+	*[maya.cmds.listRelatives(
+	    *[maya.cmds.listHistory(
+	        *[maya.cmds.ls(
+	            *('pCube1',),
+	            **{'l': True})],
+	        **{'fl': True})],
+	    **{'p': True})],
+	**{'l': True})))
