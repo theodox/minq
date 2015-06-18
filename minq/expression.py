@@ -21,9 +21,9 @@ class Expression(object):
         cmd = command.__module__ + "." + command.__name__
         arglist = []
         if len(args):
-            arglist.append("*" + args.__repr__())
+            arglist.append("\n\t*" + args.__repr__())
         if len(flags):
-            arglist.append("**" + flags.__repr__()) 
+            arglist.append("\n\t**" + flags.__repr__()) 
         return "{}({})".format(cmd, ",".join(arglist))
 
     def __repr__(self):
@@ -64,13 +64,14 @@ class DisjointExpression(Expression):
     def __repr__(self):
         flags = self.downstream.flags
         cmd = self.downstream.command
-        return self._format_expression(cmd, [self.upstream], flags)
+        return self._format_expression(cmd, tuple([self.upstream]), flags)
 
-
-Test = Expression(cmds.ls, 'pCube1')
+Pretest = Expression(cmds.ls, l = True)
+PrePreTest = Expression(cmds.ls, 'pCube1', 'top')
+Test1 = ChainedExpression(Pretest, PrePreTest)
 Test2 = Expression(cmds.listHistory, fl=True)
 Test3 = Expression(cmds.listRelatives, p=True)
-x = DisjointExpression(Test, Test2)
+Test4 = Expression(cmds.ls, l=True)
+x = DisjointExpression(Test1, Test2)
 y = DisjointExpression(x, Test3)
-print y
-eval(str(y))
+z = DisjointExpression(y, Test4)
