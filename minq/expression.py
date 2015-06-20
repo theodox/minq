@@ -107,6 +107,10 @@ class DisjointExpression(Expression):
         return self
 
 
+
+
+
+
 class ChainableBase(Expression):
     CMD = cmds.ls
     FLAGS = {}
@@ -213,4 +217,14 @@ class Cast(Iterate):
     def _run(self, *args, **kwargs):
         return itertools.imap(self.expression, args)
 
+
+class For_Each(Iterate):
+        
+    def _run(self, *args, **kwargs):
+        return ( (p, self.expression(p)) for p in args )
+        
+class Positions(Iterate):
+    def _run(
+
+LSCommand().OfTypeCommand("camera").Parents.For_Each(lambda p: cmds.getAttr (p + ".t")[0]).Where(lambda p: p[1][0] > 0).eval()
 
