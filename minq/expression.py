@@ -222,9 +222,12 @@ class For_Each(Iterate):
         
     def _run(self, *args, **kwargs):
         return ( (p, self.expression(p)) for p in args )
-        
+
+
 class Positions(Iterate):
-    def _run(
+
+    def _run(self, *args,**kwargs):
+        return ( (p, cmds.xform(p, q=True, t=True) for p in args)
 
 LSCommand().OfTypeCommand("camera").Parents.For_Each(lambda p: cmds.getAttr (p + ".t")[0]).Where(lambda p: p[1][0] > 0).eval()
 
