@@ -1,6 +1,7 @@
 __author__ = 'stevet'
-import maya.cmds as cmds
 import itertools
+
+import maya.cmds as cmds
 
 
 def extension(self, name):
@@ -89,6 +90,7 @@ class ChainedExpression(Expression):
         self.downstream(*args, **kwargs)
         return self
 
+
 class DisjointExpression(Expression):
     def __init__(self, expr1, expr2):
         self.upstream = expr1
@@ -105,10 +107,6 @@ class DisjointExpression(Expression):
     def __call__(self, *args, **kwargs):
         self.downstream(*args, **kwargs)
         return self
-
-
-
-
 
 
 class ChainableBase(Expression):
@@ -145,7 +143,7 @@ class LSCommand(ChainableBase):
 
 class OfTypeCommand(LSCommand):
     FLAGS = {'long': True}
-    
+
     def __call__(self, *types):
         self.flags['type'] = types
 
@@ -166,6 +164,7 @@ class Shapes(ListRelativesCommand):
 class Parents(ListRelativesCommand):
     FLAGS = {'fullPath': True, 'parent': True}
 
+
 class FindTypeCommand(ChainableBase):
     CMD = cmds.findType
     FLAGS = {'deep': True}
@@ -183,7 +182,9 @@ class Iterate(UnchainableBase):
     def __init__(self, *args, **flags):
         self.command = self._run
         self.args = args
-        self.flags = flags
+        d = dict(**flags)
+        d.update(self.FLAGS)
+        self.flags = d
         self.expression = lambda p: p
 
     def _run(self, *args, **kwargs):
@@ -219,15 +220,44 @@ class Cast(Iterate):
 
 
 class For_Each(Iterate):
-        
     def _run(self, *args, **kwargs):
-        return ( (p, self.expression(p)) for p in args )
+        return ((p, self.expression(p)) for p in args)
+
+    def __call__(self, expr, world=True, abs=True):
+        self.expression = expr
+        self.flags = {'ws': world, 'a': abs}
 
 
-class Positions(Iterate):
+class XformCommand(Iterate):
+    '''
+    Base class for commands that return transform queries
+    '''
+    CMD = cmds.xform
+    FLAGS = {'q': True, 'ws': True, 'a': True}
 
-    def _run(self, *args,**kwargs):
-        return ( (p, cmds.xform(p, q=True, t=True) for p in args)
+    def _run(self, *args, **kwargs):
+        return ((p, self.CMD(p, **self.flags)) for p in args)
 
-LSCommand().OfTypeCommand("camera").Parents.For_Each(lambda p: cmds.getAttr (p + ".t")[0]).Where(lambda p: p[1][0] > 0).eval()
+    def __call__(self, world=True, abs=True):
+        self.flags.update({'ws': world, 'a': abs})
 
+
+class Translations(XformCommand):
+    FLAGS = {'q': True, 'ws': True, 'a': True, 't': True}
+
+
+class Rotations(XformCommand):
+    FLAGS = {'q': True, 'ws': True, 'a': True, 'r': True}
+
+
+class Scales(XformCommand):
+    FLAGS = {'q': True, 'ws': True, 'a': True, 's': True}
+
+
+class Pivots(XformCommand):
+    FLAGS = {'q': True, 'ws': True, 'a': True, 'piv': True}
+
+
+class Matrices(XformCommand):
+    FLAGS = {'q': True, 'ws': True, 'matrix': True}
+        
