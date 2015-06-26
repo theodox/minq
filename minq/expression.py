@@ -171,6 +171,9 @@ class Parents(ListRelativesCommand):
 
 
 class ComponentFilter(object):
+    """
+    Helper class for working with components
+    """
     EXPANSIONS = {
         31: 'vtx',
         32: 'e',
@@ -193,20 +196,12 @@ class ComponentFilter(object):
     def expand(cls, *args, **kwargs):
         mask = kwargs.get('selectionMask')
         force = kwargs.get('force', False)
-        indices = kwargs.get('indices', False)
-        if indices:
-            kwargs['fullPath'] = False
 
         if force:
             args = [cls.componentize(i, mask) for i in args]
-
-        for k in ('indices', 'force'):
-            if k in kwargs:
-                del kwargs[k]
+            del kwargs['force']
 
         result = cmds.filterExpand(*args, **kwargs) or []
-        if indices:
-            return itertools.imap(cls.index, result)
         return result
 
     @classmethod
@@ -257,11 +252,14 @@ class ConvertComponentCommand(ChainableBase):
 class AsFaces(ConvertComponentCommand):
     FLAGS = {'toFace': True}
 
+
 class AsVertices(ConvertComponentCommand):
     FLAGS = {'toVertex': True}
 
+
 class AsEdges(ConvertComponentCommand):
     FLAGS = {'toEdge': True}
+
 
 class AsVertexFace(ConvertComponentCommand):
     FLAGS = {'toVertexFace': True}
@@ -275,13 +273,10 @@ class UnchainableBase(Expression):
         return DisjointExpression(self, downstream)
 
 
-
-
-
-
 class FindTypeCommand(ChainableBase):
     CMD = cmds.findType
     FLAGS = {'deep': True}
+
 
 class Iterate(UnchainableBase):
     def __init__(self, *args, **flags):
@@ -301,7 +296,6 @@ class Iterate(UnchainableBase):
 
     def __call__(self, expr):
         self.expression = expr
-
 
 
 class Where(Iterate):

@@ -36,8 +36,8 @@
       <file leaf-file-name="expression.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/minq/expression.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.84355557" vertical-offset="7191" max-vertical-offset="8558">
-              <caret line="370" column="0" selection-start-line="370" selection-start-column="0" selection-end-line="370" selection-end-column="0" />
+            <state vertical-scroll-proportion="-3.087111" vertical-offset="7301" max-vertical-offset="8426">
+              <caret line="174" column="44" selection-start-line="174" selection-start-column="44" selection-end-line="174" selection-end-column="44" />
               <folding>
                 <element signature="e#22#38#0" expanded="true" />
               </folding>
@@ -431,8 +431,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/minq/expression.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.84355557" vertical-offset="7191" max-vertical-offset="8558">
-          <caret line="370" column="0" selection-start-line="370" selection-start-column="0" selection-end-line="370" selection-end-column="0" />
+        <state vertical-scroll-proportion="-3.087111" vertical-offset="7301" max-vertical-offset="8426">
+          <caret line="174" column="44" selection-start-line="174" selection-start-column="44" selection-end-line="174" selection-end-column="44" />
           <folding>
             <element signature="e#22#38#0" expanded="true" />
           </folding>
