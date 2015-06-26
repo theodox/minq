@@ -1,5 +1,6 @@
 __author__ = 'stevet'
 import itertools
+import re
 
 import maya.cmds as cmds
 
@@ -141,6 +142,10 @@ class LSCommand(ChainableBase):
     FLAGS = {'long': True}
 
 
+class SelectionCommand(LSCommand):
+    FLAGS = {'long': True, 'selection': True}
+
+
 class OfTypeCommand(LSCommand):
     FLAGS = {'long': True}
 
@@ -165,9 +170,101 @@ class Parents(ListRelativesCommand):
     FLAGS = {'fullPath': True, 'parent': True}
 
 
-class FindTypeCommand(ChainableBase):
-    CMD = cmds.findType
-    FLAGS = {'deep': True}
+class ComponentFilter(object):
+    EXPANSIONS = {
+        31: 'vtx',
+        32: 'e',
+        34: 'f',
+        35: 'map',
+        70: 'vtxFace',
+        28: 'cv',
+        30: 'ep'
+    }
+
+    BRACKETS = re.compile("(\[)(\d*)(\])")
+
+    @classmethod
+    def componentize(cls, comp, mask):
+        if '[' in comp:
+            return comp
+        return "%s.%s[*]" % (comp, cls.EXPANSIONS[mask])
+
+    @classmethod
+    def expand(cls, *args, **kwargs):
+        mask = kwargs.get('selectionMask')
+        force = kwargs.get('force', False)
+        indices = kwargs.get('indices', False)
+        if indices:
+            kwargs['fullPath'] = False
+
+        if force:
+            args = [cls.componentize(i, mask) for i in args]
+
+        for k in ('indices', 'force'):
+            if k in kwargs:
+                del kwargs[k]
+
+        result = cmds.filterExpand(*args, **kwargs) or []
+        if indices:
+            return itertools.imap(cls.index, result)
+        return result
+
+    @classmethod
+    def index(cls, item):
+        return int(cls.BRACKETS.search(item).groups()[1])
+
+
+class FilterExpandCommand(ChainableBase):
+    CMD = ComponentFilter.expand
+
+    def __call__(self, force=False, expand=True, indices=False):
+        self.flags.update(force=force, expand=expand, indices=indices)
+
+
+class Vertices(FilterExpandCommand):
+    FLAGS = {'selectionMask': 31, 'fullPath': True}
+
+
+class Edges(FilterExpandCommand):
+    FLAGS = {'selectionMask': 32, 'fullPath': True}
+
+
+class Faces(FilterExpandCommand):
+    FLAGS = {'selectionMask': 34, 'fullPath': True}
+
+
+class UVs(FilterExpandCommand):
+    FLAGS = {'selectionMask': 35, 'fullPath': True}
+
+
+class VertexFaces(FilterExpandCommand):
+    FLAGS = {'selectionMask': 70, 'fullPath': True}
+
+
+class CVs(FilterExpandCommand):
+    FLAGS = {'selectionMask': 28, 'fullPath': True}
+
+
+class EPs(FilterExpandCommand):
+    FLAGS = {'selectionMask': 30, 'fullPath': True}
+
+
+class ConvertComponentCommand(ChainableBase):
+    CMD = cmds.polyListComponentConversion
+    FLAGS = {}
+
+
+class AsFaces(ConvertComponentCommand):
+    FLAGS = {'toFace': True}
+
+class AsVertices(ConvertComponentCommand):
+    FLAGS = {'toVertex': True}
+
+class AsEdges(ConvertComponentCommand):
+    FLAGS = {'toEdge': True}
+
+class AsVertexFace(ConvertComponentCommand):
+    FLAGS = {'toVertexFace': True}
 
 
 class UnchainableBase(Expression):
@@ -177,6 +274,14 @@ class UnchainableBase(Expression):
         downstream = other_cls()
         return DisjointExpression(self, downstream)
 
+
+
+
+
+
+class FindTypeCommand(ChainableBase):
+    CMD = cmds.findType
+    FLAGS = {'deep': True}
 
 class Iterate(UnchainableBase):
     def __init__(self, *args, **flags):
@@ -196,6 +301,7 @@ class Iterate(UnchainableBase):
 
     def __call__(self, expr):
         self.expression = expr
+
 
 
 class Where(Iterate):
@@ -219,7 +325,21 @@ class Cast(Iterate):
         return itertools.imap(self.expression, args)
 
 
+class Indices(Cast):
+    """
+    Return the indexed part of incoming components, ie 'pCube1.vtx[1]' becomes 1
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(Indices, self).__init__(*args, **kwargs)
+        self.expression = ComponentFilter.index
+
+
 class For_Each(Iterate):
+    """
+    return <expr> on all incoming items; equivalent to [expr(i) for i in incoming]
+    """
+
     def _run(self, *args, **kwargs):
         return ((p, self.expression(p)) for p in args)
 
