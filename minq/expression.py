@@ -42,7 +42,6 @@ class Expression(object):
     def eval(self):
         return tuple(self._eval() or tuple())
 
-
     def _format_expression(self, command, args, flags):
         cmd = command.__module__ + "." + command.__name__
         arglist = []
@@ -199,6 +198,8 @@ class ComponentFilter(object):
 
         if force:
             args = [cls.componentize(i, mask) for i in args]
+
+        if 'force' in kwargs:
             del kwargs['force']
 
         result = cmds.filterExpand(*args, **kwargs) or []
@@ -212,8 +213,8 @@ class ComponentFilter(object):
 class FilterExpandCommand(ChainableBase):
     CMD = ComponentFilter.expand
 
-    def __call__(self, force=False, expand=True, indices=False):
-        self.flags.update(force=force, expand=expand, indices=indices)
+    def __call__(self, force=False, expand=True):
+        self.flags.update(force=force, expand=expand)
 
 
 class Vertices(FilterExpandCommand):
@@ -244,10 +245,27 @@ class EPs(FilterExpandCommand):
     FLAGS = {'selectionMask': 30, 'fullPath': True}
 
 
-class ConvertComponentCommand(ChainableBase):
+
+class FindTypeCommand(ChainableBase):
+    CMD = cmds.findType
+    FLAGS = {'deep': True}
+
+
+class UnchainableBase(Expression):
+    FLAGS = {}
+
+    def compose(self, other_cls):
+        downstream = other_cls()
+        return DisjointExpression(self, downstream)
+
+
+class ConvertComponentCommand(UnchainableBase):
     CMD = cmds.polyListComponentConversion
     FLAGS = {}
 
+    def _eval(self):
+        print ("boo")
+        return self.args
 
 class AsFaces(ConvertComponentCommand):
     FLAGS = {'toFace': True}
@@ -264,18 +282,6 @@ class AsEdges(ConvertComponentCommand):
 class AsVertexFace(ConvertComponentCommand):
     FLAGS = {'toVertexFace': True}
 
-
-class UnchainableBase(Expression):
-    FLAGS = {}
-
-    def compose(self, other_cls):
-        downstream = other_cls()
-        return DisjointExpression(self, downstream)
-
-
-class FindTypeCommand(ChainableBase):
-    CMD = cmds.findType
-    FLAGS = {'deep': True}
 
 
 class Iterate(UnchainableBase):
@@ -297,6 +303,14 @@ class Iterate(UnchainableBase):
     def __call__(self, expr):
         self.expression = expr
 
+    def _format_expression(self, command, args, flags):
+        cmd = str(self.expression)
+        arglist = []
+        if len(args):
+            arglist.append("\n\t*" + args.__repr__())
+        if len(flags):
+            arglist.append("\n\t**" + flags.__repr__())
+        return "{}({})".format(cmd, ",".join(arglist))
 
 class Where(Iterate):
     def _run(self, *args, **kwargs):
