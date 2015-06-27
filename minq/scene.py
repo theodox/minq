@@ -14,13 +14,13 @@ class QueryMeta(type):
     Root metaclass for queries. It allows for declarative flags:
 
        class Example(object):
-           _CMD = cmds.ls
+           _CMD = cmds.ls.py
            __metaclass__ = QueryMeta
 
            shapes = True
            transforms = False
 
-    will produce a class that calls cmds.ls(shapes=True, transforms = False) when resultsd.
+    will produce a class that calls cmds.ls.py(shapes=True, transforms = False) when resultsd.
 
     All classes are registered so that querys can spawn sub-queries
     """
@@ -43,7 +43,7 @@ class QueryMeta(type):
 
 class Composable(object):
     """
-    Base class for queries which can be chained together, such as multiple ls flags
+    Base class for queries which can be chained together, such as multiple ls.py flags
     """
 
     def compose(self, other_type):
@@ -66,7 +66,7 @@ class Composable(object):
 
 class QueryBase(object):
     """
-    Allows for lazy execution a maya command (usually ls, but this change in derived classes) and iteration over thew results:
+    Allows for lazy execution a maya command (usually ls.py, but this change in derived classes) and iteration over thew results:
 
     A simple example:
 
@@ -148,7 +148,7 @@ class QueryBase(object):
 
     def __str__(self):
         rpr = {
-            cmds.ls: "cmds.ls( {} )".format,
+            cmds.ls: "cmds.ls.py( {} )".format,
             cmds.listRelatives: "cmds.listRelatives( {} )".format,
             cmds.listHistory: "cmds.listHistory( {} )".format
         }
@@ -198,7 +198,7 @@ class SceneQuery(Composable, QueryBase):
 
 class Scene(SceneQuery):
     """
-    A default query, similar to ls(). You can restrict it to known items by passing in an iterable (list, tuple or generator) of names:
+    A default query, similar to ls.py(). You can restrict it to known items by passing in an iterable (list, tuple or generator) of names:
 
         Query()  # returns everything in the scene
         Query(['a', 'b','c'])   # returns a, b and c, can be filtered or expanded
@@ -558,6 +558,7 @@ class history(Reprocess):
         self._instance_flags['type'] = type
         self._instance_flags['exact'] = exact
         return self
+
 
 class future(Reprocess):
     _CMD = cmds.listHistory

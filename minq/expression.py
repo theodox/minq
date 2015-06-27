@@ -1,3 +1,5 @@
+from minq.core import Operator, DisjointOperator
+
 __author__ = 'stevet'
 import itertools
 import re
@@ -5,158 +7,27 @@ import re
 import maya.cmds as cmds
 
 
-def extension(self, name):
-    target_class = ExpressionMeta.get_type(name)
-    if target_class is False:
-        raise NameError, "No Expression named " + name
-    return self.compose(target_class)
-
-
-class ExpressionMeta(type):
-    _CLASSES = {}
-
-    def __new__(cls, name, bases, dct):
-        dct['__getattr__'] = extension
-        ExpressionMeta._CLASSES[name] = type.__new__(cls, name, bases, dct)
-        return ExpressionMeta._CLASSES[name]
-
-    @staticmethod
-    def get_type(name):
-        return ExpressionMeta._CLASSES.get(name, False)
-
-
-class Expression(object):
-    __metaclass__ = ExpressionMeta
-
-    def __init__(self, *args, **flags):
-        self.command = flags.get('command', lambda p: p)
-        if 'command' in flags:
-            del flags['command']
-        self.flags = flags
-        self.args = args
-
-    def _eval(self):
-        result = self.command(*self.args, **self.flags)
-        return result
-
-    def eval(self):
-        return tuple(self._eval() or tuple())
-
-    def _format_expression(self, command, args, flags):
-        cmd = command.__module__ + "." + command.__name__
-        arglist = []
-        if len(args):
-            arglist.append("\n\t*" + args.__repr__())
-        if len(flags):
-            arglist.append("\n\t**" + flags.__repr__())
-        return "{}({})".format(cmd, ",".join(arglist))
-
-    def __iter__(self):
-        return iter(self._eval() or tuple())
-
-    def __repr__(self):
-        return self._format_expression(self.command, self.args, self.flags)
-
-    def __call__(self, *args, **flags):
-        self.args = args
-        self.flags = flags
-
-    def compose(self, other):
-        return DisjointExpression(self, other())
-
-
-class ChainedExpression(Expression):
-    def __init__(self, expr1, expr2):
-        self.upstream = expr1
-        self.downstream = expr2
-
-    def _concat(self):
-        args = self.upstream.args + self.downstream.args
-        flags = dict(self.upstream.flags)
-        flags.update(self.downstream.flags)
-        return args, flags
-
-    def _eval(self):
-        args, flags = self._concat()
-        return self.downstream.command(*args, **flags)
-
-
-    def __repr__(self):
-        args, flags = self._concat()
-        cmd = self.upstream.command
-        return self._format_expression(cmd, args, flags)
-
-    def __call__(self, *args, **kwargs):
-        self.downstream(*args, **kwargs)
-        return self
-
-
-class DisjointExpression(Expression):
-    def __init__(self, expr1, expr2):
-        self.upstream = expr1
-        self.downstream = expr2
-
-    def _eval(self):
-        return self.downstream.command(*self.upstream.eval(), **self.downstream.flags)
-
-    def __repr__(self):
-        flags = self.downstream.flags
-        cmd = self.downstream.command
-        return self._format_expression(cmd, tuple([self.upstream]), flags)
-
-    def __call__(self, *args, **kwargs):
-        self.downstream(*args, **kwargs)
-        return self
-
-
-class ChainableBase(Expression):
-    CMD = cmds.ls
-    FLAGS = {}
-
-    def __init__(self, *args, **flags):
-        d = dict(**flags)
-        d.update(self.FLAGS)
-        d['command'] = self.CMD
-        super(ChainableBase, self).__init__(*args, **d)
-
-    @classmethod
-    def can_chain(cls, other_cls):
-        """
-        override to provide special logic, eg for cmds.ls which has incompatible flags
-        """
-        return issubclass(other_cls, ChainableBase) \
-               and cls.CMD == other_cls.CMD
-
-    def compose(self, other_cls):
-        downstream = other_cls()
-
-        if self.can_chain(other_cls):
-            return ChainedExpression(self, downstream)
-        else:
-            return DisjointExpression(self, downstream)
-
-
-class LSCommand(ChainableBase):
+class LSBase(Operator):
     CMD = cmds.ls
     FLAGS = {'long': True}
 
 
-class SelectionCommand(LSCommand):
+class selection(LSBase):
     FLAGS = {'long': True, 'selection': True}
 
 
-class OfTypeCommand(LSCommand):
+class of_type(LSBase):
     FLAGS = {'long': True}
 
     def __call__(self, *types):
         self.flags['type'] = types
 
 
-class ListHistoryCommand(ChainableBase):
+class ListHistoryCommand(Operator):
     CMD = cmds.listHistory
 
 
-class ListRelativesCommand(ChainableBase):
+class ListRelativesCommand(Operator):
     CMD = cmds.listRelatives
     FLAGS = {'fullPath': True}
 
@@ -210,7 +81,7 @@ class ComponentFilter(object):
         return int(cls.BRACKETS.search(item).groups()[1])
 
 
-class FilterExpandCommand(ChainableBase):
+class FilterExpandCommand(Operator):
     CMD = ComponentFilter.expand
 
     def __call__(self, force=False, expand=True):
@@ -245,35 +116,15 @@ class EPs(FilterExpandCommand):
     FLAGS = {'selectionMask': 30, 'fullPath': True}
 
 
-
-class FindTypeCommand(ChainableBase):
+class FindTypeCommand(Operator):
     CMD = cmds.findType
     FLAGS = {'deep': True}
 
 
-def passthru(*args, **kwargs):
-    return args
-
-class UnchainableBase(Expression):
-    CMD = passthru
-    FLAGS = {}
-
-    def __init__(self, *args, **flags):
-        d = dict(**flags)
-        d.update(self.FLAGS)
-        d['command'] = self.CMD
-        super(UnchainableBase, self).__init__(*args, **d)
-
-    def compose(self, other_cls):
-        downstream = other_cls()
-        return DisjointExpression(self, downstream)
-
-
-
-
-class ConvertComponentCommand(UnchainableBase):
+class ConvertComponentCommand(DisjointOperator):
     CMD = cmds.polyListComponentConversion
     FLAGS = {}
+
 
 class AsFaces(ConvertComponentCommand):
     FLAGS = {'tf': True}
@@ -291,8 +142,7 @@ class AsVertexFace(ConvertComponentCommand):
     FLAGS = {'tvf': True}
 
 
-
-class Iterate(UnchainableBase):
+class Iterate(DisjointOperator):
     def __init__(self, *args, **flags):
         self.command = self._run
         self.args = args
@@ -319,6 +169,7 @@ class Iterate(UnchainableBase):
         if len(flags):
             arglist.append("\n\t**" + flags.__repr__())
         return "{}({})".format(cmd, ",".join(arglist))
+
 
 class Where(Iterate):
     def _run(self, *args, **kwargs):
