@@ -202,7 +202,7 @@ class ComponentFilter(object):
         if 'force' in kwargs:
             del kwargs['force']
 
-        result = cmds.filterExpand(*args, **kwargs) or []
+        result = (i for i in cmds.filterExpand(*args, **kwargs) or [])
         return result
 
     @classmethod
@@ -251,36 +251,44 @@ class FindTypeCommand(ChainableBase):
     FLAGS = {'deep': True}
 
 
+def passthru(*args, **kwargs):
+    return args
+
 class UnchainableBase(Expression):
+    CMD = passthru
     FLAGS = {}
+
+    def __init__(self, *args, **flags):
+        d = dict(**flags)
+        d.update(self.FLAGS)
+        d['command'] = self.CMD
+        super(UnchainableBase, self).__init__(*args, **d)
 
     def compose(self, other_cls):
         downstream = other_cls()
         return DisjointExpression(self, downstream)
 
 
+
+
 class ConvertComponentCommand(UnchainableBase):
     CMD = cmds.polyListComponentConversion
     FLAGS = {}
 
-    def _eval(self):
-        print ("boo")
-        return self.args
-
 class AsFaces(ConvertComponentCommand):
-    FLAGS = {'toFace': True}
+    FLAGS = {'tf': True}
 
 
 class AsVertices(ConvertComponentCommand):
-    FLAGS = {'toVertex': True}
+    FLAGS = {'tv': True}
 
 
 class AsEdges(ConvertComponentCommand):
-    FLAGS = {'toEdge': True}
+    FLAGS = {'te': True}
 
 
 class AsVertexFace(ConvertComponentCommand):
-    FLAGS = {'toVertexFace': True}
+    FLAGS = {'tvf': True}
 
 
 
