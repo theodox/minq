@@ -1,4 +1,4 @@
-from minq.core import Operator
+from .core import Operator
 
 __author__ = 'stevet'
 
@@ -125,6 +125,8 @@ class surface_curves(LSByType):
 class dagNode(LSByType):
     TYPE = 'dagNode'
 
+class deformers(LSByType):
+    TYPE = 'geometryFilter'
 
 class dimensions(LSByType):
     TYPE = 'dimensionShape'
@@ -146,6 +148,10 @@ class geometry(LSByType):
     TYPE = 'geometryShape'
 
 
+class joints(LSByType):
+    TYPE = 'joint'
+
+
 class lights(LSByType):
     TYPE = 'light'
 
@@ -156,6 +162,10 @@ class surfaces(LSByType):
 
 class manips(LSByType):
     TYPE = ('manip2D', 'manip3D')
+
+
+class meshes(LSByType):
+    TYPE = ('mesh')
 
 
 class nodes(LSByType):
@@ -198,6 +208,10 @@ class shapes(LSByType):
     TYPE = 'shape'
 
 
+class skins(LSByType):
+    TYPE = 'skinCluster'
+
+
 class transforms(LSByType):
     TYPE = 'transform'
 
@@ -221,5 +235,5 @@ class surfaces(LSByType):
 
 
 class textures(LSByType):
-    TYPE = ('texture2d', 'textures3d', 'textureEnv')
+    TYPE = ('texture2d', 'texture3d', 'textureEnv')
 

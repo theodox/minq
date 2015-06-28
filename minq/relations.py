@@ -1,7 +1,6 @@
-import itertools
 import re
 
-from minq.core import Operator, DisjointOperator
+from .core import Operator, DisjointOperator
 import maya.cmds as cmds
 
 
@@ -9,17 +8,30 @@ class ListHistoryCommand(Operator):
     CMD = cmds.listHistory
 
 
+class history(Operator):
+    CMD = cmds.listHistory
+    FLAGS = {'future': False}
+
+
+class future(Operator):
+    CMD = cmds.listHistory
+    FLAGS = {'future':True}
+
+
 class ListRelativesBase(Operator):
     CMD = cmds.listRelatives
     FLAGS = {'fullPath': True}
 
 
-class shape_children(ListRelativesBase):
-    FLAGS = {'fullPath': True, 'shapes': True}
+class children(ListRelativesBase):
+    FLAGS = {'fullPath': True, 'children': True}
+
+    def __call__(self, shapes=False):
+        self.flags['shapes'] = shapes
+        self.flags['children'] = not shapes
 
 
-class parents(ListRelativesBase):
-    FLAGS = {'fullPath': True, 'parent': True}
+
 
 
 class ComponentFilter(object):
@@ -124,109 +136,3 @@ class AsVertexFace(ConvertComponentCommand):
     FLAGS = {'tvf': True}
 
 
-class Iterate(DisjointOperator):
-    def __init__(self, *args, **flags):
-        self.command = self._run
-        self.args = args
-        d = dict(**flags)
-        d.update(self.FLAGS)
-        self.flags = d
-        self.expression = lambda p: p
-
-    def _run(self, *args, **kwargs):
-        return itertools.imap(self.expression, args)
-
-
-    def _eval(self):
-        return self._run(*self.args)
-
-    def __call__(self, expr):
-        self.expression = expr
-
-    def _format_expression(self, command, args, flags):
-        cmd = str(self.expression)
-        arglist = []
-        if len(args):
-            arglist.append("\n\t*" + args.__repr__())
-        if len(flags):
-            arglist.append("\n\t**" + flags.__repr__())
-        return "{}({})".format(cmd, ",".join(arglist))
-
-
-class Where(Iterate):
-    def _run(self, *args, **kwargs):
-        return itertools.ifilter(self.expression, args)
-
-
-class Where_Not(Iterate):
-    def _run(self, *args, **kwargs):
-        return itertools.ifilterfalse(self.expression, args)
-
-
-class Cast(Iterate):
-    def __init__(self, *args, **flags):
-        self.command = self._run
-        self.args = args
-        self.flags = flags
-        self.expression = lambda p: p
-
-    def _run(self, *args, **kwargs):
-        return itertools.imap(self.expression, args)
-
-
-class Indices(Cast):
-    """
-    Return the indexed part of incoming components, ie 'pCube1.vtx[1]' becomes 1
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(Indices, self).__init__(*args, **kwargs)
-        self.expression = ComponentFilter.index
-
-
-class For_Each(Iterate):
-    """
-    return <expr> on all incoming items; equivalent to [expr(i) for i in incoming]
-    """
-
-    def _run(self, *args, **kwargs):
-        return ((p, self.expression(p)) for p in args)
-
-    def __call__(self, expr, world=True, abs=True):
-        self.expression = expr
-        self.flags = {'ws': world, 'a': abs}
-
-
-class XformCommand(Iterate):
-    '''
-    Base class for commands that return transform queries
-    '''
-    CMD = cmds.xform
-    FLAGS = {'q': True, 'ws': True, 'a': True}
-
-    def _run(self, *args, **kwargs):
-        return ((p, self.CMD(p, **self.flags)) for p in args)
-
-    def __call__(self, world=True, abs=True):
-        self.flags.update({'ws': world, 'a': abs})
-
-
-class Translations(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 't': True}
-
-
-class Rotations(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 'ro': True}
-
-
-class Scales(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 's': True}
-
-
-class Pivots(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 'piv': True}
-
-
-class Matrices(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'matrix': True}
-        

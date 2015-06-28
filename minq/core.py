@@ -1,3 +1,7 @@
+"""
+Core classes
+"""
+
 def extension(self, name):
     target_class = ExpressionMeta.get_type(name)
     if target_class is False:
