@@ -216,7 +216,7 @@ class Translations(XformCommand):
 
 
 class Rotations(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 'r': True}
+    FLAGS = {'q': True, 'ws': True, 'a': True, 'ro': True}
 
 
 class Scales(XformCommand):
