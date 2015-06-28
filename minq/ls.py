@@ -9,9 +9,67 @@ class LSBase(Operator):
     CMD = cmds.ls
     FLAGS = {'long': True}
 
+class scene(LSBase):
+    SOURCE_ONLY = True
 
-class selection(LSBase):
+
+class selected(LSBase):
+    """
+    filter for the selection
+    """
     FLAGS = {'long': True, 'selection': True}
+
+
+class templated(LSBase):
+    """
+    filter for templated objects.  If called, a true value filters for templated and a false value for untemplated
+    """
+    FLAGS = {'long': True, 'templated': True}
+
+    def __call__(self, templated = True):
+        self.flags['templated'] = templated
+        self.flags['untemplated'] = not templated
+
+class intermediates(LSBase):
+    """
+    filter for intermediate objects.  If called, use true to find intermediates or false to suppress them
+    """
+    FLAGS = {'long': True, 'intermediateObjects': True}
+
+    def __call__(self, inter = True):
+        self.flags['intermediateObjects'] = inter
+        self.flags['noIntermediate'] = not inter
+
+
+
+class objects(LSBase):
+    """
+    filter for objects (no components or attributes)
+    """
+    FLAGS = {'long': True, 'objects': True}
+
+class below(LSBase):
+    """
+    Return any dag objects below the incoming objects. Includes both shapes and transforms
+    """
+    FLAGS = {'long': True, 'dagObjects': True}
+
+class roots(LSBase):
+    FLAGS = {'long': True, 'assemblies': True}
+
+class leaves(LSBase):
+    FLAGS = {'long': True, 'dag': True, 'leaf':True}
+
+
+class of_type(LSBase):
+    FLAGS = {'long': True}
+
+    def __call__(self, *types, **kw):
+        if kw.get('exact'):
+            self.flags['exactType'] = types
+        else:
+            self.flags['type'] = types
+
 
 
 class LSByType(LSBase):
@@ -136,8 +194,12 @@ class shading_nodes(LSByType):
     TYPE = 'shadingDependNode'
 
 
-class shape(LSByType):
+class shapes(LSByType):
     TYPE = 'shape'
+
+
+class transforms(LSByType):
+    TYPE = 'transform'
 
 
 class subd_creators(LSByType):
@@ -151,6 +213,8 @@ class subd_modifieres(LSByType):
 class subd_uv_modifiers(LSByType):
     TYPE = 'subdModifierUV'
 
+class sets(LSByType):
+    TYPE = 'objectSet'
 
 class surfaces(LSByType):
     TYPE = 'surfaceShape'
