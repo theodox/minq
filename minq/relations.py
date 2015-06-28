@@ -1,42 +1,24 @@
-from minq.core import Operator, DisjointOperator
-
-__author__ = 'stevet'
 import itertools
 import re
 
+from minq.core import Operator, DisjointOperator
 import maya.cmds as cmds
-
-
-class LSBase(Operator):
-    CMD = cmds.ls
-    FLAGS = {'long': True}
-
-
-class selection(LSBase):
-    FLAGS = {'long': True, 'selection': True}
-
-
-class of_type(LSBase):
-    FLAGS = {'long': True}
-
-    def __call__(self, *types):
-        self.flags['type'] = types
 
 
 class ListHistoryCommand(Operator):
     CMD = cmds.listHistory
 
 
-class ListRelativesCommand(Operator):
+class ListRelativesBase(Operator):
     CMD = cmds.listRelatives
     FLAGS = {'fullPath': True}
 
 
-class Shapes(ListRelativesCommand):
+class shape_children(ListRelativesBase):
     FLAGS = {'fullPath': True, 'shapes': True}
 
 
-class Parents(ListRelativesCommand):
+class parents(ListRelativesBase):
     FLAGS = {'fullPath': True, 'parent': True}
 
 
