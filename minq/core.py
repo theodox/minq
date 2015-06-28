@@ -20,6 +20,7 @@ class ExpressionMeta(type):
 
     def __new__(cls, name, bases, dct):
         dct['__getattr__'] = extension
+        dct['SOURCE_ONLY'] = dct.get('SOURCE_ONLY', False)
         ExpressionMeta._CLASSES[name] = type.__new__(cls, name, bases, dct)
         return ExpressionMeta._CLASSES[name]
 
@@ -30,12 +31,13 @@ class ExpressionMeta(type):
 
 class Expression(object):
     """
-    Base class representing a query operation. An individual expression represents a single transformation of one set of incoming data: for example, taking a selection list and finding upstream nodes
+    Base class representing a query operation. An individual expression represents a single transformation of one set
+    of incoming data: for example, taking a selection list and finding upstream nodes
     """
     __metaclass__ = ExpressionMeta
 
     def __init__(self, *args, **flags):
-        self.command = flags.get('command', lambda p: p)
+        self.command = flags.get('command', command_proxy)
         if 'command' in flags:
             del flags['command']
         self.flags = flags
@@ -57,23 +59,56 @@ class Expression(object):
             arg_list.append("\n\t**" + flags.__repr__())
         return "{}({})".format(cmd, ",".join(arg_list))
 
+
+    def compose(self, other):
+        assert not other.SOURCE_ONLY, "%s is a source node and can't be used downstream" % other
+        return DisjointExpression(self, other())
+
+
     def __iter__(self):
         return iter(self._eval() or tuple())
 
+
     def __repr__(self):
         return self._format_expression(self.command, self.args, self.flags)
+
 
     def __call__(self, *args, **flags):
         self.args = args
         self.flags = flags
 
-    def compose(self, other):
-        return DisjointExpression(self, other())
+
+    def __add__(self, other):
+        result = iter(set(self).union(set(other)))
+        return Expression(*result)
+
+
+    def __sub__(self, other):
+        result = iter(set(self).difference(set(other)))
+        return Expression(*result)
+
+
+    def __xor__(self, other):
+        result = iter(set(self).symmetric_difference(set(other)))
+        return Expression(*result)
+
+
+    def __and__(self, other):
+        result = iter(set(self).intersection(set(other)))
+        return Expression(*result)
+
+
+    def __invert__(self):
+        """
+        use the tilde as shortcut for 'eval'
+        """
+        return self.eval()
 
 
 class ChainedExpression(Expression):
     """
-    Represents two similar expressions which can be collapsed: for example, two ls.py() commands which can be combined into a single call by combining flags
+    Represents two similar expressions which can be collapsed: for example, two ls.py() commands which can be
+    combined into a single call by combining flags
     """
 
     def __init__(self, expr1, expr2):
@@ -102,7 +137,8 @@ class ChainedExpression(Expression):
 
 class DisjointExpression(Expression):
     """
-    Represents pair of expressions which can't be chained. the "upstream" expression will be evaluated and the results passed to the downstream expression as arguments
+    Represents pair of expressions which can't be chained. the "upstream" expression will be evaluated and the
+    results passed to the downstream expression as arguments
     """
 
     def __init__(self, expr1, expr2):
@@ -124,7 +160,8 @@ class DisjointExpression(Expression):
 
 class Operator(Expression):
     """
-    Base class for simple maya commands: It's an expression that can be pointed at a command and a set of flags using class-level variables
+    Base class for simple maya commands: It's an expression that can be pointed at a command and a set of flags using
+    class-level variables
     """
     CMD = command_proxy()
     FLAGS = {}
@@ -144,6 +181,8 @@ class Operator(Expression):
                and cls.CMD == other_cls.CMD
 
     def compose(self, other_cls):
+        assert not other_cls.SOURCE_ONLY, "%s is a source node and can't be used downstream" % other_cls
+
         downstream = other_cls()
 
         if self.can_chain(other_cls):
@@ -154,7 +193,8 @@ class Operator(Expression):
 
 class DisjointOperator(Expression):
     """
-    An operator which can't be chained - the base class for any operation which always forces upstream operators to evaluate before proceeding
+    An operator which can't be chained - the base class for any operation which always forces upstream operators to
+    evaluate before proceeding
     """
     CMD = command_proxy
     FLAGS = {}
@@ -166,6 +206,8 @@ class DisjointOperator(Expression):
         super(DisjointOperator, self).__init__(*args, **d)
 
     def compose(self, other_cls):
+        assert not other_cls.SOURCE_ONLY, "%s is a source node and can't be used downstream" % other_cls
+
         downstream = other_cls()
         return DisjointExpression(self, downstream)
 
