@@ -2,7 +2,10 @@
 this submodule contains operators which change incoming data: for example, returning the result of a function on each incoming item
 """
 import itertools
-from .core import  DisjointOperator
+import re
+
+from .core import DisjointOperator
+from .relations import ComponentFilter
 import maya.cmds as cmds
 
 
@@ -36,8 +39,9 @@ class Iterate(DisjointOperator):
 
 class above(Iterate):
     """
-    returns the hierarchy chain above all incoming items
+    returns the transform hierarchy chain above all incoming up to the root transforms
     """
+
     def _run(self, *args, **kwargs):
         def iter_parents(source):
 
@@ -63,10 +67,25 @@ class where_not(Iterate):
         return itertools.ifilterfalse(self.expression, args)
 
 
+class like(Iterate):
+    def __init__(self, *args, **kwargs):
+        super(like, self).__init__(*args, **kwargs)
+        self.re = re.compile(".")
+
+    def _run(self, *args, **kwargs):
+        is_match = lambda p: self.re.search(p) is not None
+
+        return itertools.ifilter(is_match, args)
+
+    def __call__(self, *args):
+        self.re = re.compile(*args)
+
+
 class cast(Iterate):
     """
     Return the result of the supplied single-item function for ever item in the list
     """
+
     def __init__(self, *args, **flags):
         self.command = self._run
         self.args = args
@@ -94,6 +113,21 @@ class zip(Iterate):
 
     def _run(self, *args, **kwargs):
         return ((p, self.expression(p)) for p in args)
+
+
+class distinct(Iterate):
+    def _run(self, *args, **kwargs):
+        return iter(set(args))
+
+
+class ordered(Iterate):
+    def _run(self, *args, **kwargs):
+        results = [i for i in args]
+        return iter(sorted(results, reverse=self.flags.get('reverse', False), key=self.flags.get('key')))
+
+    def __call__(self, reverse=False, key=None):
+        self.flags['reverse'] = reverse
+        self.flags['key'] = key
 
 
 class XformCommand(Iterate):

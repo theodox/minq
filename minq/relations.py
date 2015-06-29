@@ -15,7 +15,7 @@ class history(Operator):
 
 class future(Operator):
     CMD = cmds.listHistory
-    FLAGS = {'future':True}
+    FLAGS = {'future': True}
 
 
 class ListRelativesBase(Operator):
@@ -24,6 +24,9 @@ class ListRelativesBase(Operator):
 
 
 class children(ListRelativesBase):
+    """
+    return immediate children. If shapes is true, return only shape children
+    """
     FLAGS = {'fullPath': True, 'children': True}
 
     def __call__(self, shapes=False):
@@ -31,7 +34,11 @@ class children(ListRelativesBase):
         self.flags['children'] = not shapes
 
 
-
+class parents(ListRelativesBase):
+    """
+    return immediate parents
+    """
+    FLAGS = {'fullPath': True, 'parent': True}
 
 
 class ComponentFilter(object):
@@ -82,15 +89,15 @@ class FilterExpandCommand(Operator):
         self.flags.update(force=force, expand=expand)
 
 
-class Vertices(FilterExpandCommand):
+class vertices(FilterExpandCommand):
     FLAGS = {'selectionMask': 31, 'fullPath': True}
 
 
-class Edges(FilterExpandCommand):
+class edges(FilterExpandCommand):
     FLAGS = {'selectionMask': 32, 'fullPath': True}
 
 
-class Faces(FilterExpandCommand):
+class faces(FilterExpandCommand):
     FLAGS = {'selectionMask': 34, 'fullPath': True}
 
 
@@ -98,7 +105,7 @@ class UVs(FilterExpandCommand):
     FLAGS = {'selectionMask': 35, 'fullPath': True}
 
 
-class VertexFaces(FilterExpandCommand):
+class vertex_faces(FilterExpandCommand):
     FLAGS = {'selectionMask': 70, 'fullPath': True}
 
 
@@ -110,29 +117,26 @@ class EPs(FilterExpandCommand):
     FLAGS = {'selectionMask': 30, 'fullPath': True}
 
 
-class FindTypeCommand(Operator):
-    CMD = cmds.findType
-    FLAGS = {'deep': True}
 
-
-class ConvertComponentCommand(DisjointOperator):
+class ComponentConversionCommand(DisjointOperator):
     CMD = cmds.polyListComponentConversion
     FLAGS = {}
 
+    def __call__(self, internal = False):
+        if internal:
+            self.flags['internal'] = True
 
-class AsFaces(ConvertComponentCommand):
+class to_faces(ComponentConversionCommand):
     FLAGS = {'tf': True}
 
 
-class AsVertices(ConvertComponentCommand):
+class to_vertices(ComponentConversionCommand):
     FLAGS = {'tv': True}
 
 
-class AsEdges(ConvertComponentCommand):
+class to_edges(ComponentConversionCommand):
     FLAGS = {'te': True}
 
 
-class AsVertexFace(ConvertComponentCommand):
+class to_vertex_faces(ComponentConversionCommand):
     FLAGS = {'tvf': True}
-
-

@@ -2,6 +2,7 @@
 Core classes
 """
 
+
 def extension(self, name):
     target_class = ExpressionMeta.get_type(name)
     if target_class is False:
@@ -63,44 +64,35 @@ class Expression(object):
             arg_list.append("\n\t**" + flags.__repr__())
         return "{}({})".format(cmd, ",".join(arg_list))
 
-
     def compose(self, other):
         assert not other.SOURCE_ONLY, "%s is a source node and can't be used downstream" % other
         return DisjointExpression(self, other())
 
-
     def __iter__(self):
         return iter(self._eval() or tuple())
 
-
     def __repr__(self):
         return self._format_expression(self.command, self.args, self.flags)
-
 
     def __call__(self, *args, **flags):
         self.args = args
         self.flags = flags
 
-
     def __add__(self, other):
         result = iter(set(self).union(set(other)))
         return Expression(*result)
-
 
     def __sub__(self, other):
         result = iter(set(self).difference(set(other)))
         return Expression(*result)
 
-
     def __xor__(self, other):
         result = iter(set(self).symmetric_difference(set(other)))
         return Expression(*result)
 
-
     def __and__(self, other):
         result = iter(set(self).intersection(set(other)))
         return Expression(*result)
-
 
     def __invert__(self):
         """
@@ -215,3 +207,6 @@ class DisjointOperator(Expression):
         downstream = other_cls()
         return DisjointExpression(self, downstream)
 
+
+def get(expr):
+    return expr.eval()

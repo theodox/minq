@@ -4,6 +4,7 @@ import logging
 
 import maya.cmds as cmds
 
+# almost ready to go away
 
 logging.basicConfig()
 _log = logging.getLogger('minq')

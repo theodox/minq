@@ -41,12 +41,19 @@ class intermediates(LSBase):
         self.flags['noIntermediate'] = not inter
 
 
-
 class objects(LSBase):
     """
     filter for objects (no components or attributes)
     """
     FLAGS = {'long': True, 'objects': True}
+
+
+class short_names(LSBase):
+    FLAGS = {'long':False}
+
+class long_names(LSBase):
+    FLAGS = {'long':False}
+
 
 class below(LSBase):
     """
