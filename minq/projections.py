@@ -3,6 +3,7 @@ this submodule contains operators which change incoming data: for example, retur
 """
 import itertools
 import re
+import posixpath
 
 from .core import DisjointOperator
 from .relations import ComponentFilter
@@ -13,6 +14,7 @@ class Iterate(DisjointOperator):
     """
     Base class for operations which run a callable procedure on every item in the incoming query.
     """
+
     def __init__(self, *args, **flags):
         self.command = self._run
         self.args = args
@@ -70,6 +72,7 @@ class where(Iterate):
 
     will return just 'x'
     """
+
     def _run(self, *args, **kwargs):
         return itertools.ifilter(self.expression, args)
 
@@ -85,7 +88,7 @@ class where_not(Iterate):
 
 class like(Iterate):
     """
-    Pass only items matching the supplied regex.  So:
+    Pass only items whose short name is matched by the supplied regex.  So:
 
         Scene('top', 'bottom').like('to')
 
@@ -101,12 +104,13 @@ class like(Iterate):
 
     will match ("XYZ", 'xyz' and 'XyZ')
     """
+
     def __init__(self, *args, **kwargs):
         super(like, self).__init__(*args, **kwargs)
         self.re = re.compile(".")
 
     def _run(self, *args, **kwargs):
-        is_match = lambda p: self.re.search(p) is not None
+        is_match = lambda p: self.re.search(p.rpartition("|")[-1]) is not None
 
         return itertools.ifilter(is_match, args)
 
@@ -164,6 +168,7 @@ class distinct(Iterate):
     """
     Returns only one copy of all incoming items. Useful for queries which return duplicate items.
     """
+
     def _run(self, *args, **kwargs):
         return iter(set(args))
 
@@ -196,6 +201,7 @@ class ordered(Iterate):
 
         ['z', 'aaaaa']
     """
+
     def _run(self, *args, **kwargs):
         results = [i for i in args]
         return iter(sorted(results, reverse=self.flags.get('reverse', False), key=self.flags.get('key')))
@@ -250,7 +256,7 @@ class pivots(XformCommand):
     """
     Return the pivot for each incoming transform
     """
-    FLAGS = {'q': True, 'ws': True,  'piv': True}
+    FLAGS = {'q': True, 'ws': True, 'piv': True}
 
 
 class matrices(XformCommand):
@@ -259,10 +265,56 @@ class matrices(XformCommand):
     """
     FLAGS = {'q': True, 'ws': True, 'matrix': True}
 
-class bounds (XformCommand):
+
+class bounds(XformCommand):
     """
     Return the bounding box for each incoming transform.  This is equivalent to
 
         [ (i, cmds.xform(i, q=True, ws=True, bb=True)) for i in query]
     """
     FLAGS = {'q': True, 'ws': True, 'bb': True}
+
+
+class get_attr(Iterate):
+    """
+    Returns attribute, value pairs for the supplied attribute on all incoming item.  Items without that attribute
+    will not be returned
+    """
+
+    FLAGS = {'attrib': 'nodeState'}
+
+    def _run(self, *args, **kwargs):
+        attrib = self.flags['attrib']
+        attributed = lambda p: "%s.%s" % (p, attrib)
+        attribute_strings = cmds.ls([attributed(s) for s in args])
+        attrib_values = cmds.getAttr(*attribute_strings)
+        return itertools.izip(attribute_strings, attrib_values)
+
+    def __call__(self, attrib):
+        self.flags.update({'attrib': attrib})
+
+
+class relative(Iterate):
+    """
+    Return all of the long paths transformed using path style syntax: thus
+
+        cameras.relative("..")
+
+    will return the ['top', 'persp', 'front', 'side'] because the transforms are one level above the shapes returned
+    by cameras.
+
+    The generated paths are not guaranteed to actually exist: you can filter them by adding a long_names or
+    short_names after this operator to winnow out nonexistent results.
+    """
+
+    FLAGS = {'path': ""}
+
+    def _run(self, *args, **kwargs):
+        pth = self.flags['path']
+        convert = lambda p: posixpath.normpath(p.replace("|", "/") + pth)
+        relativized = (convert(p) for p in args)
+        no_pipes = lambda p: p.replace('/', '|') if len(p) > 1 else ''
+        return (no_pipes(q) for q in relativized)
+
+    def __call__(self, relpath):
+        self.flags.update({'path': '/' + relpath.replace('|', '/')})
