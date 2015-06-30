@@ -207,33 +207,62 @@ class ordered(Iterate):
 
 class XformCommand(Iterate):
     '''
-    Base class for commands that return transform queries
+    Base class for commands that return transform queries.
+
+    Xform commands return *world space*, *absolute* values by default. Get local values py passing world = False. For example:
+
+         world_positions = query.translations
+         local_positions = query.translations(world=False)
+
     '''
     CMD = cmds.xform
-    FLAGS = {'q': True, 'ws': True, 'a': True}
+    FLAGS = {'q': True, 'ws': True}
 
     def _run(self, *args, **kwargs):
         return ((p, self.CMD(p, **self.flags)) for p in args)
 
-    def __call__(self, world=True, abs=True):
-        self.flags.update({'ws': world, 'a': abs})
+    def __call__(self, world=True):
+        self.flags.update({'ws': world})
 
 
 class translations(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 't': True}
+    """
+    Return the translation for each incoming transform
+    """
+    FLAGS = {'q': True, 'ws': True, 't': True}
 
 
 class rotations(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 'ro': True}
+    """
+    Return the rotation for each incoming transform
+    """
+    FLAGS = {'q': True, 'ws': True, 'ro': True}
 
 
 class scales(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 's': True}
+    """
+    Return the scale for each incoming transform
+    """
+    FLAGS = {'q': True, 'ws': True, 's': True}
 
 
 class pivots(XformCommand):
-    FLAGS = {'q': True, 'ws': True, 'a': True, 'piv': True}
+    """
+    Return the pivot for each incoming transform
+    """
+    FLAGS = {'q': True, 'ws': True,  'piv': True}
 
 
 class matrices(XformCommand):
+    """
+    Return the matrix for each incoming transform
+    """
     FLAGS = {'q': True, 'ws': True, 'matrix': True}
+
+class bounds (XformCommand):
+    """
+    Return the bounding box for each incoming transform.  This is equivalent to
+
+        [ (i, cmds.xform(i, q=True, ws=True, bb=True)) for i in query]
+    """
+    FLAGS = {'q': True, 'ws': True, 'bb': True}
