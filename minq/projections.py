@@ -10,6 +10,9 @@ import maya.cmds as cmds
 
 
 class Iterate(DisjointOperator):
+    """
+    Base class for operations which run a callable procedure on every item in the incoming query.
+    """
     def __init__(self, *args, **flags):
         self.command = self._run
         self.args = args
@@ -39,7 +42,8 @@ class Iterate(DisjointOperator):
 
 class above(Iterate):
     """
-    returns the transform hierarchy chain above all incoming up to the root transforms
+    Produces the transform hierarchy chain above all incoming up to the root transforms.  This is the inverse of
+    `below` in minq.ls
     """
 
     def _run(self, *args, **kwargs):
@@ -58,16 +62,45 @@ class above(Iterate):
 
 
 class where(Iterate):
+    """
+    Pass only items which pass the supplied predicate function.  For example:
+
+        has_an_x = lambda p: x in p
+        Scene('a', 'b', 'x').where(has_an_x)
+
+    will return just 'x'
+    """
     def _run(self, *args, **kwargs):
         return itertools.ifilter(self.expression, args)
 
 
 class where_not(Iterate):
+    """
+    Pass only items which _fail_ the supplied predicate: the inverse of 'where'
+    """
+
     def _run(self, *args, **kwargs):
         return itertools.ifilterfalse(self.expression, args)
 
 
 class like(Iterate):
+    """
+    Pass only items matching the supplied regex.  So:
+
+        Scene('top', 'bottom').like('to')
+
+    will pass ('top', 'bottom'), while:
+
+        Scene('top', 'bottom').like('^to')
+
+    will only pass 'top' since the regex matches only the start of the string due to the '^'.
+
+    You can also use the regex compile arguments:
+
+        .like("xyz", re.I)
+
+    will match ("XYZ", 'xyz' and 'XyZ')
+    """
     def __init__(self, *args, **kwargs):
         super(like, self).__init__(*args, **kwargs)
         self.re = re.compile(".")
@@ -83,7 +116,12 @@ class like(Iterate):
 
 class cast(Iterate):
     """
-    Return the result of the supplied single-item function for ever item in the list
+    Return the result of the supplied single-item function for ever item in the list. For example:
+
+        example = lambda p: p.upper()
+        Scene('top', 'front').cast(example)
+
+    will return ("TOP", "FRONT")
     """
 
     def __init__(self, *args, **flags):
@@ -108,7 +146,14 @@ class indices(cast):
 
 class zip(Iterate):
     """
-    return <expr> on all incoming items; equivalent to [expr(i) for i in incoming]
+    Return (item, cast(item)) for all incoming items.
+
+    Like .cast() runs the supplied function on every incoming item, but returns the original item alongside the
+    result as a tuple.  The result can be turned into a dictionary:
+
+        Scene('top', 'front').zip(lambda p: len(p))
+
+    will return  [('top', 3),  ('front', 5)]
     """
 
     def _run(self, *args, **kwargs):
@@ -116,11 +161,41 @@ class zip(Iterate):
 
 
 class distinct(Iterate):
+    """
+    Returns only one copy of all incoming items. Useful for queries which return duplicate items.
+    """
     def _run(self, *args, **kwargs):
         return iter(set(args))
 
 
 class ordered(Iterate):
+    """
+    Returns all incoming items sorted using a standard python sort (ie, alphanumeric order).
+
+    Accepts the same arguments as python 'sorted':
+
+        Expression('zzz', 'aaa', 'bbb').sorted
+
+    will return
+
+        ['aaa', 'bbb', 'zzz']
+
+    while
+
+        Expression('zzz', 'aaa', 'bbb').sorted(reverse = True)
+
+    will return
+
+        ['zzz', 'bbb', 'aaa']
+
+    You can also use the python 'key' parameter to provide a custom sort:
+
+        Expression( 'aaaaa', 'z').sorted(key = lambda p: len(p))
+
+    will return
+
+        ['z', 'aaaaa']
+    """
     def _run(self, *args, **kwargs):
         results = [i for i in args]
         return iter(sorted(results, reverse=self.flags.get('reverse', False), key=self.flags.get('key')))
