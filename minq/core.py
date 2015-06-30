@@ -1,7 +1,7 @@
 """
 Core classes
 """
-
+import itertools
 
 def extension(self, name):
     target_class = ExpressionMeta.get_type(name)
@@ -210,3 +210,7 @@ class DisjointOperator(Expression):
 
 def get(expr):
     return expr.eval()
+
+def parallel(*exprs):
+    return itertools.izip_longest(*exprs)
+
