@@ -59,7 +59,7 @@ class objects(LSBase):
     """
     Pass only objects for objects (no components or attributes)
     """
-    FLAGS = {'long': True, 'objects': True}
+    FLAGS = {'long': True, 'objectsOnly': True}
 
 
 class short_names(LSBase):
@@ -381,6 +381,18 @@ class shapes(LSByType):
     """
 
     TYPE = 'shape'
+
+class shaders(LSByType):
+    """
+    Pass only shaders
+    """
+    TYPE = 'lambert'
+
+class sgs(LSByType):
+    """
+    Pass only shader groups
+    """
+    TYPE = 'shadingEngine'
 
 
 class skins(LSByType):
