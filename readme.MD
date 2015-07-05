@@ -1,7 +1,7 @@
 minq
------
+====
 A query language for Maya scenes
-======================================
+-----
 
 This project aims to cut down on the large amount of boilerplate involved in finding objects in a Maya scene.  There 
 are several commands -- `ls()`, `listRelatives()` and `listHistory()` are the most obvious but not the only ones 
@@ -55,8 +55,7 @@ for item in q:
 # |top|topShape
 ```
 Query chaining
-===============
-
+-----
 
 The real power of this setup is that the expressions can be expanded in place without loops and temporary variables. 
 This works quite similarly to [linq](https://msdn.microsoft.com/en-us/library/bb397906.aspx), or the database query 
@@ -102,7 +101,7 @@ retrieved until the query is iterated or results are called.
 
 
 Filtering
-==========
+-------
 
 Many operators act as 'filters', whittling down a set of results to a smaller and smaller group.  While
 ```python
@@ -178,7 +177,7 @@ convenience for common cases and not the answer to all possible problems.
 
 
 Expanding and transforming
-==========================
+--------
 
 Some operators change the data which is passing through, something like what happens in a SQL 'cast' statement.  A 
 simple and not very useful example:
@@ -210,7 +209,7 @@ dict(cameras().parents.translations())
 ```
 
 Set Operations
-===========
+-------
 
 Queries can be treated like sets.  So, for example:
 
