@@ -111,6 +111,14 @@ class zip(Iterate):
         return ((p, self.expression(p)) for p in args)
 
 
+class node_types(Iterate):
+    """
+    Return (item, nodeType(item)) for every incoming item.
+
+    Like `.zip()`, can be turned into a dictionary
+    """
+    def _run(self, *args, **kwargs):
+        return itertools.imap(lambda p: (p, cmds.nodeType(p)), args)
 
 
 
