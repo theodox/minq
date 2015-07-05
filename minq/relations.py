@@ -8,14 +8,21 @@ class ListHistoryCommand(Operator):
     CMD = cmds.listHistory
 
 
-class history(Operator):
+class history(ListHistoryCommand):
     CMD = cmds.listHistory
     FLAGS = {'future': False}
 
 
-class future(Operator):
-    CMD = cmds.listHistory
+class future(ListHistoryCommand):
     FLAGS = {'future': True}
+
+
+class inputs(ListHistoryCommand):
+    FLAGS = {'future': False, 'levels': 1}
+
+
+class outputs(ListHistoryCommand):
+    FLAGS = {'future': True, 'levels': 1}
 
 
 class ListRelativesBase(Operator):
@@ -81,11 +88,29 @@ class ComponentFilter(object):
     def index(cls, item):
         return int(cls.BRACKETS.search(item).groups()[1])
 
+    @classmethod
+    def convert_components(cls, *args, **kwargs):
+
+        target = kwargs.get('to')
+        target_mask = {
+            'face': ({'tf': 1}, 34),
+            'vertex': ({'tv': 1}, 31),
+            'edge': ({'te': 1}, 32),
+            'vtf': ({'tvf': 1}, 70)
+        }[target]
+
+        convert_args = target_mask[0]
+        if 'internal' in kwargs:
+            convert_args['internal'] = kwargs.get('internal')
+
+        conversion = (i for i in cmds.polyListComponentConversion(*args, **convert_args))
+        return cls.expand(*conversion, force=True, selectionMask=target_mask[1])
+
 
 class FilterExpandCommand(Operator):
     CMD = ComponentFilter.expand
 
-    def __call__(self, force=False, expand=True):
+    def __call__(self, force=True, expand=True):
         self.flags.update(force=force, expand=expand)
 
 
@@ -101,7 +126,7 @@ class faces(FilterExpandCommand):
     FLAGS = {'selectionMask': 34, 'fullPath': True}
 
 
-class UVs(FilterExpandCommand):
+class uvs(FilterExpandCommand):
     FLAGS = {'selectionMask': 35, 'fullPath': True}
 
 
@@ -109,34 +134,34 @@ class vertex_faces(FilterExpandCommand):
     FLAGS = {'selectionMask': 70, 'fullPath': True}
 
 
-class CVs(FilterExpandCommand):
+class cvs(FilterExpandCommand):
     FLAGS = {'selectionMask': 28, 'fullPath': True}
 
 
-class EPs(FilterExpandCommand):
+class eps(FilterExpandCommand):
     FLAGS = {'selectionMask': 30, 'fullPath': True}
 
 
-
 class ComponentConversionCommand(DisjointOperator):
-    CMD = cmds.polyListComponentConversion
+    CMD = ComponentFilter.convert_components
     FLAGS = {}
 
-    def __call__(self, internal = False):
+    def __call__(self, internal=False):
         if internal:
             self.flags['internal'] = True
 
+
 class to_faces(ComponentConversionCommand):
-    FLAGS = {'tf': True}
+    FLAGS = {'to': 'face'}
 
 
 class to_vertices(ComponentConversionCommand):
-    FLAGS = {'tv': True}
+    FLAGS = {'to': 'vertex'}
 
 
 class to_edges(ComponentConversionCommand):
-    FLAGS = {'te': True}
+    FLAGS = {'to': 'edge'}
 
 
 class to_vertex_faces(ComponentConversionCommand):
-    FLAGS = {'tvf': True}
+    FLAGS = {'to': 'vtf'}
