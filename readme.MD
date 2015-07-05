@@ -1,19 +1,52 @@
-a simple query language for Maya scenes
+minq
+-----
+A query language for Maya scenes
+======================================
 
-The query system allows for lazy execution a maya command (usually ls, but this change in derived classes) and iteration over thew results:
+This project aims to cut down on the large amount of boilerplate involved in finding objects in a Maya scene.  There 
+are several commands -- `ls()`, `listRelatives()` and `listHistory()` are the most obvious but not the only ones 
+which have to work together when you're attempting to find an object in a maya scene. For example, if you wanted to 
+find all the IK handles attached to right the right hand (but not the right foot) of a character in your scene  you'd
+ have to try something like:
+ 
+    iks = cmds.ls(type = 'ikHandle') or []
+    for ik in iks:
+        parents = cmds.listRelatives(ik, p=True)
+        for p in parents:
+            if p.split("|")[-1] == 1:
+                return p
+    return None
+    
+Which is a bit much for such a simple idea. It's particularly annoying because different commands use slightly 
+different result formats:  you need to remember to  `or []` after `ls()` so you can iterate the results; you if you 
+want unambiguous paths `ls` expects the `long` flag but `listRelatives` uses `fullPath` for the same thing.
 
-A simple example:
+The goal of minq is to provide a less wordy and more declarative way to look for things in the maya scene.  The idea 
+is that you state your goals up front and then execute them at once, rather than creating and storing intermediate 
+results. This is both faster to execute and also cleaner to read.
+
+The key is that the queries are _not_ commands: they are descriptions of commands you'll run in sequence. The 
+simplest query is no different from an `ls()` call:
 
     q = scene('top*')
 
-produces a query object -- but as of yet it has no results: it's a description of a query you _could_ call, not a list of objects
+This would produce a query object (tecnically a `minq.Expression` object)  -- but as of yet it has no results: it's a 
+description  of a query you  _could_ call,  not a list of objects.
 
 To get the result call it directly:
 
     print q.eval()
     [u'|top', u'|top|topShape']
 
-iterating over the results also calls the query:
+It's often more convenient to turn the results directly into a list or a tuple:
+
+    tuple(cameras())
+    # Result: (u'|front|frontShape', u'|persp|perspShape', u'|side|sideShape', u'|top|topShape') # 
+ 
+    list(nodes().of_type('polyCreator'))
+    # Result: [u'polyCube1', u'polyCube2', u'polyCube3', u'polyUnite1'] # 
+
+Iterating over the results also calls the query:
 
     for item in q:
         print item
@@ -21,42 +54,51 @@ iterating over the results also calls the query:
     |top
     |top|topShape
 
-This class and its derivatives use the ExpressionMeta metaclass so they can specify command flags cleanly: most derived classes differ only in flags. The system will attempt to combine flags on similar queries for a speedied execution: so a series of queries based on the maya `ls()` command will be reduced to a single function:
+Query chaining
+===============
+
+
+The real power of this setup is that the expressions can be expanded in place without loops and temporary variables. 
+This works quite similarly to [linq](https://msdn.microsoft.com/en-us/library/bb397906.aspx), or the database query 
+system in [peewee](https://github.com/coleifer/peewee): rather than creating a series of operations and storing the 
+intermediate results you create a chain of operations that can be optimized and evaluated at once.
+
+In minq, the `minq.ExpressionMeta` metaclass allows you to chain conditions off any expression instance. A simple 
+example might be
+
+    meshes().parents.like('wall')
+    
+which would find all the meshes in the scene whose parents were named "*wall*".  Under the hood that expression would
+ translate to something like:
+ 
+    results = []
+    meshes = cmds.ls(type='mesh') or []
+    if meshes: 
+        parents = cmds.listRelatives(*meshes, p=True)
+        for item in parents:
+            if re.match('wall', item):
+                results.append(item)
+    return results
+
+Minq will try to optimize the conditions yu provide. Often different operations are variants on the same maya command
+(usually, but not always, `ls()`). Where possible minq will combine the flags on flags on successive queries for a
+speedied execution: so a series of queries based on the maya `ls()` command will be reduced to a single function. 
+Thus:
 
     scene().of_type('mesh').of_type('light').of_type('camera') 
 
 will result in a single call : `cmds.ls(type = ('mesh', 'light', 'camera')`
 
-Queries can be chained together, filtering the original results down to a subset. 
+More often, though, the chaining of the results is ussed to filter the results down to a subset:
 
-
-    q = transforms.like('fred').leaves
+    q = transforms().like('fred').leaves
 
 would find all the transforms in the scene with 'fred' in their names who have no children, while
 
-    q = scene('joint1').children.shapes
+    scene('joint1').children.shapes
 
 would find all of the children of 'joint1' which are shapes.  As with a simple query, the actual values are not
 retrieved until the query is iterated or results are called.
-
-Expanding and transforming
-==========================
-
-Some operators change the data which is passing through, something like what happens in a SQL 'cast' statement.  A 
-simple example:
-
-    upper_case = lambda p: p.upper()
-    q = cameras().parents.cast(upper_case)
-    # Result: (u'|FRONT', u'|PERSP', u'|SIDE', u'|TOP') # 
-
-The argument to cast is a single-item function which will be called on every item in the query.  Note that -- unlike 
-regular queries -- this can produce results which don't exist in the maya scene.
-
-There are several other transformations you can apply to the query for common operations.  For example:
-
-    meshes().parents.translations.eval()
-    # Result: ((u'|pCube1', XYZ(x=0.0, y=0.0, z=0.0)), (u'|pPlane1', XYZ(x=0.0, y=2.0, z=0.0)), (u'|pSphere1', XYZ
-    (x=-2.5, y=1.25, z=1.0))) # 
 
 
 Filtering
@@ -132,6 +174,37 @@ flag so that bad queries raise exceptions.  So:
 
 The actual logic is in `items.py`.  When in doubt you can use a regular function, the item syntax is intended as a 
 convenience for common cases and not the answer to all possible problems.
+
+
+Expanding and transforming
+==========================
+
+Some operators change the data which is passing through, something like what happens in a SQL 'cast' statement.  A 
+simple and not very useful example:
+
+    upper_case = lambda p: p.upper()
+    q = cameras().parents.cast(upper_case)
+    # Result: (u'|FRONT', u'|PERSP', u'|SIDE', u'|TOP') # 
+
+The argument to cast is a single-item function which will be called on every item in the query.  Note that -- unlike 
+regular queries -- this can produce results which don't exist in the maya scene.  The operators which can apply these
+ kind of arbitrary changes to the data are grouped together in the `minq.projections` submodule.
+
+`cast()` is completely general, but there are several more targeted transformations you  can apply to the query 
+for common maya operations.  For example:
+
+    meshes().parents.translations.eval()
+    # Result: ((u'|pCube1', XYZ(x=0.0, y=0.0, z=0.0)), (u'|pPlane1', XYZ(x=0.0, y=2.0, z=0.0)), (u'|pSphere1', XYZ
+    (x=-2.5, y=1.25, z=1.0))) # 
+
+will give you a list of object - XYZ tuple pairs for all of the mesh transforms in the scene. Many of the projection 
+operators return (name, value) pairs like `translations()` so that you can turn the results into a dictionary:
+
+    dict(cameras().parents.translations())
+    # Result: {u'|side': XYZ(x=350, y=50, z=5), 
+               u'|top': XYZ(x=-35, y=200, z=0), 
+               u'|persp': XYZ(x=280, y=80, z=370), 
+               u'|front': XYZ(x=60, y=70, z=140 )} # 
 
 
 Set Operations
