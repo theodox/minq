@@ -1,7 +1,7 @@
 """
 Core classes
 """
-import itertools
+
 
 def extension(self, name):
     target_class = ExpressionMeta.get_type(name)
@@ -78,9 +78,10 @@ class Expression(object):
         self.args = args
         self.flags = flags
 
-    def __add__(self, other):
+    def __or__(self, other):
         result = iter(set(self).union(set(other)))
         return Expression(*result)
+
 
     def __sub__(self, other):
         result = iter(set(self).difference(set(other)))
@@ -207,10 +208,4 @@ class DisjointOperator(Expression):
         downstream = other_cls()
         return DisjointExpression(self, downstream)
 
-
-def get(expr):
-    return expr.eval()
-
-def parallel(*exprs):
-    return itertools.izip_longest(*exprs)
 
