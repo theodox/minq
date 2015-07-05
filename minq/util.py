@@ -1,9 +1,15 @@
+import itertools
+
 __author__ = 'stevet'
 
 
-from .core import DisjointOperator
+from collections import namedtuple
+XYZ = namedtuple('XYZ', 'x y z')
 
 
-class distinct(DisjointOperator):
-    pass
+def get(expr):
+    return expr.eval()
 
+
+def parallel(*exprs):
+    return itertools.izip_longest(*exprs)
