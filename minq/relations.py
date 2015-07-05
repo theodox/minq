@@ -25,6 +25,24 @@ class outputs(ListHistoryCommand):
     FLAGS = {'future': True, 'levels': 1}
 
 
+class ConnectionHelper(object):
+    @classmethod
+    def upstream(cls, *args, **kwargs):
+        return iter(set(cmds.listConnections(*args, source=True, destination=False, scn=True) or []))
+
+    @classmethod
+    def downstream(cls, *args, **kwargs):
+        return iter(set(cmds.listConnections(*args, source=False, destination=True, scn=True) or []))
+
+
+class downstream(Operator):
+    CMD = ConnectionHelper.downstream
+
+
+class upstream(Operator):
+    CMD = ConnectionHelper.upstream
+
+
 class ListRelativesBase(Operator):
     CMD = cmds.listRelatives
     FLAGS = {'fullPath': True}
