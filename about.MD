@@ -4,13 +4,13 @@ The query system allows for lazy execution a maya command (usually ls, but this 
 
 A simple example:
 
-    q = QueryBase('top*')
+    q = scene('top*')
 
 produces a query object -- but as of yet it has no results: it's a description of a query you _could_ call, not a list of objects
 
 To get the result call it directly:
 
-    print q.results()
+    print q.eval()
     [u'|top', u'|top|topShape']
 
 iterating over the results also calls the query:
@@ -21,7 +21,11 @@ iterating over the results also calls the query:
    |top
    |top|topShape
 
-This class and its derivatives use the QueryMeta metaclass so they can specify command flags cleanly: most derived classes differ only in flags
+This class and its derivatives use the ExpressionMeta metaclass so they can specify command flags cleanly: most derived classes differ only in flags. The system will attempt to combine flags on similar queries for a speedied execution: so a series of queries based on the maya `ls()` command will be reduced to a single function:
+
+    scene().of_type('mesh').of_type('light').of_type('camera') 
+
+will result in a single call : `cmds.ls(type = ('mesh', 'light', 'camera')
 
 Queries can be chained together. All QueryMeta classes can 'chain' to other types, creating a cascading filter that will be evaluated only
 when called: For example:
