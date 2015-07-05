@@ -1,13 +1,15 @@
 """
 this submodule contains operators which change incoming data: for example, returning the result of a function on each incoming item
+
 """
 import itertools
-import re
 import posixpath
+from collections import namedtuple
 
 from .core import DisjointOperator
 from .relations import ComponentFilter
 import maya.cmds as cmds
+from .util import XYZ
 
 
 class Iterate(DisjointOperator):
@@ -63,61 +65,6 @@ class above(Iterate):
         return iter(set(results))
 
 
-class where(Iterate):
-    """
-    Pass only items which pass the supplied predicate function.  For example:
-
-        has_an_x = lambda p: x in p
-        Scene('a', 'b', 'x').where(has_an_x)
-
-    will return just 'x'
-    """
-
-    def _run(self, *args, **kwargs):
-        return itertools.ifilter(self.expression, args)
-
-
-class where_not(Iterate):
-    """
-    Pass only items which _fail_ the supplied predicate: the inverse of 'where'
-    """
-
-    def _run(self, *args, **kwargs):
-        return itertools.ifilterfalse(self.expression, args)
-
-
-class like(Iterate):
-    """
-    Pass only items whose short name is matched by the supplied regex.  So:
-
-        Scene('top', 'bottom').like('to')
-
-    will pass ('top', 'bottom'), while:
-
-        Scene('top', 'bottom').like('^to')
-
-    will only pass 'top' since the regex matches only the start of the string due to the '^'.
-
-    You can also use the regex compile arguments:
-
-        .like("xyz", re.I)
-
-    will match ("XYZ", 'xyz' and 'XyZ')
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(like, self).__init__(*args, **kwargs)
-        self.re = re.compile(".")
-
-    def _run(self, *args, **kwargs):
-        is_match = lambda p: self.re.search(p.rpartition("|")[-1]) is not None
-
-        return itertools.ifilter(is_match, args)
-
-    def __call__(self, *args):
-        self.re = re.compile(*args)
-
-
 class cast(Iterate):
     """
     Return the result of the supplied single-item function for ever item in the list. For example:
@@ -164,13 +111,7 @@ class zip(Iterate):
         return ((p, self.expression(p)) for p in args)
 
 
-class distinct(Iterate):
-    """
-    Returns only one copy of all incoming items. Useful for queries which return duplicate items.
-    """
 
-    def _run(self, *args, **kwargs):
-        return iter(set(args))
 
 
 class ordered(Iterate):
@@ -211,6 +152,11 @@ class ordered(Iterate):
         self.flags['key'] = key
 
 
+# convenience tuple wrappers
+Bounds = namedtuple('bounds', 'minx miny minz max maxy maxz')
+Matrix = namedtuple('matrix', 'm00 m01 m02 m03 m10 m11 m12 m13 m20 m21 m22 m23 m30 m31 m32 m33')
+
+
 class XformCommand(Iterate):
     '''
     Base class for commands that return transform queries.
@@ -220,12 +166,19 @@ class XformCommand(Iterate):
          world_positions = query.translations
          local_positions = query.translations(world=False)
 
+    Results are returned as a tuple (object, value) where the object is the maya transform path and the value is the
+    result of the query.  This makes it easy to do
+
+        dict(meshes().parents.translations)
+        # Result: {u'|pSphere1': XYZ(x=1.0, y=2.0, z=3.0), u'|pPlane1': XYZ(x=0.0, y=2.0, z=0.0), u'|pCube1': XYZ(x=0.0, y=0.0, z=0.0)} #
+
     '''
     CMD = cmds.xform
     FLAGS = {'q': True, 'ws': True}
+    TRANSFORM = XYZ
 
     def _run(self, *args, **kwargs):
-        return ((p, self.CMD(p, **self.flags)) for p in args)
+        return ((p, self.TRANSFORM(*self.CMD(p, **self.flags))) for p in args)
 
     def __call__(self, world=True):
         self.flags.update({'ws': world})
@@ -264,6 +217,7 @@ class matrices(XformCommand):
     Return the matrix for each incoming transform
     """
     FLAGS = {'q': True, 'ws': True, 'matrix': True}
+    TRANSFORM = Matrix
 
 
 class bounds(XformCommand):
@@ -273,6 +227,7 @@ class bounds(XformCommand):
         [ (i, cmds.xform(i, q=True, ws=True, bb=True)) for i in query]
     """
     FLAGS = {'q': True, 'ws': True, 'bb': True}
+    TRANSFORM = Bounds
 
 
 class get_attr(Iterate):
