@@ -125,13 +125,13 @@ Besides type filters you can use arbitary filter expressions. The simplest are `
     # Result: (u'|persp|perspShape', u'|side|sideShape') # 
 
 By default both `like` and `unlike` are case sensitive, but you can pass any regex arguments to make them ignore case:
-    
+```python
     cameras().like('TOP').eval()
     # Result: () # 
     
     cameras().like('TOP', re.I)
     # Result: (u'|top|topShape',) # 
-
+```
 Since like and unlike are regexes you can use python regex controls for more control:
 
     # use the regex square brackets to find multiple possibilities
