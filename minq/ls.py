@@ -1,4 +1,4 @@
-from .core import Operator
+from .core import Operator, DisjointOperator, DisjointExpression
 import maya.cmds as cmds
 
 
@@ -142,6 +142,12 @@ class LSByType(LSBase):
         d = dict(**flags)
         d['type'] = self.TYPE
         super(LSByType, self).__init__(*args, **d)
+
+
+# by default, use a hand-built list of common nodes types. nodes.py contains a much longer and more complete list.
+#   The longer list is complete for maya 2016 but may not be accurate for earlier or later versions.
+# It's also full of rarely used nodes which may be distracting. However if you have very fast autocomplete
+# you may want to use it instead: in that case copy it into this module in place of the classes below
 
 
 class animCurves(LSByType):
