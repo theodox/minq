@@ -6,42 +6,10 @@ import itertools
 import posixpath
 from collections import namedtuple
 
-from .core import DisjointOperator
+from .core import Iterate
 from .relations import ComponentFilter
 import maya.cmds as cmds
 from .util import XYZ
-
-
-class Iterate(DisjointOperator):
-    """
-    Base class for operations which run a callable procedure on every item in the incoming query.
-    """
-
-    def __init__(self, *args, **flags):
-        self.command = self._run
-        self.args = args
-        d = dict(**flags)
-        d.update(self.FLAGS)
-        self.flags = d
-        self.expression = lambda p: p
-
-    def _run(self, *args, **kwargs):
-        return itertools.imap(self.expression, args)
-
-    def _eval(self):
-        return self._run(*self.args)
-
-    def __call__(self, expr):
-        self.expression = expr
-
-    def _format_expression(self, command, args, flags):
-        cmd = str(self.expression)
-        arglist = []
-        if len(args):
-            arglist.append("\n\t*" + args.__repr__())
-        if len(flags):
-            arglist.append("\n\t**" + flags.__repr__())
-        return "{}({})".format(cmd, ",".join(arglist))
 
 
 class above(Iterate):
@@ -117,9 +85,9 @@ class node_types(Iterate):
 
     Like `.zip()`, can be turned into a dictionary
     """
+
     def _run(self, *args, **kwargs):
         return itertools.imap(lambda p: (p, cmds.nodeType(p)), args)
-
 
 
 class ordered(Iterate):
@@ -158,7 +126,6 @@ class ordered(Iterate):
     def __call__(self, reverse=False, key=None):
         self.flags['reverse'] = reverse
         self.flags['key'] = key
-
 
 # convenience tuple wrappers
 Bounds = namedtuple('bounds', 'minx miny minz max maxy maxz')
@@ -238,7 +205,36 @@ class bounds(XformCommand):
     TRANSFORM = Bounds
 
 
-class get_attr(Iterate):
+class attribs(Iterate):
+    """
+    Converts a list of objects into a list of attributes. Items in the list which don't have the attribute will not be
+    passed.
+
+       cameras().attribs("orthographic")
+       # Result:  ("|top|topShape.orthographic", "|front\frontShape.orthographic" ... etc) #
+
+    but meshes().attributes("orthographic")
+
+       #Result:  (,) #
+
+    Since non-existent objects are removed from the list, you can use this to find objects that have an attribute using
+    the `.objects` filter:
+
+        objects_with_attr = transforms().attribs("customAttribute").objects.distinct
+
+    """
+    FLAGS = {'attrib': 'nodeState'}
+
+    def _run(self, *args, **kwargs):
+        attrib = self.flags['attrib']
+        attributed = lambda p: "%s.%s" % (p, attrib)
+        return cmds.ls([attributed(s) for s in args], long=True) or []
+
+    def __call__(self, attrib):
+        self.flags.update({'attrib': attrib})
+
+
+class values(attribs):
     """
     Returns attribute, value pairs for the supplied attribute on all incoming item.  Items without that attribute
     will not be returned
@@ -247,14 +243,10 @@ class get_attr(Iterate):
     FLAGS = {'attrib': 'nodeState'}
 
     def _run(self, *args, **kwargs):
-        attrib = self.flags['attrib']
-        attributed = lambda p: "%s.%s" % (p, attrib)
-        attribute_strings = cmds.ls([attributed(s) for s in args])
-        attrib_values = cmds.getAttr(*attribute_strings)
-        return itertools.izip(attribute_strings, attrib_values)
 
-    def __call__(self, attrib):
-        self.flags.update({'attrib': attrib})
+        attributed = super(values, self)._run(*args, **kwargs)
+        attrib_values = cmds.getAttr(*attributed)
+        return itertools.izip(attributed, attrib_values)
 
 
 class relative(Iterate):
