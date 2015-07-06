@@ -4,7 +4,10 @@ This submodule defines operators which filter the incoming results and return a 
 
 import itertools
 import re
-from .projections import Iterate
+
+from .core import Iterate
+from projections import attribs
+import maya.cmds as cmds
 
 
 class where(Iterate):
@@ -66,6 +69,7 @@ class unlike(like):
     """
     The inverse of `like` : return items which DONT match the supplied regex
     """
+
     def _run(self, *args, **kwargs):
         is_match = lambda p: self.re.search(p.rpartition("|")[-1]) is not None
 
@@ -79,3 +83,20 @@ class distinct(Iterate):
 
     def _run(self, *args, **kwargs):
         return iter(set(args))
+
+
+class with_attrib(attribs):
+    """
+    A return only objects from the incoming stream which have 'attrib' :
+
+        tuple(nodes().with_attrib('orthographic'))
+        # Result: (u'|top|topShape', u'|side|sideShape', u'|persp|perspShape', u'|front|frontShape') #
+
+    """
+
+    def _run(self, *args, **kwargs):
+        results = super(with_attrib, self)._run(*args, **kwargs)
+        if not results:
+            return tuple()
+        objects = cmds.ls(*results, long=True, o=True) or []
+        return iter(set(objects))
