@@ -1,6 +1,7 @@
 """
 Core classes
 """
+import itertools
 
 
 def extension(self, name):
@@ -209,3 +210,33 @@ class DisjointOperator(Expression):
         return DisjointExpression(self, downstream)
 
 
+class Iterate(DisjointOperator):
+    """
+    Base class for operations which run a callable procedure on every item in the incoming query.
+    """
+
+    def __init__(self, *args, **flags):
+        self.command = self._run
+        self.args = args
+        d = dict(**flags)
+        d.update(self.FLAGS)
+        self.flags = d
+        self.expression = lambda p: p
+
+    def _run(self, *args, **kwargs):
+        return itertools.imap(self.expression, args)
+
+    def _eval(self):
+        return self._run(*self.args)
+
+    def __call__(self, expr):
+        self.expression = expr
+
+    def _format_expression(self, command, args, flags):
+        cmd = str(self.expression)
+        arglist = []
+        if len(args):
+            arglist.append("\n\t*" + args.__repr__())
+        if len(flags):
+            arglist.append("\n\t**" + flags.__repr__())
+        return "{}({})".format(cmd, ",".join(arglist))
