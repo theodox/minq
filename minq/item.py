@@ -2,12 +2,49 @@ __author__ = 'stevet'
 import operator
 
 import maya.cmds as cmds
-from collections import namedtuple
+from util import XYZ
 
-XYZ = namedtuple ('XYZ', 'x y z')
 
 class AttributeQuery(object):
+    """
+    This is a query-generation helper class.  You can use it to create (simple) attribute value tests inside a query
+    like `where` or `where_not` that takes a callable predicate.  For example:
 
+        cameras().where(item.orthographic == True))
+
+    will find all the scene camera with their 'orthographic' attribute set True, while
+
+        meshes().parents.where(item.ty > 0)
+
+    will find all mesh parent transforms whose translate Y attribute is larger than zero.
+
+
+    The 'item' keywords stands for each value passing through the query.  The attribute value will be resolved when
+    the query is evaluated (so if you have a typo, you may not notice it at compile time!)  Any item which is evaluated
+    and doesn't have the attribute will automatically fail the test: if a shape is mixed in with a collection of
+    transforms, for example, it will fail both item.ty > 0 and item.ty < 0 since it has not 'ty' attribute.
+
+    You can use a stricter evaluation to identify queries that produce bad attribute checks.  If you create the item
+    separately and set it's "strict" property to true, it will except when it can't find the attribute:
+
+        is_ortho = item.orthographic == True
+        is_ortho.strict = True
+
+        meshes().where(is_ortho)
+
+    will raise a RuntimeException when evaluated, since meshes don't have an `orthographic` attribute.
+
+    If the attribute is compound with XYZ values (such as translate, rotate or scale), the query will automatically
+    Maya's annoying default behavior of returning these values as nested lists:
+
+        cmds.getAttr('pCube1.t')
+        # Result: [(0,0,0)]
+
+    an item query will instead see the result as (0,0,0), which means you can write:
+
+        some_query.where(item.t == (0,0,0) )
+
+    """
     # these attribs are return as tuples-in-lists by getAttr, so we unpack them
     UNPACK_MULT = ('t', 'translate', 'r', 'rotate', 's', 'scale', 'rp', 'rotatePivot', 'sp', 'scalePivot')
 
