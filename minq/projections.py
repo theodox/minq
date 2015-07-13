@@ -205,12 +205,59 @@ class bounds(XformCommand):
     TRANSFORM = Bounds
 
 
+class PolyEvaluateCommand(Iterate):
+    '''
+    Base class for commands that return poly topology queries.
+
+    '''
+    CMD = cmds.polyEvaluate
+    FLAGS = {}
+
+    def _run(self, *args, **kwargs):
+        return ((p, self.CMD(p, **self.flags)) for p in args)
+
+
+class vertex_counts(PolyEvaluateCommand):
+    FLAGS = {'v': True}
+
+
+class areas(PolyEvaluateCommand):
+    FLAGS = {'wa': True}
+
+    def __call__(self, *args, **kwargs):
+        if kwargs.get('world'):
+            self.flags = {'wa': True}
+        else:
+            self.flags = {'a': True}
+
+
+class edge_counts(PolyEvaluateCommand):
+    FLAGS = {'edges': True}
+
+
+class face_counts(PolyEvaluateCommand):
+    FLAGS = {'face': True}
+
+
+class triangle_counts(PolyEvaluateCommand):
+    FLAGS = {'triangle': True}
+
+
+class uv_counts(PolyEvaluateCommand):
+    FLAGS = {'uv': True}
+
+    def __call__(self, *args, **kwargs):
+        uvs = kwargs.get('uvs', kwargs.get('uvSetName', None))
+        if uvs:
+            self.flags['uvs'] = uvs
+
+
 class attribs(Iterate):
     """
     Converts a list of objects into a list of attributes. Items in the list which don't have the attribute will not be
     passed.
 
-       cameras().attribs("orthographic")
+       cameras().attributes("orthographic")
        # Result:  ("|top|topShape.orthographic", "|front\frontShape.orthographic" ... etc) #
 
     but meshes().attributes("orthographic")
@@ -234,7 +281,7 @@ class attribs(Iterate):
         self.flags.update({'attrib': attrib})
 
 
-class values(attribs):
+class get_attribs(attribs):
     """
     Returns attribute, value pairs for the supplied attribute on all incoming item.  Items without that attribute
     will not be returned
@@ -243,7 +290,6 @@ class values(attribs):
     FLAGS = {'attrib': 'nodeState'}
 
     def _run(self, *args, **kwargs):
-
         attributed = super(values, self)._run(*args, **kwargs)
         attrib_values = cmds.getAttr(*attributed)
         return itertools.izip(attributed, attrib_values)
@@ -273,3 +319,23 @@ class relative(Iterate):
 
     def __call__(self, relpath):
         self.flags.update({'path': '/' + relpath.replace('|', '/')})
+
+
+class keys(cast):
+    """
+    Given an input list of (name, value) pairs, return only the names
+    """
+
+    def __init__(self, *args, **flags):
+        super(keys, self).__init__(*args, **flags)
+        self.expression = lambda p: p[0]
+
+
+class values(cast):
+    """
+    Given an input list of (name, value) pairs, return only the values
+    """
+
+    def __init__(self, *args, **flags):
+        super(values, self).__init__(*args, **flags)
+        self.expression = lambda p: p[-1]
