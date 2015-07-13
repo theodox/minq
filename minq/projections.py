@@ -218,10 +218,27 @@ class PolyEvaluateCommand(Iterate):
 
 
 class vertex_counts(PolyEvaluateCommand):
+    """
+    Return (object, vertex count(object)) for each object in the stream
+    """
+
     FLAGS = {'v': True}
 
 
 class areas(PolyEvaluateCommand):
+    """
+    Return (object, world area(object)) for each object in the stream.
+
+    To get the local space area instead, use parens:
+
+        ~meshes().areas(world=False)
+
+    for local space or
+
+        ~meshes().areas(world=True)
+
+    for world space
+    """
     FLAGS = {'wa': True}
 
     def __call__(self, *args, **kwargs):
@@ -232,18 +249,38 @@ class areas(PolyEvaluateCommand):
 
 
 class edge_counts(PolyEvaluateCommand):
+    """
+    Return (object, edge count(object)) for items in stream
+    """
     FLAGS = {'edges': True}
 
 
 class face_counts(PolyEvaluateCommand):
+    """
+    Return (object, face count(object)) for items in stream.  Note that 'faces' is polygons, not triangles.
+    """
     FLAGS = {'face': True}
 
 
 class triangle_counts(PolyEvaluateCommand):
+    """
+    Return (object, tri count(object)) for items in stream
+    """
+
     FLAGS = {'triangle': True}
 
 
 class uv_counts(PolyEvaluateCommand):
+    """
+    Return (object, uv count(object)) for items in stream
+
+    To specify a uv set name, use the parens:
+
+         ~meshes().uv_counts(uvs = 'map2')
+
+     will return the count of uvs in the 'map2' uv set
+    """
+
     FLAGS = {'uv': True}
 
     def __call__(self, *args, **kwargs):
@@ -290,7 +327,7 @@ class get_attribs(attribs):
     FLAGS = {'attrib': 'nodeState'}
 
     def _run(self, *args, **kwargs):
-        attributed = super(values, self)._run(*args, **kwargs)
+        attributed = super(get_attribs, self)._run(*args, **kwargs)
         attrib_values = cmds.getAttr(*attributed)
         return itertools.izip(attributed, attrib_values)
 
