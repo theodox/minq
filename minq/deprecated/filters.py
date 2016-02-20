@@ -5,8 +5,8 @@ This submodule defines operators which filter the incoming results and return a 
 import itertools
 import re
 
-from .core import Iterate
-from projections import attribs
+from external.minq.minq.deprecated.core import Iterate
+from external.minq.minq.deprecated.projections_old import attribs
 import maya.cmds as cmds
 
 

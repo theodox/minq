@@ -1,6 +1,6 @@
 import re
 
-from .core import Operator, DisjointOperator
+from external.minq.minq.deprecated.core import Operator, DisjointOperator
 import maya.cmds as cmds
 
 

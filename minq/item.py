@@ -2,7 +2,7 @@ __author__ = 'stevet'
 import operator
 
 import maya.cmds as cmds
-from util import XYZ
+from external.minq.minq.deprecated.util import XYZ
 
 
 class AttributeQuery(object):

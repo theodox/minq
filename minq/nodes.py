@@ -1,3897 +1,3967 @@
 '''
-This module contains LSByType filters for all of the node classes in Maya 2015.  Early or later versions may have
-slightly different node type lists. It's useful if you use an autocompleting IDE - otherwise it's only a convenience
+This module contains NodeType filters for all of the node classes in Maya 2015.  Early or later versions may have
+slightly different node TAG lists. It's useful if you use an autocompleting IDE - otherwise it's only a convenience
 to avoid typing 'of_type'
 '''
 
-from .ls import LSByType
+from minq.core import NodeType
 
 
-class abstractBaseCreate(LSByType):
-    TYPE = 'abstractBaseCreate'
+class AbstractBaseCreate(NodeType):
+    TAG = 'abstractBaseCreate'
 
-class abstractBaseNurbsConversion(LSByType):
-    TYPE = 'abstractBaseNurbsConversion'
 
-class adskAssetInstanceNode_TdependNode(LSByType):
-    TYPE = 'adskAssetInstanceNode_TdependNode'
+class AbstractBaseNurbsConversion(NodeType):
+    TAG = 'abstractBaseNurbsConversion'
 
-class adskAssetInstanceNode_TdnTx2D(LSByType):
-    TYPE = 'adskAssetInstanceNode_TdnTx2D'
 
-class adskAssetInstanceNode_TlightShape(LSByType):
-    TYPE = 'adskAssetInstanceNode_TlightShape'
+class AdskAssetInstanceNode_TdependNode(NodeType):
+    TAG = 'adskAssetInstanceNode_TdependNode'
 
-class animBlendNodeBase(LSByType):
-    TYPE = 'animBlendNodeBase'
 
-class animCurve(LSByType):
-    TYPE = 'animCurve'
+class AdskAssetInstanceNode_TdnTx2D(NodeType):
+    TAG = 'adskAssetInstanceNode_TdnTx2D'
 
-class assembly(LSByType):
-    TYPE = 'assembly'
 
-class bakeSet(LSByType):
-    TYPE = 'bakeSet'
+class AdskAssetInstanceNode_TlightShape(NodeType):
+    TAG = 'adskAssetInstanceNode_TlightShape'
 
-class baseGeometryVarGroup(LSByType):
-    TYPE = 'baseGeometryVarGroup'
 
-class baseShadingSwitch(LSByType):
-    TYPE = 'baseShadingSwitch'
+class AnimBlendNodeBase(NodeType):
+    TAG = 'animBlendNodeBase'
 
-class birailSrf(LSByType):
-    TYPE = 'birailSrf'
 
-class blend(LSByType):
-    TYPE = 'blend'
+class AnimCurve(NodeType):
+    TAG = 'animCurve'
 
-class boundaryBase(LSByType):
-    TYPE = 'boundaryBase'
 
-class cacheBase(LSByType):
-    TYPE = 'cacheBase'
+class BakeSet(NodeType):
+    TAG = 'bakeSet'
 
-class clientDevice(LSByType):
-    TYPE = 'clientDevice'
 
-class constraint(LSByType):
-    TYPE = 'constraint'
+class BaseGeometryVarGroup(NodeType):
+    TAG = 'baseGeometryVarGroup'
 
-class controlPoint(LSByType):
-    TYPE = 'controlPoint'
 
-class cteInterpolator(LSByType):
-    TYPE = 'cteInterpolator'
+class BaseShadingSwitch(NodeType):
+    TAG = 'baseShadingSwitch'
 
-class curveFromMesh(LSByType):
-    TYPE = 'curveFromMesh'
 
-class curveFromSubdiv(LSByType):
-    TYPE = 'curveFromSubdiv'
+class BirailSrf(NodeType):
+    TAG = 'birailSrf'
 
-class curveFromSurface(LSByType):
-    TYPE = 'curveFromSurface'
 
-class curveNormalizer(LSByType):
-    TYPE = 'curveNormalizer'
+class Blend(NodeType):
+    TAG = 'blend'
 
-class curveRange(LSByType):
-    TYPE = 'curveRange'
 
-class curveShape(LSByType):
-    TYPE = 'curveShape'
+class BoundaryBase(NodeType):
+    TAG = 'boundaryBase'
 
-class dagNode(LSByType):
-    TYPE = 'dagNode'
 
-class deformFunc(LSByType):
-    TYPE = 'deformFunc'
+class CacheBase(NodeType):
+    TAG = 'cacheBase'
 
-class deformableShape(LSByType):
-    TYPE = 'deformableShape'
 
-class dimensionShape(LSByType):
-    TYPE = 'dimensionShape'
+class ClientDevice(NodeType):
+    TAG = 'clientDevice'
 
-class dynBase(LSByType):
-    TYPE = 'dynBase'
 
-class entity(LSByType):
-    TYPE = 'entity'
+class Constraint(NodeType):
+    TAG = 'constraint'
 
-class field(LSByType):
-    TYPE = 'field'
 
-class filter(LSByType):
-    TYPE = 'filter'
+class ControlPoint(NodeType):
+    TAG = 'controlPoint'
 
-class geometryShape(LSByType):
-    TYPE = 'geometryShape'
 
-class groundPlane(LSByType):
-    TYPE = 'groundPlane'
+class CteInterpolator(NodeType):
+    TAG = 'cteInterpolator'
 
-class hwShader(LSByType):
-    TYPE = 'hwShader'
 
-class ikSolver(LSByType):
-    TYPE = 'ikSolver'
+class CurveFromMesh(NodeType):
+    TAG = 'curveFromMesh'
 
-class imageSource(LSByType):
-    TYPE = 'imageSource'
 
-class light(LSByType):
-    TYPE = 'light'
+class CurveFromSubdiv(NodeType):
+    TAG = 'curveFromSubdiv'
 
-class makeCircularArc(LSByType):
-    TYPE = 'makeCircularArc'
 
-class manip2D(LSByType):
-    TYPE = 'manip2D'
+class CurveFromSurface(NodeType):
+    TAG = 'curveFromSurface'
 
-class manip3D(LSByType):
-    TYPE = 'manip3D'
 
-class nBase(LSByType):
-    TYPE = 'nBase'
+class CurveNormalizer(NodeType):
+    TAG = 'curveNormalizer'
 
-class node(LSByType):
-    TYPE = 'node'
 
-class nonAmbientLightShapeNode(LSByType):
-    TYPE = 'nonAmbientLightShapeNode'
+class CurveRange(NodeType):
+    TAG = 'curveRange'
 
-class nonExtendedLightShapeNode(LSByType):
-    TYPE = 'nonExtendedLightShapeNode'
 
-class nurbsDimShape(LSByType):
-    TYPE = 'nurbsDimShape'
+class CurveShape(NodeType):
+    TAG = 'curveShape'
 
-class orthoGrid(LSByType):
-    TYPE = 'orthoGrid'
 
-class parentTessellate(LSByType):
-    TYPE = 'parentTessellate'
+class DagNode(NodeType):
+    TAG = 'dagNode'
 
-class pfxGeometry(LSByType):
-    TYPE = 'pfxGeometry'
 
-class plane(LSByType):
-    TYPE = 'plane'
+class DeformFunc(NodeType):
+    TAG = 'deformFunc'
 
-class polyBase(LSByType):
-    TYPE = 'polyBase'
 
-class polyCreator(LSByType):
-    TYPE = 'polyCreator'
+class DeformableShape(NodeType):
+    TAG = 'deformableShape'
 
-class polyModifier(LSByType):
-    TYPE = 'polyModifier'
 
-class polyModifierUV(LSByType):
-    TYPE = 'polyModifierUV'
+class DimensionShape(NodeType):
+    TAG = 'dimensionShape'
 
-class polyModifierWorld(LSByType):
-    TYPE = 'polyModifierWorld'
 
-class polyPrimitive(LSByType):
-    TYPE = 'polyPrimitive'
+class DynBase(NodeType):
+    TAG = 'dynBase'
 
-class primitive(LSByType):
-    TYPE = 'primitive'
 
-class reflect(LSByType):
-    TYPE = 'reflect'
+class Entity(NodeType):
+    TAG = 'entity'
 
-class renderLight(LSByType):
-    TYPE = 'renderLight'
 
-class resultCurve(LSByType):
-    TYPE = 'resultCurve'
+class Field(NodeType):
+    TAG = 'field'
 
-class revolvedPrimitive(LSByType):
-    TYPE = 'revolvedPrimitive'
 
-class shadingDependNode(LSByType):
-    TYPE = 'shadingDependNode'
+class Filter(NodeType):
+    TAG = 'filter'
 
-class shape(LSByType):
-    TYPE = 'shape'
 
-class subdBase(LSByType):
-    TYPE = 'subdBase'
+class GeometryShape(NodeType):
+    TAG = 'geometryShape'
 
-class subdModifier(LSByType):
-    TYPE = 'subdModifier'
 
-class subdModifierUV(LSByType):
-    TYPE = 'subdModifierUV'
+class GroundPlane(NodeType):
+    TAG = 'groundPlane'
 
-class subdModifierWorld(LSByType):
-    TYPE = 'subdModifierWorld'
 
-class surfaceShape(LSByType):
-    TYPE = 'surfaceShape'
+class HwShader(NodeType):
+    TAG = 'hwShader'
 
-class texBaseDeformManip(LSByType):
-    TYPE = 'texBaseDeformManip'
 
-class texture2d(LSByType):
-    TYPE = 'texture2d'
+class IkSolver(NodeType):
+    TAG = 'ikSolver'
 
-class texture3d(LSByType):
-    TYPE = 'texture3d'
 
-class textureEnv(LSByType):
-    TYPE = 'textureEnv'
+class ImageSource(NodeType):
+    TAG = 'imageSource'
 
-class threadedDevice(LSByType):
-    TYPE = 'threadedDevice'
 
-class writeToFrameBuffer(LSByType):
-    TYPE = 'writeToFrameBuffer'
+class Light(NodeType):
+    TAG = 'light'
 
 
-class AISEnvFacade(LSByType):
-    TYPE = 'AISEnvFacade'
+class MakeCircularArc(NodeType):
+    TAG = 'makeCircularArc'
 
 
-class AlembicNode(LSByType):
-    TYPE = 'AlembicNode'
+class Manip2D(NodeType):
+    TAG = 'manip2D'
 
 
-class ComputeGlobal(LSByType):
-    TYPE = 'ComputeGlobal'
+class Manip3D(NodeType):
+    TAG = 'manip3D'
 
 
-class ComputeLocal(LSByType):
-    TYPE = 'ComputeLocal'
+class NBase(NodeType):
+    TAG = 'nBase'
 
 
-class CustomRigDefaultMappingNode(LSByType):
-    TYPE = 'CustomRigDefaultMappingNode'
+class Node(NodeType):
+    TAG = 'node'
 
 
-class CustomRigRetargeterNode(LSByType):
-    TYPE = 'CustomRigRetargeterNode'
+class NonAmbientLightShapeNode(NodeType):
+    TAG = 'nonAmbientLightShapeNode'
 
 
-class HIKCharacterNode(LSByType):
-    TYPE = 'HIKCharacterNode'
+class NonExtendedLightShapeNode(NodeType):
+    TAG = 'nonExtendedLightShapeNode'
 
 
-class HIKCharacterStateClient(LSByType):
-    TYPE = 'HIKCharacterStateClient'
+class NurbsDimShape(NodeType):
+    TAG = 'nurbsDimShape'
 
 
-class HIKControlSetNode(LSByType):
-    TYPE = 'HIKControlSetNode'
+class OrthoGrid(NodeType):
+    TAG = 'orthoGrid'
 
 
-class HIKEffector2State(LSByType):
-    TYPE = 'HIKEffector2State'
+class ParentTessellate(NodeType):
+    TAG = 'parentTessellate'
 
 
-class HIKEffectorFromCharacter(LSByType):
-    TYPE = 'HIKEffectorFromCharacter'
+class PfxGeometry(NodeType):
+    TAG = 'pfxGeometry'
 
 
-class HIKFK2State(LSByType):
-    TYPE = 'HIKFK2State'
+class Plane(NodeType):
+    TAG = 'plane'
 
 
-class HIKPinning2State(LSByType):
-    TYPE = 'HIKPinning2State'
+class PolyBase(NodeType):
+    TAG = 'polyBase'
 
 
-class HIKProperty2State(LSByType):
-    TYPE = 'HIKProperty2State'
+class PolyCreator(NodeType):
+    TAG = 'polyCreator'
 
 
-class HIKRetargeterNode(LSByType):
-    TYPE = 'HIKRetargeterNode'
+class PolyModifier(NodeType):
+    TAG = 'polyModifier'
 
 
-class HIKSK2State(LSByType):
-    TYPE = 'HIKSK2State'
+class PolyModifierUV(NodeType):
+    TAG = 'polyModifierUV'
 
 
-class HIKSkeletonGeneratorNode(LSByType):
-    TYPE = 'HIKSkeletonGeneratorNode'
+class PolyModifierWorld(NodeType):
+    TAG = 'polyModifierWorld'
 
 
-class HIKSolverNode(LSByType):
-    TYPE = 'HIKSolverNode'
+class PolyPrimitive(NodeType):
+    TAG = 'polyPrimitive'
 
 
-class HIKState2Effector(LSByType):
-    TYPE = 'HIKState2Effector'
+class Primitive(NodeType):
+    TAG = 'primitive'
 
 
-class HIKState2FK(LSByType):
-    TYPE = 'HIKState2FK'
+class Reflect(NodeType):
+    TAG = 'reflect'
 
 
-class HIKState2GlobalSK(LSByType):
-    TYPE = 'HIKState2GlobalSK'
+class RenderLight(NodeType):
+    TAG = 'renderLight'
 
 
-class HIKState2SK(LSByType):
-    TYPE = 'HIKState2SK'
+class ResultCurve(NodeType):
+    TAG = 'resultCurve'
 
 
-class ShaderfxShader(LSByType):
-    TYPE = 'ShaderfxShader'
+class RevolvedPrimitive(NodeType):
+    TAG = 'revolvedPrimitive'
 
 
-class StingrayPBS(LSByType):
-    TYPE = 'StingrayPBS'
+class ShadingDependNode(NodeType):
+    TAG = 'shadingDependNode'
 
 
-class Unfold3DOptimize(LSByType):
-    TYPE = 'Unfold3DOptimize'
+class Shape(NodeType):
+    TAG = 'shape'
 
 
-class Unfold3DUnfold(LSByType):
-    TYPE = 'Unfold3DUnfold'
+class SubdBase(NodeType):
+    TAG = 'subdBase'
 
 
-class aboutToSetValueTestNode(LSByType):
-    TYPE = 'aboutToSetValueTestNode'
+class SubdModifier(NodeType):
+    TAG = 'subdModifier'
 
 
-class addDoubleLinear(LSByType):
-    TYPE = 'addDoubleLinear'
+class SubdModifierUV(NodeType):
+    TAG = 'subdModifierUV'
 
 
-class addMatrix(LSByType):
-    TYPE = 'addMatrix'
+class SubdModifierWorld(NodeType):
+    TAG = 'subdModifierWorld'
 
 
-class adskMaterial(LSByType):
-    TYPE = 'adskMaterial'
+class SurfaceShape(NodeType):
+    TAG = 'surfaceShape'
 
 
-class adskPrepareRenderGlobals(LSByType):
-    TYPE = 'adskPrepareRenderGlobals'
+class TexBaseDeformManip(NodeType):
+    TAG = 'texBaseDeformManip'
 
 
-class aimConstraint(LSByType):
-    TYPE = 'aimConstraint'
+class Texture2d(NodeType):
+    TAG = 'texture2d'
 
 
-class airField(LSByType):
-    TYPE = 'airField'
+class Texture3d(NodeType):
+    TAG = 'texture3d'
 
 
-class airManip(LSByType):
-    TYPE = 'airManip'
+class TextureEnv(NodeType):
+    TAG = 'textureEnv'
 
 
-class alignCurve(LSByType):
-    TYPE = 'alignCurve'
+class ThreadedDevice(NodeType):
+    TAG = 'threadedDevice'
 
 
-class alignManip(LSByType):
-    TYPE = 'alignManip'
+class WriteToFrameBuffer(NodeType):
+    TAG = 'writeToFrameBuffer'
 
 
-class alignSurface(LSByType):
-    TYPE = 'alignSurface'
+class AISEnvFacade(NodeType):
+    TAG = 'AISEnvFacade'
 
 
-class ambientLight(LSByType):
-    TYPE = 'ambientLight'
+class AlembicNode(NodeType):
+    TAG = 'AlembicNode'
 
 
-class angleBetween(LSByType):
-    TYPE = 'angleBetween'
+class ComputeGlobal(NodeType):
+    TAG = 'ComputeGlobal'
 
 
-class angleDimension(LSByType):
-    TYPE = 'angleDimension'
+class ComputeLocal(NodeType):
+    TAG = 'ComputeLocal'
 
 
-class animBlend(LSByType):
-    TYPE = 'animBlend'
+class CustomRigDefaultMappingNode(NodeType):
+    TAG = 'CustomRigDefaultMappingNode'
 
 
-class animBlendInOut(LSByType):
-    TYPE = 'animBlendInOut'
+class CustomRigRetargeterNode(NodeType):
+    TAG = 'CustomRigRetargeterNode'
 
 
-class animBlendNodeAdditive(LSByType):
-    TYPE = 'animBlendNodeAdditive'
+class HIKCharacterNode(NodeType):
+    TAG = 'HIKCharacterNode'
 
 
-class animBlendNodeAdditiveDA(LSByType):
-    TYPE = 'animBlendNodeAdditiveDA'
+class HIKCharacterStateClient(NodeType):
+    TAG = 'HIKCharacterStateClient'
 
 
-class animBlendNodeAdditiveDL(LSByType):
-    TYPE = 'animBlendNodeAdditiveDL'
+class HIKControlSetNode(NodeType):
+    TAG = 'HIKControlSetNode'
 
 
-class animBlendNodeAdditiveF(LSByType):
-    TYPE = 'animBlendNodeAdditiveF'
+class HIKEffector2State(NodeType):
+    TAG = 'HIKEffector2State'
 
 
-class animBlendNodeAdditiveFA(LSByType):
-    TYPE = 'animBlendNodeAdditiveFA'
+class HIKEffectorFromCharacter(NodeType):
+    TAG = 'HIKEffectorFromCharacter'
 
 
-class animBlendNodeAdditiveFL(LSByType):
-    TYPE = 'animBlendNodeAdditiveFL'
+class HIKFK2State(NodeType):
+    TAG = 'HIKFK2State'
 
 
-class animBlendNodeAdditiveI16(LSByType):
-    TYPE = 'animBlendNodeAdditiveI16'
+class HIKPinning2State(NodeType):
+    TAG = 'HIKPinning2State'
 
 
-class animBlendNodeAdditiveI32(LSByType):
-    TYPE = 'animBlendNodeAdditiveI32'
+class HIKProperty2State(NodeType):
+    TAG = 'HIKProperty2State'
 
 
-class animBlendNodeAdditiveRotation(LSByType):
-    TYPE = 'animBlendNodeAdditiveRotation'
+class HIKRetargeterNode(NodeType):
+    TAG = 'HIKRetargeterNode'
 
 
-class animBlendNodeAdditiveScale(LSByType):
-    TYPE = 'animBlendNodeAdditiveScale'
+class HIKSK2State(NodeType):
+    TAG = 'HIKSK2State'
 
 
-class animBlendNodeBoolean(LSByType):
-    TYPE = 'animBlendNodeBoolean'
+class HIKSkeletonGeneratorNode(NodeType):
+    TAG = 'HIKSkeletonGeneratorNode'
 
 
-class animBlendNodeEnum(LSByType):
-    TYPE = 'animBlendNodeEnum'
+class HIKSolverNode(NodeType):
+    TAG = 'HIKSolverNode'
 
 
-class animBlendNodeTime(LSByType):
-    TYPE = 'animBlendNodeTime'
+class HIKState2Effector(NodeType):
+    TAG = 'HIKState2Effector'
 
 
-class animClip(LSByType):
-    TYPE = 'animClip'
+class HIKState2FK(NodeType):
+    TAG = 'HIKState2FK'
 
 
-class animCurveTA(LSByType):
-    TYPE = 'animCurveTA'
+class HIKState2GlobalSK(NodeType):
+    TAG = 'HIKState2GlobalSK'
 
 
-class animCurveTL(LSByType):
-    TYPE = 'animCurveTL'
+class HIKState2SK(NodeType):
+    TAG = 'HIKState2SK'
 
 
-class animCurveTT(LSByType):
-    TYPE = 'animCurveTT'
+class ShaderfxShader(NodeType):
+    TAG = 'ShaderfxShader'
 
 
-class animCurveTU(LSByType):
-    TYPE = 'animCurveTU'
+class StingrayPBS(NodeType):
+    TAG = 'StingrayPBS'
 
 
-class animCurveUA(LSByType):
-    TYPE = 'animCurveUA'
+class Unfold3DOptimize(NodeType):
+    TAG = 'Unfold3DOptimize'
 
 
-class animCurveUL(LSByType):
-    TYPE = 'animCurveUL'
+class Unfold3DUnfold(NodeType):
+    TAG = 'Unfold3DUnfold'
 
 
-class animCurveUT(LSByType):
-    TYPE = 'animCurveUT'
+class AboutToSetValueTestNode(NodeType):
+    TAG = 'aboutToSetValueTestNode'
 
 
-class animCurveUU(LSByType):
-    TYPE = 'animCurveUU'
+class AddDoubleLinear(NodeType):
+    TAG = 'addDoubleLinear'
 
 
-class animLayer(LSByType):
-    TYPE = 'animLayer'
+class AddMatrix(NodeType):
+    TAG = 'addMatrix'
 
 
-class animLayerClip(LSByType):
-    TYPE = 'animLayerClip'
+class AdskMaterial(NodeType):
+    TAG = 'adskMaterial'
 
 
-class animLayerClipContainer(LSByType):
-    TYPE = 'animLayerClipContainer'
+class AdskPrepareRenderGlobals(NodeType):
+    TAG = 'adskPrepareRenderGlobals'
 
 
-class animLayerClipRoster(LSByType):
-    TYPE = 'animLayerClipRoster'
+class AimConstraint(NodeType):
+    TAG = 'aimConstraint'
 
 
-class animLayerClipRotation(LSByType):
-    TYPE = 'animLayerClipRotation'
+class AirField(NodeType):
+    TAG = 'airField'
 
 
-class animLayerClipSingle(LSByType):
-    TYPE = 'animLayerClipSingle'
+class AirManip(NodeType):
+    TAG = 'airManip'
 
 
-class animLayerClipTRS(LSByType):
-    TYPE = 'animLayerClipTRS'
+class AlignCurve(NodeType):
+    TAG = 'alignCurve'
 
 
-class anisotropic(LSByType):
-    TYPE = 'anisotropic'
+class AlignManip(NodeType):
+    TAG = 'alignManip'
 
 
-class annotationShape(LSByType):
-    TYPE = 'annotationShape'
+class AlignSurface(NodeType):
+    TAG = 'alignSurface'
 
 
-class apfEntityNode(LSByType):
-    TYPE = 'apfEntityNode'
+class AmbientLight(NodeType):
+    TAG = 'ambientLight'
 
 
-class apfFileNode(LSByType):
-    TYPE = 'apfFileNode'
+class AngleBetween(NodeType):
+    TAG = 'angleBetween'
 
 
-class arcLengthDimension(LSByType):
-    TYPE = 'arcLengthDimension'
+class AngleDimension(NodeType):
+    TAG = 'angleDimension'
 
 
-class areaLight(LSByType):
-    TYPE = 'areaLight'
+class AnimBlend(NodeType):
+    TAG = 'animBlend'
 
 
-class arrayMapper(LSByType):
-    TYPE = 'arrayMapper'
+class AnimBlendInOut(NodeType):
+    TAG = 'animBlendInOut'
 
 
-class arrowManip(LSByType):
-    TYPE = 'arrowManip'
+class AnimBlendNodeAdditive(NodeType):
+    TAG = 'animBlendNodeAdditive'
 
 
-class assemblyDefinition(LSByType):
-    TYPE = 'assemblyDefinition'
+class AnimBlendNodeAdditiveDA(NodeType):
+    TAG = 'animBlendNodeAdditiveDA'
 
 
-class assemblyReference(LSByType):
-    TYPE = 'assemblyReference'
+class AnimBlendNodeAdditiveDL(NodeType):
+    TAG = 'animBlendNodeAdditiveDL'
 
 
-class attachCurve(LSByType):
-    TYPE = 'attachCurve'
+class AnimBlendNodeAdditiveF(NodeType):
+    TAG = 'animBlendNodeAdditiveF'
 
 
-class attachSurface(LSByType):
-    TYPE = 'attachSurface'
+class AnimBlendNodeAdditiveFA(NodeType):
+    TAG = 'animBlendNodeAdditiveFA'
 
 
-class attrHierarchyTest(LSByType):
-    TYPE = 'attrHierarchyTest'
+class AnimBlendNodeAdditiveFL(NodeType):
+    TAG = 'animBlendNodeAdditiveFL'
 
 
-class audio(LSByType):
-    TYPE = 'audio'
+class AnimBlendNodeAdditiveI16(NodeType):
+    TAG = 'animBlendNodeAdditiveI16'
 
 
-class avgCurves(LSByType):
-    TYPE = 'avgCurves'
+class AnimBlendNodeAdditiveI32(NodeType):
+    TAG = 'animBlendNodeAdditiveI32'
 
 
-class avgCurvesManip(LSByType):
-    TYPE = 'avgCurvesManip'
+class AnimBlendNodeAdditiveRotation(NodeType):
+    TAG = 'animBlendNodeAdditiveRotation'
 
 
-class avgNurbsSurfacePoints(LSByType):
-    TYPE = 'avgNurbsSurfacePoints'
+class AnimBlendNodeAdditiveScale(NodeType):
+    TAG = 'animBlendNodeAdditiveScale'
 
 
-class avgSurfacePoints(LSByType):
-    TYPE = 'avgSurfacePoints'
+class AnimBlendNodeBoolean(NodeType):
+    TAG = 'animBlendNodeBoolean'
 
 
-class axesActionManip(LSByType):
-    TYPE = 'axesActionManip'
+class AnimBlendNodeEnum(NodeType):
+    TAG = 'animBlendNodeEnum'
 
 
-class ballProjManip(LSByType):
-    TYPE = 'ballProjManip'
+class AnimBlendNodeTime(NodeType):
+    TAG = 'animBlendNodeTime'
 
 
-class barnDoorManip(LSByType):
-    TYPE = 'barnDoorManip'
+class AnimClip(NodeType):
+    TAG = 'animClip'
 
 
-class baseLattice(LSByType):
-    TYPE = 'baseLattice'
+class AnimCurveTA(NodeType):
+    TAG = 'animCurveTA'
 
 
-class bevel(LSByType):
-    TYPE = 'bevel'
+class AnimCurveTL(NodeType):
+    TAG = 'animCurveTL'
 
 
-class bevelManip(LSByType):
-    TYPE = 'bevelManip'
+class AnimCurveTT(NodeType):
+    TAG = 'animCurveTT'
 
 
-class bevelPlus(LSByType):
-    TYPE = 'bevelPlus'
+class AnimCurveTU(NodeType):
+    TAG = 'animCurveTU'
 
 
-class bezierCurve(LSByType):
-    TYPE = 'bezierCurve'
+class AnimCurveUA(NodeType):
+    TAG = 'animCurveUA'
 
 
-class bezierCurveToNurbs(LSByType):
-    TYPE = 'bezierCurveToNurbs'
+class AnimCurveUL(NodeType):
+    TAG = 'animCurveUL'
 
 
-class bifrostAeroMaterial(LSByType):
-    TYPE = 'bifrostAeroMaterial'
+class AnimCurveUT(NodeType):
+    TAG = 'animCurveUT'
 
 
-class bifrostAttrNotifier(LSByType):
-    TYPE = 'bifrostAttrNotifier'
+class AnimCurveUU(NodeType):
+    TAG = 'animCurveUU'
 
 
-class bifrostContainer(LSByType):
-    TYPE = 'bifrostContainer'
+class AnimLayer(NodeType):
+    TAG = 'animLayer'
 
 
-class bifrostFoamMaterial(LSByType):
-    TYPE = 'bifrostFoamMaterial'
+class AnimLayerClip(NodeType):
+    TAG = 'animLayerClip'
 
 
-class bifrostLiquidMaterial(LSByType):
-    TYPE = 'bifrostLiquidMaterial'
+class AnimLayerClipContainer(NodeType):
+    TAG = 'animLayerClipContainer'
 
 
-class bifrostShape(LSByType):
-    TYPE = 'bifrostShape'
+class AnimLayerClipRoster(NodeType):
+    TAG = 'animLayerClipRoster'
 
 
-class blendColorSets(LSByType):
-    TYPE = 'blendColorSets'
+class AnimLayerClipRotation(NodeType):
+    TAG = 'animLayerClipRotation'
 
 
-class blendColors(LSByType):
-    TYPE = 'blendColors'
+class AnimLayerClipSingle(NodeType):
+    TAG = 'animLayerClipSingle'
 
 
-class blendDevice(LSByType):
-    TYPE = 'blendDevice'
+class AnimLayerClipTRS(NodeType):
+    TAG = 'animLayerClipTRS'
 
 
-class blendManip(LSByType):
-    TYPE = 'blendManip'
+class Anisotropic(NodeType):
+    TAG = 'anisotropic'
 
 
-class blendShape(LSByType):
-    TYPE = 'blendShape'
+class AnnotationShape(NodeType):
+    TAG = 'annotationShape'
 
 
-class blendTwoAttr(LSByType):
-    TYPE = 'blendTwoAttr'
+class ApfEntityNode(NodeType):
+    TAG = 'apfEntityNode'
 
 
-class blendWeighted(LSByType):
-    TYPE = 'blendWeighted'
+class ApfFileNode(NodeType):
+    TAG = 'apfFileNode'
 
 
-class blindDataTemplate(LSByType):
-    TYPE = 'blindDataTemplate'
+class ArcLengthDimension(NodeType):
+    TAG = 'arcLengthDimension'
 
 
-class blinn(LSByType):
-    TYPE = 'blinn'
+class AreaLight(NodeType):
+    TAG = 'areaLight'
 
 
-class boneLattice(LSByType):
-    TYPE = 'boneLattice'
+class ArrayMapper(NodeType):
+    TAG = 'arrayMapper'
 
 
-class boolean(LSByType):
-    TYPE = 'boolean'
+class ArrowManip(NodeType):
+    TAG = 'arrowManip'
 
 
-class boundary(LSByType):
-    TYPE = 'boundary'
+class AssemblyDefinition(NodeType):
+    TAG = 'assemblyDefinition'
 
 
-class brownian(LSByType):
-    TYPE = 'brownian'
+class AssemblyReference(NodeType):
+    TAG = 'assemblyReference'
 
 
-class brush(LSByType):
-    TYPE = 'brush'
+class AttachCurve(NodeType):
+    TAG = 'attachCurve'
 
 
-class bulge(LSByType):
-    TYPE = 'bulge'
+class AttachSurface(NodeType):
+    TAG = 'attachSurface'
 
 
-class bump2d(LSByType):
-    TYPE = 'bump2d'
+class AttrHierarchyTest(NodeType):
+    TAG = 'attrHierarchyTest'
 
 
-class bump3d(LSByType):
-    TYPE = 'bump3d'
+class Audio(NodeType):
+    TAG = 'audio'
 
 
-class buttonManip(LSByType):
-    TYPE = 'buttonManip'
+class AvgCurves(NodeType):
+    TAG = 'avgCurves'
 
 
-class cMuscleCreator(LSByType):
-    TYPE = 'cMuscleCreator'
+class AvgCurvesManip(NodeType):
+    TAG = 'avgCurvesManip'
 
 
-class cMuscleDebug(LSByType):
-    TYPE = 'cMuscleDebug'
+class AvgNurbsSurfacePoints(NodeType):
+    TAG = 'avgNurbsSurfacePoints'
 
 
-class cMuscleDirection(LSByType):
-    TYPE = 'cMuscleDirection'
+class AvgSurfacePoints(NodeType):
+    TAG = 'avgSurfacePoints'
 
 
-class cMuscleDisplace(LSByType):
-    TYPE = 'cMuscleDisplace'
+class AxesActionManip(NodeType):
+    TAG = 'axesActionManip'
 
 
-class cMuscleDisplay(LSByType):
-    TYPE = 'cMuscleDisplay'
+class BallProjManip(NodeType):
+    TAG = 'ballProjManip'
 
 
-class cMuscleFalloff(LSByType):
-    TYPE = 'cMuscleFalloff'
+class BarnDoorManip(NodeType):
+    TAG = 'barnDoorManip'
 
 
-class cMuscleKeepOut(LSByType):
-    TYPE = 'cMuscleKeepOut'
+class BaseLattice(NodeType):
+    TAG = 'baseLattice'
 
 
-class cMuscleMultiCollide(LSByType):
-    TYPE = 'cMuscleMultiCollide'
+class Bevel(NodeType):
+    TAG = 'bevel'
 
 
-class cMuscleObject(LSByType):
-    TYPE = 'cMuscleObject'
+class BevelManip(NodeType):
+    TAG = 'bevelManip'
 
 
-class cMuscleRelative(LSByType):
-    TYPE = 'cMuscleRelative'
+class BevelPlus(NodeType):
+    TAG = 'bevelPlus'
 
 
-class cMuscleShader(LSByType):
-    TYPE = 'cMuscleShader'
+class BezierCurve(NodeType):
+    TAG = 'bezierCurve'
 
 
-class cMuscleSmartCollide(LSByType):
-    TYPE = 'cMuscleSmartCollide'
+class BezierCurveToNurbs(NodeType):
+    TAG = 'bezierCurveToNurbs'
 
 
-class cMuscleSmartConstraint(LSByType):
-    TYPE = 'cMuscleSmartConstraint'
+class BifrostAeroMaterial(NodeType):
+    TAG = 'bifrostAeroMaterial'
 
 
-class cMuscleSpline(LSByType):
-    TYPE = 'cMuscleSpline'
+class BifrostAttrNotifier(NodeType):
+    TAG = 'bifrostAttrNotifier'
 
 
-class cMuscleSplineDeformer(LSByType):
-    TYPE = 'cMuscleSplineDeformer'
+class BifrostContainer(NodeType):
+    TAG = 'bifrostContainer'
 
 
-class cMuscleStretch(LSByType):
-    TYPE = 'cMuscleStretch'
+class BifrostFoamMaterial(NodeType):
+    TAG = 'bifrostFoamMaterial'
 
 
-class cMuscleSurfAttach(LSByType):
-    TYPE = 'cMuscleSurfAttach'
+class BifrostLiquidMaterial(NodeType):
+    TAG = 'bifrostLiquidMaterial'
 
 
-class cMuscleSystem(LSByType):
-    TYPE = 'cMuscleSystem'
+class BifrostShape(NodeType):
+    TAG = 'bifrostShape'
 
 
-class cacheBlend(LSByType):
-    TYPE = 'cacheBlend'
+class BlendColorSets(NodeType):
+    TAG = 'blendColorSets'
 
 
-class cacheFile(LSByType):
-    TYPE = 'cacheFile'
+class BlendColors(NodeType):
+    TAG = 'blendColors'
 
 
-class caddyManip(LSByType):
-    TYPE = 'caddyManip'
+class BlendDevice(NodeType):
+    TAG = 'blendDevice'
 
 
-class caddyManipBase(LSByType):
-    TYPE = 'caddyManipBase'
+class BlendManip(NodeType):
+    TAG = 'blendManip'
 
 
-class camera(LSByType):
-    TYPE = 'camera'
+class BlendShape(NodeType):
+    TAG = 'blendShape'
 
 
-class cameraManip(LSByType):
-    TYPE = 'cameraManip'
+class BlendTwoAttr(NodeType):
+    TAG = 'blendTwoAttr'
 
 
-class cameraPlaneManip(LSByType):
-    TYPE = 'cameraPlaneManip'
+class BlendWeighted(NodeType):
+    TAG = 'blendWeighted'
 
 
-class cameraSet(LSByType):
-    TYPE = 'cameraSet'
+class BlindDataTemplate(NodeType):
+    TAG = 'blindDataTemplate'
 
 
-class cameraView(LSByType):
-    TYPE = 'cameraView'
+class Blinn(NodeType):
+    TAG = 'blinn'
 
 
-class centerManip(LSByType):
-    TYPE = 'centerManip'
+class BoneLattice(NodeType):
+    TAG = 'boneLattice'
 
 
-class character(LSByType):
-    TYPE = 'character'
+class Boolean(NodeType):
+    TAG = 'boolean'
 
 
-class characterMap(LSByType):
-    TYPE = 'characterMap'
+class Boundary(NodeType):
+    TAG = 'boundary'
 
 
-class characterOffset(LSByType):
-    TYPE = 'characterOffset'
+class Brownian(NodeType):
+    TAG = 'brownian'
 
 
-class checker(LSByType):
-    TYPE = 'checker'
+class Brush(NodeType):
+    TAG = 'brush'
 
 
-class choice(LSByType):
-    TYPE = 'choice'
+class Bulge(NodeType):
+    TAG = 'bulge'
 
 
-class chooser(LSByType):
-    TYPE = 'chooser'
+class Bump2d(NodeType):
+    TAG = 'bump2d'
 
 
-class circleManip(LSByType):
-    TYPE = 'circleManip'
+class Bump3d(NodeType):
+    TAG = 'bump3d'
 
 
-class circleSweepManip(LSByType):
-    TYPE = 'circleSweepManip'
+class ButtonManip(NodeType):
+    TAG = 'buttonManip'
 
 
-class clamp(LSByType):
-    TYPE = 'clamp'
+class CMuscleCreator(NodeType):
+    TAG = 'cMuscleCreator'
 
 
-class clipGhostShape(LSByType):
-    TYPE = 'clipGhostShape'
+class CMuscleDebug(NodeType):
+    TAG = 'cMuscleDebug'
 
 
-class clipLibrary(LSByType):
-    TYPE = 'clipLibrary'
+class CMuscleDirection(NodeType):
+    TAG = 'cMuscleDirection'
 
 
-class clipScheduler(LSByType):
-    TYPE = 'clipScheduler'
+class CMuscleDisplace(NodeType):
+    TAG = 'cMuscleDisplace'
 
 
-class clipToGhostData(LSByType):
-    TYPE = 'clipToGhostData'
+class CMuscleDisplay(NodeType):
+    TAG = 'cMuscleDisplay'
 
 
-class closeCurve(LSByType):
-    TYPE = 'closeCurve'
+class CMuscleFalloff(NodeType):
+    TAG = 'cMuscleFalloff'
 
 
-class closeSurface(LSByType):
-    TYPE = 'closeSurface'
+class CMuscleKeepOut(NodeType):
+    TAG = 'cMuscleKeepOut'
 
 
-class closestPointOnMesh(LSByType):
-    TYPE = 'closestPointOnMesh'
+class CMuscleMultiCollide(NodeType):
+    TAG = 'cMuscleMultiCollide'
 
 
-class closestPointOnSurface(LSByType):
-    TYPE = 'closestPointOnSurface'
+class CMuscleObject(NodeType):
+    TAG = 'cMuscleObject'
 
 
-class cloth(LSByType):
-    TYPE = 'cloth'
+class CMuscleRelative(NodeType):
+    TAG = 'cMuscleRelative'
 
 
-class cloud(LSByType):
-    TYPE = 'cloud'
+class CMuscleShader(NodeType):
+    TAG = 'cMuscleShader'
 
 
-class cluster(LSByType):
-    TYPE = 'cluster'
+class CMuscleSmartCollide(NodeType):
+    TAG = 'cMuscleSmartCollide'
 
 
-class clusterFlexorShape(LSByType):
-    TYPE = 'clusterFlexorShape'
+class CMuscleSmartConstraint(NodeType):
+    TAG = 'cMuscleSmartConstraint'
 
 
-class clusterHandle(LSByType):
-    TYPE = 'clusterHandle'
+class CMuscleSpline(NodeType):
+    TAG = 'cMuscleSpline'
 
 
-class coiManip(LSByType):
-    TYPE = 'coiManip'
+class CMuscleSplineDeformer(NodeType):
+    TAG = 'cMuscleSplineDeformer'
 
 
-class collisionModel(LSByType):
-    TYPE = 'collisionModel'
+class CMuscleStretch(NodeType):
+    TAG = 'cMuscleStretch'
 
 
-class colorManagementGlobals(LSByType):
-    TYPE = 'colorManagementGlobals'
+class CMuscleSurfAttach(NodeType):
+    TAG = 'cMuscleSurfAttach'
 
 
-class colorProfile(LSByType):
-    TYPE = 'colorProfile'
+class CMuscleSystem(NodeType):
+    TAG = 'cMuscleSystem'
 
 
-class compactPlugArrayTest(LSByType):
-    TYPE = 'compactPlugArrayTest'
+class CacheBlend(NodeType):
+    TAG = 'cacheBlend'
 
 
-class componentManip(LSByType):
-    TYPE = 'componentManip'
+class CacheFile(NodeType):
+    TAG = 'cacheFile'
 
 
-class composeMatrix(LSByType):
-    TYPE = 'composeMatrix'
+class CaddyManip(NodeType):
+    TAG = 'caddyManip'
 
 
-class concentricProjManip(LSByType):
-    TYPE = 'concentricProjManip'
+class CaddyManipBase(NodeType):
+    TAG = 'caddyManipBase'
 
 
-class condition(LSByType):
-    TYPE = 'condition'
+class Camera(NodeType):
+    TAG = 'camera'
 
 
-class container(LSByType):
-    TYPE = 'container'
+class CameraManip(NodeType):
+    TAG = 'cameraManip'
 
 
-class containerBase(LSByType):
-    TYPE = 'containerBase'
+class CameraPlaneManip(NodeType):
+    TAG = 'cameraPlaneManip'
 
 
-class contourProjManip(LSByType):
-    TYPE = 'contourProjManip'
+class CameraSet(NodeType):
+    TAG = 'cameraSet'
 
 
-class contrast(LSByType):
-    TYPE = 'contrast'
+class CameraView(NodeType):
+    TAG = 'cameraView'
 
 
-class controller(LSByType):
-    TYPE = 'controller'
+class CenterManip(NodeType):
+    TAG = 'centerManip'
 
 
-class copyColorSet(LSByType):
-    TYPE = 'copyColorSet'
+class Character(NodeType):
+    TAG = 'character'
 
 
-class copyUVSet(LSByType):
-    TYPE = 'copyUVSet'
+class CharacterMap(NodeType):
+    TAG = 'characterMap'
 
 
-class cpManip(LSByType):
-    TYPE = 'cpManip'
+class CharacterOffset(NodeType):
+    TAG = 'characterOffset'
 
 
-class crater(LSByType):
-    TYPE = 'crater'
+class Checker(NodeType):
+    TAG = 'checker'
 
 
-class creaseSet(LSByType):
-    TYPE = 'creaseSet'
+class Choice(NodeType):
+    TAG = 'choice'
 
 
-class createBPManip(LSByType):
-    TYPE = 'createBPManip'
+class Chooser(NodeType):
+    TAG = 'chooser'
 
 
-class createCVManip(LSByType):
-    TYPE = 'createCVManip'
+class CircleManip(NodeType):
+    TAG = 'circleManip'
 
 
-class createColorSet(LSByType):
-    TYPE = 'createColorSet'
+class CircleSweepManip(NodeType):
+    TAG = 'circleSweepManip'
 
 
-class createEPManip(LSByType):
-    TYPE = 'createEPManip'
+class Clamp(NodeType):
+    TAG = 'clamp'
 
 
-class createPtexUV(LSByType):
-    TYPE = 'createPtexUV'
+class ClipGhostShape(NodeType):
+    TAG = 'clipGhostShape'
 
 
-class createUVSet(LSByType):
-    TYPE = 'createUVSet'
+class ClipLibrary(NodeType):
+    TAG = 'clipLibrary'
 
 
-class cte(LSByType):
-    TYPE = 'cte'
+class ClipScheduler(NodeType):
+    TAG = 'clipScheduler'
 
 
-class cteAnimSource(LSByType):
-    TYPE = 'cteAnimSource'
+class ClipToGhostData(NodeType):
+    TAG = 'clipToGhostData'
 
 
-class cteCurveVisualizer(LSByType):
-    TYPE = 'cteCurveVisualizer'
+class CloseCurve(NodeType):
+    TAG = 'closeCurve'
 
 
-class cteInterpolatorRotation(LSByType):
-    TYPE = 'cteInterpolatorRotation'
+class CloseSurface(NodeType):
+    TAG = 'closeSurface'
 
 
-class cteInterpolatorSingle(LSByType):
-    TYPE = 'cteInterpolatorSingle'
+class ClosestPointOnMesh(NodeType):
+    TAG = 'closestPointOnMesh'
 
 
-class cteInterpolatorTRS(LSByType):
-    TYPE = 'cteInterpolatorTRS'
+class ClosestPointOnSurface(NodeType):
+    TAG = 'closestPointOnSurface'
 
 
-class cteRoster(LSByType):
-    TYPE = 'cteRoster'
+class Cloth(NodeType):
+    TAG = 'cloth'
 
 
-class cteTracks(LSByType):
-    TYPE = 'cteTracks'
+class Cloud(NodeType):
+    TAG = 'cloud'
 
 
-class cubeManip(LSByType):
-    TYPE = 'cubeManip'
+class Cluster(NodeType):
+    TAG = 'cluster'
 
 
-class cubicProjManip(LSByType):
-    TYPE = 'cubicProjManip'
+class ClusterFlexorShape(NodeType):
+    TAG = 'clusterFlexorShape'
 
 
-class curveEdManip(LSByType):
-    TYPE = 'curveEdManip'
+class ClusterHandle(NodeType):
+    TAG = 'clusterHandle'
 
 
-class curveFromMeshCoM(LSByType):
-    TYPE = 'curveFromMeshCoM'
+class CoiManip(NodeType):
+    TAG = 'coiManip'
 
 
-class curveFromMeshEdge(LSByType):
-    TYPE = 'curveFromMeshEdge'
+class CollisionModel(NodeType):
+    TAG = 'collisionModel'
 
 
-class curveFromSubdivEdge(LSByType):
-    TYPE = 'curveFromSubdivEdge'
+class ColorManagementGlobals(NodeType):
+    TAG = 'colorManagementGlobals'
 
 
-class curveFromSubdivFace(LSByType):
-    TYPE = 'curveFromSubdivFace'
+class ColorProfile(NodeType):
+    TAG = 'colorProfile'
 
 
-class curveFromSurfaceBnd(LSByType):
-    TYPE = 'curveFromSurfaceBnd'
+class CompactPlugArrayTest(NodeType):
+    TAG = 'compactPlugArrayTest'
 
 
-class curveFromSurfaceCoS(LSByType):
-    TYPE = 'curveFromSurfaceCoS'
+class ComponentManip(NodeType):
+    TAG = 'componentManip'
 
 
-class curveFromSurfaceIso(LSByType):
-    TYPE = 'curveFromSurfaceIso'
+class ComposeMatrix(NodeType):
+    TAG = 'composeMatrix'
 
 
-class curveInfo(LSByType):
-    TYPE = 'curveInfo'
+class ConcentricProjManip(NodeType):
+    TAG = 'concentricProjManip'
 
 
-class curveIntersect(LSByType):
-    TYPE = 'curveIntersect'
+class Condition(NodeType):
+    TAG = 'condition'
 
 
-class curveNormalizerAngle(LSByType):
-    TYPE = 'curveNormalizerAngle'
+class Container(NodeType):
+    TAG = 'container'
 
 
-class curveNormalizerLinear(LSByType):
-    TYPE = 'curveNormalizerLinear'
+class ContainerBase(NodeType):
+    TAG = 'containerBase'
 
 
-class curveSegmentManip(LSByType):
-    TYPE = 'curveSegmentManip'
+class ContourProjManip(NodeType):
+    TAG = 'contourProjManip'
 
 
-class curveVarGroup(LSByType):
-    TYPE = 'curveVarGroup'
+class Contrast(NodeType):
+    TAG = 'contrast'
 
 
-class cylindricalProjManip(LSByType):
-    TYPE = 'cylindricalProjManip'
+class Controller(NodeType):
+    TAG = 'controller'
 
 
-class dagContainer(LSByType):
-    TYPE = 'dagContainer'
+class CopyColorSet(NodeType):
+    TAG = 'copyColorSet'
 
 
-class dagPose(LSByType):
-    TYPE = 'dagPose'
+class CopyUVSet(NodeType):
+    TAG = 'copyUVSet'
 
 
-class dataBlockTest(LSByType):
-    TYPE = 'dataBlockTest'
+class CpManip(NodeType):
+    TAG = 'cpManip'
 
 
-class decomposeMatrix(LSByType):
-    TYPE = 'decomposeMatrix'
+class Crater(NodeType):
+    TAG = 'crater'
 
 
-class defaultLightList(LSByType):
-    TYPE = 'defaultLightList'
+class CreaseSet(NodeType):
+    TAG = 'creaseSet'
 
 
-class defaultRenderUtilityList(LSByType):
-    TYPE = 'defaultRenderUtilityList'
+class CreateBPManip(NodeType):
+    TAG = 'createBPManip'
 
 
-class defaultRenderingList(LSByType):
-    TYPE = 'defaultRenderingList'
+class CreateCVManip(NodeType):
+    TAG = 'createCVManip'
 
 
-class defaultShaderList(LSByType):
-    TYPE = 'defaultShaderList'
+class CreateColorSet(NodeType):
+    TAG = 'createColorSet'
 
 
-class defaultTextureList(LSByType):
-    TYPE = 'defaultTextureList'
+class CreateEPManip(NodeType):
+    TAG = 'createEPManip'
 
 
-class deformBend(LSByType):
-    TYPE = 'deformBend'
+class CreatePtexUV(NodeType):
+    TAG = 'createPtexUV'
 
 
-class deformBendManip(LSByType):
-    TYPE = 'deformBendManip'
+class CreateUVSet(NodeType):
+    TAG = 'createUVSet'
 
 
-class deformFlare(LSByType):
-    TYPE = 'deformFlare'
+class Cte(NodeType):
+    TAG = 'cte'
 
 
-class deformFlareManip(LSByType):
-    TYPE = 'deformFlareManip'
+class CteAnimSource(NodeType):
+    TAG = 'cteAnimSource'
 
 
-class deformSine(LSByType):
-    TYPE = 'deformSine'
+class CteCurveVisualizer(NodeType):
+    TAG = 'cteCurveVisualizer'
 
 
-class deformSineManip(LSByType):
-    TYPE = 'deformSineManip'
+class CteInterpolatorRotation(NodeType):
+    TAG = 'cteInterpolatorRotation'
 
 
-class deformSquash(LSByType):
-    TYPE = 'deformSquash'
+class CteInterpolatorSingle(NodeType):
+    TAG = 'cteInterpolatorSingle'
 
 
-class deformSquashManip(LSByType):
-    TYPE = 'deformSquashManip'
+class CteInterpolatorTRS(NodeType):
+    TAG = 'cteInterpolatorTRS'
 
 
-class deformTwist(LSByType):
-    TYPE = 'deformTwist'
+class CteRoster(NodeType):
+    TAG = 'cteRoster'
 
 
-class deformTwistManip(LSByType):
-    TYPE = 'deformTwistManip'
+class CteTracks(NodeType):
+    TAG = 'cteTracks'
 
 
-class deformWave(LSByType):
-    TYPE = 'deformWave'
+class CubeManip(NodeType):
+    TAG = 'cubeManip'
 
 
-class deformWaveManip(LSByType):
-    TYPE = 'deformWaveManip'
+class CubicProjManip(NodeType):
+    TAG = 'cubicProjManip'
 
 
-class deleteColorSet(LSByType):
-    TYPE = 'deleteColorSet'
+class CurveEdManip(NodeType):
+    TAG = 'curveEdManip'
 
 
-class deleteComponent(LSByType):
-    TYPE = 'deleteComponent'
+class CurveFromMeshCoM(NodeType):
+    TAG = 'curveFromMeshCoM'
 
 
-class deleteUVSet(LSByType):
-    TYPE = 'deleteUVSet'
+class CurveFromMeshEdge(NodeType):
+    TAG = 'curveFromMeshEdge'
 
 
-class deltaMush(LSByType):
-    TYPE = 'deltaMush'
+class CurveFromSubdivEdge(NodeType):
+    TAG = 'curveFromSubdivEdge'
 
 
-class detachCurve(LSByType):
-    TYPE = 'detachCurve'
+class CurveFromSubdivFace(NodeType):
+    TAG = 'curveFromSubdivFace'
 
 
-class detachSurface(LSByType):
-    TYPE = 'detachSurface'
+class CurveFromSurfaceBnd(NodeType):
+    TAG = 'curveFromSurfaceBnd'
 
 
-class directedDisc(LSByType):
-    TYPE = 'directedDisc'
+class CurveFromSurfaceCoS(NodeType):
+    TAG = 'curveFromSurfaceCoS'
 
 
-class directionManip(LSByType):
-    TYPE = 'directionManip'
+class CurveFromSurfaceIso(NodeType):
+    TAG = 'curveFromSurfaceIso'
 
 
-class directionalLight(LSByType):
-    TYPE = 'directionalLight'
+class CurveInfo(NodeType):
+    TAG = 'curveInfo'
 
 
-class discManip(LSByType):
-    TYPE = 'discManip'
+class CurveIntersect(NodeType):
+    TAG = 'curveIntersect'
 
 
-class diskCache(LSByType):
-    TYPE = 'diskCache'
+class CurveNormalizerAngle(NodeType):
+    TAG = 'curveNormalizerAngle'
 
 
-class displacementShader(LSByType):
-    TYPE = 'displacementShader'
+class CurveNormalizerLinear(NodeType):
+    TAG = 'curveNormalizerLinear'
 
 
-class displayLayer(LSByType):
-    TYPE = 'displayLayer'
+class CurveSegmentManip(NodeType):
+    TAG = 'curveSegmentManip'
 
 
-class displayLayerManager(LSByType):
-    TYPE = 'displayLayerManager'
+class CurveVarGroup(NodeType):
+    TAG = 'curveVarGroup'
 
 
-class distanceBetween(LSByType):
-    TYPE = 'distanceBetween'
+class CylindricalProjManip(NodeType):
+    TAG = 'cylindricalProjManip'
 
 
-class distanceDimShape(LSByType):
-    TYPE = 'distanceDimShape'
+class DagContainer(NodeType):
+    TAG = 'dagContainer'
 
 
-class distanceManip(LSByType):
-    TYPE = 'distanceManip'
+class DagPose(NodeType):
+    TAG = 'dagPose'
 
 
-class dof(LSByType):
-    TYPE = 'dof'
+class DataBlockTest(NodeType):
+    TAG = 'dataBlockTest'
 
 
-class dofManip(LSByType):
-    TYPE = 'dofManip'
+class DecomposeMatrix(NodeType):
+    TAG = 'decomposeMatrix'
 
 
-class doubleShadingSwitch(LSByType):
-    TYPE = 'doubleShadingSwitch'
+class DefaultLightList(NodeType):
+    TAG = 'defaultLightList'
 
 
-class dpBirailSrf(LSByType):
-    TYPE = 'dpBirailSrf'
+class DefaultRenderUtilityList(NodeType):
+    TAG = 'defaultRenderUtilityList'
 
 
-class dragField(LSByType):
-    TYPE = 'dragField'
+class DefaultRenderingList(NodeType):
+    TAG = 'defaultRenderingList'
 
 
-class dropoffLocator(LSByType):
-    TYPE = 'dropoffLocator'
+class DefaultShaderList(NodeType):
+    TAG = 'defaultShaderList'
 
 
-class dropoffManip(LSByType):
-    TYPE = 'dropoffManip'
+class DefaultTextureList(NodeType):
+    TAG = 'defaultTextureList'
 
 
-class dynAttenuationManip(LSByType):
-    TYPE = 'dynAttenuationManip'
+class DeformBend(NodeType):
+    TAG = 'deformBend'
 
 
-class dynController(LSByType):
-    TYPE = 'dynController'
+class DeformBendManip(NodeType):
+    TAG = 'deformBendManip'
 
 
-class dynGlobals(LSByType):
-    TYPE = 'dynGlobals'
+class DeformFlare(NodeType):
+    TAG = 'deformFlare'
 
 
-class dynHolder(LSByType):
-    TYPE = 'dynHolder'
+class DeformFlareManip(NodeType):
+    TAG = 'deformFlareManip'
 
 
-class dynSpreadManip(LSByType):
-    TYPE = 'dynSpreadManip'
+class DeformSine(NodeType):
+    TAG = 'deformSine'
 
 
-class dynamicConstraint(LSByType):
-    TYPE = 'dynamicConstraint'
+class DeformSineManip(NodeType):
+    TAG = 'deformSineManip'
 
 
-class editMetadata(LSByType):
-    TYPE = 'editMetadata'
+class DeformSquash(NodeType):
+    TAG = 'deformSquash'
 
 
-class editsManager(LSByType):
-    TYPE = 'editsManager'
+class DeformSquashManip(NodeType):
+    TAG = 'deformSquashManip'
 
 
-class emitterManip(LSByType):
-    TYPE = 'emitterManip'
+class DeformTwist(NodeType):
+    TAG = 'deformTwist'
 
 
-class enableManip(LSByType):
-    TYPE = 'enableManip'
+class DeformTwistManip(NodeType):
+    TAG = 'deformTwistManip'
 
 
-class envBall(LSByType):
-    TYPE = 'envBall'
+class DeformWave(NodeType):
+    TAG = 'deformWave'
 
 
-class envChrome(LSByType):
-    TYPE = 'envChrome'
+class DeformWaveManip(NodeType):
+    TAG = 'deformWaveManip'
 
 
-class envCube(LSByType):
-    TYPE = 'envCube'
+class DeleteColorSet(NodeType):
+    TAG = 'deleteColorSet'
 
 
-class envFacade(LSByType):
-    TYPE = 'envFacade'
+class DeleteComponent(NodeType):
+    TAG = 'deleteComponent'
 
 
-class envFog(LSByType):
-    TYPE = 'envFog'
+class DeleteUVSet(NodeType):
+    TAG = 'deleteUVSet'
 
 
-class envSky(LSByType):
-    TYPE = 'envSky'
+class DeltaMush(NodeType):
+    TAG = 'deltaMush'
 
 
-class envSphere(LSByType):
-    TYPE = 'envSphere'
+class DetachCurve(NodeType):
+    TAG = 'detachCurve'
 
 
-class environmentFog(LSByType):
-    TYPE = 'environmentFog'
+class DetachSurface(NodeType):
+    TAG = 'detachSurface'
 
 
-class eulerToQuat(LSByType):
-    TYPE = 'eulerToQuat'
+class DirectedDisc(NodeType):
+    TAG = 'directedDisc'
 
 
-class explodeNurbsShell(LSByType):
-    TYPE = 'explodeNurbsShell'
+class DirectionManip(NodeType):
+    TAG = 'directionManip'
 
 
-class expression(LSByType):
-    TYPE = 'expression'
+class DirectionalLight(NodeType):
+    TAG = 'directionalLight'
 
 
-class extendCurve(LSByType):
-    TYPE = 'extendCurve'
+class DiscManip(NodeType):
+    TAG = 'discManip'
 
 
-class extendCurveDistanceManip(LSByType):
-    TYPE = 'extendCurveDistanceManip'
+class DiskCache(NodeType):
+    TAG = 'diskCache'
 
 
-class extendSurface(LSByType):
-    TYPE = 'extendSurface'
+class DisplacementShader(NodeType):
+    TAG = 'displacementShader'
 
 
-class extendSurfaceDistanceManip(LSByType):
-    TYPE = 'extendSurfaceDistanceManip'
+class DisplayLayer(NodeType):
+    TAG = 'displayLayer'
 
 
-class extrude(LSByType):
-    TYPE = 'extrude'
+class DisplayLayerManager(NodeType):
+    TAG = 'displayLayerManager'
 
 
-class extrudeManip(LSByType):
-    TYPE = 'extrudeManip'
+class DistanceBetween(NodeType):
+    TAG = 'distanceBetween'
 
 
-class facade(LSByType):
-    TYPE = 'facade'
+class DistanceDimShape(NodeType):
+    TAG = 'distanceDimShape'
 
 
-class ffBlendSrf(LSByType):
-    TYPE = 'ffBlendSrf'
+class DistanceManip(NodeType):
+    TAG = 'distanceManip'
 
 
-class ffBlendSrfObsolete(LSByType):
-    TYPE = 'ffBlendSrfObsolete'
+class Dof(NodeType):
+    TAG = 'dof'
 
 
-class ffFilletSrf(LSByType):
-    TYPE = 'ffFilletSrf'
+class DofManip(NodeType):
+    TAG = 'dofManip'
 
 
-class ffd(LSByType):
-    TYPE = 'ffd'
+class DoubleShadingSwitch(NodeType):
+    TAG = 'doubleShadingSwitch'
 
 
-class fieldManip(LSByType):
-    TYPE = 'fieldManip'
+class DpBirailSrf(NodeType):
+    TAG = 'dpBirailSrf'
 
 
-class fieldsManip(LSByType):
-    TYPE = 'fieldsManip'
+class DragField(NodeType):
+    TAG = 'dragField'
 
 
-class file(LSByType):
-    TYPE = 'file'
+class DropoffLocator(NodeType):
+    TAG = 'dropoffLocator'
 
 
-class filletCurve(LSByType):
-    TYPE = 'filletCurve'
+class DropoffManip(NodeType):
+    TAG = 'dropoffManip'
 
 
-class filterClosestSample(LSByType):
-    TYPE = 'filterClosestSample'
+class DynAttenuationManip(NodeType):
+    TAG = 'dynAttenuationManip'
 
 
-class filterEuler(LSByType):
-    TYPE = 'filterEuler'
+class DynController(NodeType):
+    TAG = 'dynController'
 
 
-class filterResample(LSByType):
-    TYPE = 'filterResample'
+class DynGlobals(NodeType):
+    TAG = 'dynGlobals'
 
 
-class filterSimplify(LSByType):
-    TYPE = 'filterSimplify'
+class DynHolder(NodeType):
+    TAG = 'dynHolder'
 
 
-class fitBspline(LSByType):
-    TYPE = 'fitBspline'
+class DynSpreadManip(NodeType):
+    TAG = 'dynSpreadManip'
 
 
-class flexorShape(LSByType):
-    TYPE = 'flexorShape'
+class DynamicConstraint(NodeType):
+    TAG = 'dynamicConstraint'
 
 
-class flow(LSByType):
-    TYPE = 'flow'
+class EditMetadata(NodeType):
+    TAG = 'editMetadata'
 
 
-class fluidEmitter(LSByType):
-    TYPE = 'fluidEmitter'
+class EditsManager(NodeType):
+    TAG = 'editsManager'
 
 
-class fluidShape(LSByType):
-    TYPE = 'fluidShape'
+class EmitterManip(NodeType):
+    TAG = 'emitterManip'
 
 
-class fluidSliceManip(LSByType):
-    TYPE = 'fluidSliceManip'
+class EnableManip(NodeType):
+    TAG = 'enableManip'
 
 
-class fluidTexture2D(LSByType):
-    TYPE = 'fluidTexture2D'
+class EnvBall(NodeType):
+    TAG = 'envBall'
 
 
-class fluidTexture3D(LSByType):
-    TYPE = 'fluidTexture3D'
+class EnvChrome(NodeType):
+    TAG = 'envChrome'
 
 
-class follicle(LSByType):
-    TYPE = 'follicle'
+class EnvCube(NodeType):
+    TAG = 'envCube'
 
 
-class forceUpdateManip(LSByType):
-    TYPE = 'forceUpdateManip'
+class EnvFacade(NodeType):
+    TAG = 'envFacade'
 
 
-class fosterParent(LSByType):
-    TYPE = 'fosterParent'
+class EnvFog(NodeType):
+    TAG = 'envFog'
 
 
-class fourByFourMatrix(LSByType):
-    TYPE = 'fourByFourMatrix'
+class EnvSky(NodeType):
+    TAG = 'envSky'
 
 
-class fractal(LSByType):
-    TYPE = 'fractal'
+class EnvSphere(NodeType):
+    TAG = 'envSphere'
 
 
-class frameCache(LSByType):
-    TYPE = 'frameCache'
+class EnvironmentFog(NodeType):
+    TAG = 'environmentFog'
 
 
-class freePointManip(LSByType):
-    TYPE = 'freePointManip'
+class EulerToQuat(NodeType):
+    TAG = 'eulerToQuat'
 
 
-class freePointTriadManip(LSByType):
-    TYPE = 'freePointTriadManip'
+class ExplodeNurbsShell(NodeType):
+    TAG = 'explodeNurbsShell'
 
 
-class gameFbxExporter(LSByType):
-    TYPE = 'gameFbxExporter'
+class Expression(NodeType):
+    TAG = 'expression'
 
 
-class gammaCorrect(LSByType):
-    TYPE = 'gammaCorrect'
+class ExtendCurve(NodeType):
+    TAG = 'extendCurve'
 
 
-class geoConnectable(LSByType):
-    TYPE = 'geoConnectable'
+class ExtendCurveDistanceManip(NodeType):
+    TAG = 'extendCurveDistanceManip'
 
 
-class geoConnector(LSByType):
-    TYPE = 'geoConnector'
+class ExtendSurface(NodeType):
+    TAG = 'extendSurface'
 
 
-class geomBind(LSByType):
-    TYPE = 'geomBind'
+class ExtendSurfaceDistanceManip(NodeType):
+    TAG = 'extendSurfaceDistanceManip'
 
 
-class geometryConstraint(LSByType):
-    TYPE = 'geometryConstraint'
+class Extrude(NodeType):
+    TAG = 'extrude'
 
 
-class geometryFilter(LSByType):
-    TYPE = 'geometryFilter'
+class ExtrudeManip(NodeType):
+    TAG = 'extrudeManip'
 
 
-class geometryOnLineManip(LSByType):
-    TYPE = 'geometryOnLineManip'
+class Facade(NodeType):
+    TAG = 'facade'
 
 
-class geometryVarGroup(LSByType):
-    TYPE = 'geometryVarGroup'
+class FfBlendSrf(NodeType):
+    TAG = 'ffBlendSrf'
 
 
-class globalCacheControl(LSByType):
-    TYPE = 'globalCacheControl'
+class FfBlendSrfObsolete(NodeType):
+    TAG = 'ffBlendSrfObsolete'
 
 
-class globalStitch(LSByType):
-    TYPE = 'globalStitch'
+class FfFilletSrf(NodeType):
+    TAG = 'ffFilletSrf'
 
 
-class gpuCache(LSByType):
-    TYPE = 'gpuCache'
+class Ffd(NodeType):
+    TAG = 'ffd'
 
 
-class granite(LSByType):
-    TYPE = 'granite'
+class FieldManip(NodeType):
+    TAG = 'fieldManip'
 
 
-class gravityField(LSByType):
-    TYPE = 'gravityField'
+class FieldsManip(NodeType):
+    TAG = 'fieldsManip'
 
 
-class greasePencilSequence(LSByType):
-    TYPE = 'greasePencilSequence'
+class File(NodeType):
+    TAG = 'file'
 
 
-class greasePlane(LSByType):
-    TYPE = 'greasePlane'
+class FilletCurve(NodeType):
+    TAG = 'filletCurve'
 
 
-class greasePlaneRenderShape(LSByType):
-    TYPE = 'greasePlaneRenderShape'
+class FilterClosestSample(NodeType):
+    TAG = 'filterClosestSample'
 
 
-class grid(LSByType):
-    TYPE = 'grid'
+class FilterEuler(NodeType):
+    TAG = 'filterEuler'
 
 
-class groupId(LSByType):
-    TYPE = 'groupId'
+class FilterResample(NodeType):
+    TAG = 'filterResample'
 
 
-class groupParts(LSByType):
-    TYPE = 'groupParts'
+class FilterSimplify(NodeType):
+    TAG = 'filterSimplify'
 
 
-class guide(LSByType):
-    TYPE = 'guide'
+class FitBspline(NodeType):
+    TAG = 'fitBspline'
 
 
-class hairConstraint(LSByType):
-    TYPE = 'hairConstraint'
+class FlexorShape(NodeType):
+    TAG = 'flexorShape'
 
 
-class hairSystem(LSByType):
-    TYPE = 'hairSystem'
+class Flow(NodeType):
+    TAG = 'flow'
 
 
-class hairTubeShader(LSByType):
-    TYPE = 'hairTubeShader'
+class FluidEmitter(NodeType):
+    TAG = 'fluidEmitter'
 
 
-class hardenPoint(LSByType):
-    TYPE = 'hardenPoint'
+class FluidShape(NodeType):
+    TAG = 'fluidShape'
 
 
-class hardwareRenderGlobals(LSByType):
-    TYPE = 'hardwareRenderGlobals'
+class FluidSliceManip(NodeType):
+    TAG = 'fluidSliceManip'
 
 
-class hardwareRenderingGlobals(LSByType):
-    TYPE = 'hardwareRenderingGlobals'
+class FluidTexture2D(NodeType):
+    TAG = 'fluidTexture2D'
 
 
-class heightField(LSByType):
-    TYPE = 'heightField'
+class FluidTexture3D(NodeType):
+    TAG = 'fluidTexture3D'
 
 
-class hierarchyTestNode1(LSByType):
-    TYPE = 'hierarchyTestNode1'
+class Follicle(NodeType):
+    TAG = 'follicle'
 
 
-class hierarchyTestNode2(LSByType):
-    TYPE = 'hierarchyTestNode2'
+class ForceUpdateManip(NodeType):
+    TAG = 'forceUpdateManip'
 
 
-class hierarchyTestNode3(LSByType):
-    TYPE = 'hierarchyTestNode3'
+class FosterParent(NodeType):
+    TAG = 'fosterParent'
 
 
-class hikEffector(LSByType):
-    TYPE = 'hikEffector'
+class FourByFourMatrix(NodeType):
+    TAG = 'fourByFourMatrix'
 
 
-class hikFKJoint(LSByType):
-    TYPE = 'hikFKJoint'
+class Fractal(NodeType):
+    TAG = 'fractal'
 
 
-class hikFloorContactMarker(LSByType):
-    TYPE = 'hikFloorContactMarker'
+class FrameCache(NodeType):
+    TAG = 'frameCache'
 
 
-class hikGroundPlane(LSByType):
-    TYPE = 'hikGroundPlane'
+class FreePointManip(NodeType):
+    TAG = 'freePointManip'
 
 
-class hikHandle(LSByType):
-    TYPE = 'hikHandle'
+class FreePointTriadManip(NodeType):
+    TAG = 'freePointTriadManip'
 
 
-class hikIKEffector(LSByType):
-    TYPE = 'hikIKEffector'
+class GameFbxExporter(NodeType):
+    TAG = 'gameFbxExporter'
 
 
-class hikSolver(LSByType):
-    TYPE = 'hikSolver'
+class GammaCorrect(NodeType):
+    TAG = 'gammaCorrect'
 
 
-class historySwitch(LSByType):
-    TYPE = 'historySwitch'
+class GeoConnectable(NodeType):
+    TAG = 'geoConnectable'
 
 
-class holdMatrix(LSByType):
-    TYPE = 'holdMatrix'
+class GeoConnector(NodeType):
+    TAG = 'geoConnector'
 
 
-class hsvToRgb(LSByType):
-    TYPE = 'hsvToRgb'
+class GeomBind(NodeType):
+    TAG = 'geomBind'
 
 
-class hwReflectionMap(LSByType):
-    TYPE = 'hwReflectionMap'
+class GeometryConstraint(NodeType):
+    TAG = 'geometryConstraint'
 
 
-class hwRenderGlobals(LSByType):
-    TYPE = 'hwRenderGlobals'
+class GeometryFilter(NodeType):
+    TAG = 'geometryFilter'
 
 
-class hyperGraphInfo(LSByType):
-    TYPE = 'hyperGraphInfo'
+class GeometryOnLineManip(NodeType):
+    TAG = 'geometryOnLineManip'
 
 
-class hyperLayout(LSByType):
-    TYPE = 'hyperLayout'
+class GeometryVarGroup(NodeType):
+    TAG = 'geometryVarGroup'
 
 
-class hyperView(LSByType):
-    TYPE = 'hyperView'
+class GlobalCacheControl(NodeType):
+    TAG = 'globalCacheControl'
 
 
-class igBrushManip(LSByType):
-    TYPE = 'igBrushManip'
+class GlobalStitch(NodeType):
+    TAG = 'globalStitch'
 
 
-class igmDescription(LSByType):
-    TYPE = 'igmDescription'
+class GpuCache(NodeType):
+    TAG = 'gpuCache'
 
 
-class ik2Bsolver(LSByType):
-    TYPE = 'ik2Bsolver'
+class Granite(NodeType):
+    TAG = 'granite'
 
 
-class ikEffector(LSByType):
-    TYPE = 'ikEffector'
+class GravityField(NodeType):
+    TAG = 'gravityField'
 
 
-class ikHandle(LSByType):
-    TYPE = 'ikHandle'
+class GreasePencilSequence(NodeType):
+    TAG = 'greasePencilSequence'
 
 
-class ikMCsolver(LSByType):
-    TYPE = 'ikMCsolver'
+class GreasePlane(NodeType):
+    TAG = 'greasePlane'
 
 
-class ikPASolver(LSByType):
-    TYPE = 'ikPASolver'
+class GreasePlaneRenderShape(NodeType):
+    TAG = 'greasePlaneRenderShape'
 
 
-class ikRPManip(LSByType):
-    TYPE = 'ikRPManip'
+class Grid(NodeType):
+    TAG = 'grid'
 
 
-class ikRPsolver(LSByType):
-    TYPE = 'ikRPsolver'
+class GroupId(NodeType):
+    TAG = 'groupId'
 
 
-class ikSCsolver(LSByType):
-    TYPE = 'ikSCsolver'
+class GroupParts(NodeType):
+    TAG = 'groupParts'
 
 
-class ikSplineManip(LSByType):
-    TYPE = 'ikSplineManip'
+class Guide(NodeType):
+    TAG = 'guide'
 
 
-class ikSplineSolver(LSByType):
-    TYPE = 'ikSplineSolver'
+class HairConstraint(NodeType):
+    TAG = 'hairConstraint'
 
 
-class ikSpringSolver(LSByType):
-    TYPE = 'ikSpringSolver'
+class HairSystem(NodeType):
+    TAG = 'hairSystem'
 
 
-class ikSystem(LSByType):
-    TYPE = 'ikSystem'
+class HairTubeShader(NodeType):
+    TAG = 'hairTubeShader'
 
 
-class imagePlane(LSByType):
-    TYPE = 'imagePlane'
+class HardenPoint(NodeType):
+    TAG = 'hardenPoint'
 
 
-class implicitBox(LSByType):
-    TYPE = 'implicitBox'
+class HardwareRenderGlobals(NodeType):
+    TAG = 'hardwareRenderGlobals'
 
 
-class implicitCone(LSByType):
-    TYPE = 'implicitCone'
+class HardwareRenderingGlobals(NodeType):
+    TAG = 'hardwareRenderingGlobals'
 
 
-class implicitSphere(LSByType):
-    TYPE = 'implicitSphere'
+class HeightField(NodeType):
+    TAG = 'heightField'
 
 
-class indexManip(LSByType):
-    TYPE = 'indexManip'
+class HierarchyTestNode1(NodeType):
+    TAG = 'hierarchyTestNode1'
 
 
-class insertKnotCurve(LSByType):
-    TYPE = 'insertKnotCurve'
+class HierarchyTestNode2(NodeType):
+    TAG = 'hierarchyTestNode2'
 
 
-class insertKnotSurface(LSByType):
-    TYPE = 'insertKnotSurface'
+class HierarchyTestNode3(NodeType):
+    TAG = 'hierarchyTestNode3'
 
 
-class instancer(LSByType):
-    TYPE = 'instancer'
+class HikEffector(NodeType):
+    TAG = 'hikEffector'
 
 
-class intersectSurface(LSByType):
-    TYPE = 'intersectSurface'
+class HikFKJoint(NodeType):
+    TAG = 'hikFKJoint'
 
 
-class inverseMatrix(LSByType):
-    TYPE = 'inverseMatrix'
+class HikFloorContactMarker(NodeType):
+    TAG = 'hikFloorContactMarker'
 
 
-class isoparmManip(LSByType):
-    TYPE = 'isoparmManip'
+class HikGroundPlane(NodeType):
+    TAG = 'hikGroundPlane'
 
 
-class jiggle(LSByType):
-    TYPE = 'jiggle'
+class HikHandle(NodeType):
+    TAG = 'hikHandle'
 
 
-class joint(LSByType):
-    TYPE = 'joint'
+class HikIKEffector(NodeType):
+    TAG = 'hikIKEffector'
 
 
-class jointCluster(LSByType):
-    TYPE = 'jointCluster'
+class HikSolver(NodeType):
+    TAG = 'hikSolver'
 
 
-class jointClusterManip(LSByType):
-    TYPE = 'jointClusterManip'
+class HistorySwitch(NodeType):
+    TAG = 'historySwitch'
 
 
-class jointFfd(LSByType):
-    TYPE = 'jointFfd'
+class HoldMatrix(NodeType):
+    TAG = 'holdMatrix'
 
 
-class jointLattice(LSByType):
-    TYPE = 'jointLattice'
+class HsvToRgb(NodeType):
+    TAG = 'hsvToRgb'
 
 
-class jointTranslateManip(LSByType):
-    TYPE = 'jointTranslateManip'
+class HwReflectionMap(NodeType):
+    TAG = 'hwReflectionMap'
 
 
-class keyframeRegionManip(LSByType):
-    TYPE = 'keyframeRegionManip'
+class HwRenderGlobals(NodeType):
+    TAG = 'hwRenderGlobals'
 
 
-class keyingGroup(LSByType):
-    TYPE = 'keyingGroup'
+class HyperGraphInfo(NodeType):
+    TAG = 'hyperGraphInfo'
 
 
-class lambert(LSByType):
-    TYPE = 'lambert'
+class HyperLayout(NodeType):
+    TAG = 'hyperLayout'
 
 
-class lattice(LSByType):
-    TYPE = 'lattice'
+class HyperView(NodeType):
+    TAG = 'hyperView'
 
 
-class layeredShader(LSByType):
-    TYPE = 'layeredShader'
+class IgBrushManip(NodeType):
+    TAG = 'igBrushManip'
 
 
-class layeredTexture(LSByType):
-    TYPE = 'layeredTexture'
+class IgmDescription(NodeType):
+    TAG = 'igmDescription'
 
 
-class leastSquaresModifier(LSByType):
-    TYPE = 'leastSquaresModifier'
+class Ik2Bsolver(NodeType):
+    TAG = 'ik2Bsolver'
 
 
-class leather(LSByType):
-    TYPE = 'leather'
+class IkEffector(NodeType):
+    TAG = 'ikEffector'
 
 
-class lightFog(LSByType):
-    TYPE = 'lightFog'
+class IkHandle(NodeType):
+    TAG = 'ikHandle'
 
 
-class lightInfo(LSByType):
-    TYPE = 'lightInfo'
+class IkMCsolver(NodeType):
+    TAG = 'ikMCsolver'
 
 
-class lightLinker(LSByType):
-    TYPE = 'lightLinker'
+class IkPASolver(NodeType):
+    TAG = 'ikPASolver'
 
 
-class lightList(LSByType):
-    TYPE = 'lightList'
+class IkRPManip(NodeType):
+    TAG = 'ikRPManip'
 
 
-class lightManip(LSByType):
-    TYPE = 'lightManip'
+class IkRPsolver(NodeType):
+    TAG = 'ikRPsolver'
 
 
-class limitManip(LSByType):
-    TYPE = 'limitManip'
+class IkSCsolver(NodeType):
+    TAG = 'ikSCsolver'
 
 
-class lineManip(LSByType):
-    TYPE = 'lineManip'
+class IkSplineManip(NodeType):
+    TAG = 'ikSplineManip'
 
 
-class lineModifier(LSByType):
-    TYPE = 'lineModifier'
+class IkSplineSolver(NodeType):
+    TAG = 'ikSplineSolver'
 
 
-class locator(LSByType):
-    TYPE = 'locator'
+class IkSpringSolver(NodeType):
+    TAG = 'ikSpringSolver'
 
 
-class lodGroup(LSByType):
-    TYPE = 'lodGroup'
+class IkSystem(NodeType):
+    TAG = 'ikSystem'
 
 
-class lodThresholds(LSByType):
-    TYPE = 'lodThresholds'
+class ImagePlane(NodeType):
+    TAG = 'imagePlane'
 
 
-class loft(LSByType):
-    TYPE = 'loft'
+class ImplicitBox(NodeType):
+    TAG = 'implicitBox'
 
 
-class lookAt(LSByType):
-    TYPE = 'lookAt'
+class ImplicitCone(NodeType):
+    TAG = 'implicitCone'
 
 
-class luminance(LSByType):
-    TYPE = 'luminance'
+class ImplicitSphere(NodeType):
+    TAG = 'implicitSphere'
 
 
-class makeGroup(LSByType):
-    TYPE = 'makeGroup'
+class IndexManip(NodeType):
+    TAG = 'indexManip'
 
 
-class makeIllustratorCurves(LSByType):
-    TYPE = 'makeIllustratorCurves'
+class InsertKnotCurve(NodeType):
+    TAG = 'insertKnotCurve'
 
 
-class makeNurbCircle(LSByType):
-    TYPE = 'makeNurbCircle'
+class InsertKnotSurface(NodeType):
+    TAG = 'insertKnotSurface'
 
 
-class makeNurbCone(LSByType):
-    TYPE = 'makeNurbCone'
+class Instancer(NodeType):
+    TAG = 'instancer'
 
 
-class makeNurbCube(LSByType):
-    TYPE = 'makeNurbCube'
+class IntersectSurface(NodeType):
+    TAG = 'intersectSurface'
 
 
-class makeNurbCylinder(LSByType):
-    TYPE = 'makeNurbCylinder'
+class InverseMatrix(NodeType):
+    TAG = 'inverseMatrix'
 
 
-class makeNurbPlane(LSByType):
-    TYPE = 'makeNurbPlane'
+class IsoparmManip(NodeType):
+    TAG = 'isoparmManip'
 
 
-class makeNurbSphere(LSByType):
-    TYPE = 'makeNurbSphere'
+class Jiggle(NodeType):
+    TAG = 'jiggle'
 
 
-class makeNurbTorus(LSByType):
-    TYPE = 'makeNurbTorus'
+class Joint(NodeType):
+    TAG = 'joint'
 
 
-class makeNurbsSquare(LSByType):
-    TYPE = 'makeNurbsSquare'
+class JointCluster(NodeType):
+    TAG = 'jointCluster'
 
 
-class makeTextCurves(LSByType):
-    TYPE = 'makeTextCurves'
+class JointClusterManip(NodeType):
+    TAG = 'jointClusterManip'
 
 
-class makeThreePointCircularArc(LSByType):
-    TYPE = 'makeThreePointCircularArc'
+class JointFfd(NodeType):
+    TAG = 'jointFfd'
 
 
-class makeThreePointCircularArcManip(LSByType):
-    TYPE = 'makeThreePointCircularArcManip'
+class JointLattice(NodeType):
+    TAG = 'jointLattice'
 
 
-class makeTwoPointCircularArc(LSByType):
-    TYPE = 'makeTwoPointCircularArc'
+class JointTranslateManip(NodeType):
+    TAG = 'jointTranslateManip'
 
 
-class makeTwoPointCircularArcManip(LSByType):
-    TYPE = 'makeTwoPointCircularArcManip'
+class KeyframeRegionManip(NodeType):
+    TAG = 'keyframeRegionManip'
 
 
-class mandelbrot(LSByType):
-    TYPE = 'mandelbrot'
+class KeyingGroup(NodeType):
+    TAG = 'keyingGroup'
 
 
-class mandelbrot3D(LSByType):
-    TYPE = 'mandelbrot3D'
+class Lambert(NodeType):
+    TAG = 'lambert'
 
 
-class manip2DContainer(LSByType):
-    TYPE = 'manip2DContainer'
+class Lattice(NodeType):
+    TAG = 'lattice'
 
 
-class manipContainer(LSByType):
-    TYPE = 'manipContainer'
+class LayeredShader(NodeType):
+    TAG = 'layeredShader'
 
 
-class marble(LSByType):
-    TYPE = 'marble'
+class LayeredTexture(NodeType):
+    TAG = 'layeredTexture'
 
 
-class markerManip(LSByType):
-    TYPE = 'markerManip'
+class LeastSquaresModifier(NodeType):
+    TAG = 'leastSquaresModifier'
 
 
-class materialFacade(LSByType):
-    TYPE = 'materialFacade'
+class Leather(NodeType):
+    TAG = 'leather'
 
 
-class materialInfo(LSByType):
-    TYPE = 'materialInfo'
+class LightFog(NodeType):
+    TAG = 'lightFog'
 
 
-class membrane(LSByType):
-    TYPE = 'membrane'
+class LightInfo(NodeType):
+    TAG = 'lightInfo'
 
 
-class mentalrayTexture(LSByType):
-    TYPE = 'mentalrayTexture'
+class LightLinker(NodeType):
+    TAG = 'lightLinker'
 
 
-class mesh(LSByType):
-    TYPE = 'mesh'
+class LightList(NodeType):
+    TAG = 'lightList'
 
 
-class meshVarGroup(LSByType):
-    TYPE = 'meshVarGroup'
+class LightManip(NodeType):
+    TAG = 'lightManip'
 
 
-class motionPath(LSByType):
-    TYPE = 'motionPath'
+class LimitManip(NodeType):
+    TAG = 'limitManip'
 
 
-class motionPathManip(LSByType):
-    TYPE = 'motionPathManip'
+class LineManip(NodeType):
+    TAG = 'lineManip'
 
 
-class motionTrail(LSByType):
-    TYPE = 'motionTrail'
+class LineModifier(NodeType):
+    TAG = 'lineModifier'
 
 
-class motionTrailShape(LSByType):
-    TYPE = 'motionTrailShape'
+class Locator(NodeType):
+    TAG = 'locator'
 
 
-class mountain(LSByType):
-    TYPE = 'mountain'
+class LodGroup(NodeType):
+    TAG = 'lodGroup'
 
 
-class moveBezierHandleManip(LSByType):
-    TYPE = 'moveBezierHandleManip'
+class LodThresholds(NodeType):
+    TAG = 'lodThresholds'
 
 
-class moveVertexManip(LSByType):
-    TYPE = 'moveVertexManip'
+class Loft(NodeType):
+    TAG = 'loft'
 
 
-class movie(LSByType):
-    TYPE = 'movie'
+class LookAt(NodeType):
+    TAG = 'lookAt'
 
 
-class mpBirailSrf(LSByType):
-    TYPE = 'mpBirailSrf'
+class Luminance(NodeType):
+    TAG = 'luminance'
 
 
-class multDoubleLinear(LSByType):
-    TYPE = 'multDoubleLinear'
+class MakeGroup(NodeType):
+    TAG = 'makeGroup'
 
 
-class multMatrix(LSByType):
-    TYPE = 'multMatrix'
+class MakeIllustratorCurves(NodeType):
+    TAG = 'makeIllustratorCurves'
 
 
-class multilisterLight(LSByType):
-    TYPE = 'multilisterLight'
+class MakeNurbCircle(NodeType):
+    TAG = 'makeNurbCircle'
 
 
-class multiplyDivide(LSByType):
-    TYPE = 'multiplyDivide'
+class MakeNurbCone(NodeType):
+    TAG = 'makeNurbCone'
 
 
-class mute(LSByType):
-    TYPE = 'mute'
+class MakeNurbCube(NodeType):
+    TAG = 'makeNurbCube'
 
 
-class nCloth(LSByType):
-    TYPE = 'nCloth'
+class MakeNurbCylinder(NodeType):
+    TAG = 'makeNurbCylinder'
 
 
-class nComponent(LSByType):
-    TYPE = 'nComponent'
+class MakeNurbPlane(NodeType):
+    TAG = 'makeNurbPlane'
 
 
-class nParticle(LSByType):
-    TYPE = 'nParticle'
+class MakeNurbSphere(NodeType):
+    TAG = 'makeNurbSphere'
 
 
-class nRigid(LSByType):
-    TYPE = 'nRigid'
+class MakeNurbTorus(NodeType):
+    TAG = 'makeNurbTorus'
 
 
-class nearestPointOnCurve(LSByType):
-    TYPE = 'nearestPointOnCurve'
+class MakeNurbsSquare(NodeType):
+    TAG = 'makeNurbsSquare'
 
 
-class network(LSByType):
-    TYPE = 'network'
+class MakeTextCurves(NodeType):
+    TAG = 'makeTextCurves'
 
 
-class newtonField(LSByType):
-    TYPE = 'newtonField'
+class MakeThreePointCircularArc(NodeType):
+    TAG = 'makeThreePointCircularArc'
 
 
-class newtonManip(LSByType):
-    TYPE = 'newtonManip'
+class MakeThreePointCircularArcManip(NodeType):
+    TAG = 'makeThreePointCircularArcManip'
 
 
-class nexManip(LSByType):
-    TYPE = 'nexManip'
+class MakeTwoPointCircularArc(NodeType):
+    TAG = 'makeTwoPointCircularArc'
 
 
-class nodeGraphEditorBookmarkInfo(LSByType):
-    TYPE = 'nodeGraphEditorBookmarkInfo'
+class MakeTwoPointCircularArcManip(NodeType):
+    TAG = 'makeTwoPointCircularArcManip'
 
 
-class nodeGraphEditorBookmarks(LSByType):
-    TYPE = 'nodeGraphEditorBookmarks'
+class Mandelbrot(NodeType):
+    TAG = 'mandelbrot'
 
 
-class nodeGraphEditorInfo(LSByType):
-    TYPE = 'nodeGraphEditorInfo'
+class Mandelbrot3D(NodeType):
+    TAG = 'mandelbrot3D'
 
 
-class noise(LSByType):
-    TYPE = 'noise'
+class Manip2DContainer(NodeType):
+    TAG = 'manip2DContainer'
 
 
-class nonLinear(LSByType):
-    TYPE = 'nonLinear'
+class ManipContainer(NodeType):
+    TAG = 'manipContainer'
 
 
-class normalConstraint(LSByType):
-    TYPE = 'normalConstraint'
+class Marble(NodeType):
+    TAG = 'marble'
 
 
-class nucleus(LSByType):
-    TYPE = 'nucleus'
+class MarkerManip(NodeType):
+    TAG = 'markerManip'
 
 
-class nurbsCurve(LSByType):
-    TYPE = 'nurbsCurve'
+class MaterialFacade(NodeType):
+    TAG = 'materialFacade'
 
 
-class nurbsCurveToBezier(LSByType):
-    TYPE = 'nurbsCurveToBezier'
+class MaterialInfo(NodeType):
+    TAG = 'materialInfo'
 
 
-class nurbsSurface(LSByType):
-    TYPE = 'nurbsSurface'
+class Membrane(NodeType):
+    TAG = 'membrane'
 
 
-class nurbsTessellate(LSByType):
-    TYPE = 'nurbsTessellate'
+class MentalrayTexture(NodeType):
+    TAG = 'mentalrayTexture'
 
 
-class nurbsToSubdiv(LSByType):
-    TYPE = 'nurbsToSubdiv'
+class Mesh(NodeType):
+    TAG = 'mesh'
 
 
-class nurbsToSubdivProc(LSByType):
-    TYPE = 'nurbsToSubdivProc'
+class MeshVarGroup(NodeType):
+    TAG = 'meshVarGroup'
 
 
-class objectAttrFilter(LSByType):
-    TYPE = 'objectAttrFilter'
+class MotionPath(NodeType):
+    TAG = 'motionPath'
 
 
-class objectBinFilter(LSByType):
-    TYPE = 'objectBinFilter'
+class MotionPathManip(NodeType):
+    TAG = 'motionPathManip'
 
 
-class objectFilter(LSByType):
-    TYPE = 'objectFilter'
+class MotionTrail(NodeType):
+    TAG = 'motionTrail'
 
 
-class objectMultiFilter(LSByType):
-    TYPE = 'objectMultiFilter'
+class MotionTrailShape(NodeType):
+    TAG = 'motionTrailShape'
 
 
-class objectNameFilter(LSByType):
-    TYPE = 'objectNameFilter'
+class Mountain(NodeType):
+    TAG = 'mountain'
 
 
-class objectRenderFilter(LSByType):
-    TYPE = 'objectRenderFilter'
+class MoveBezierHandleManip(NodeType):
+    TAG = 'moveBezierHandleManip'
 
 
-class objectScriptFilter(LSByType):
-    TYPE = 'objectScriptFilter'
+class MoveVertexManip(NodeType):
+    TAG = 'moveVertexManip'
 
 
-class objectSet(LSByType):
-    TYPE = 'objectSet'
+class Movie(NodeType):
+    TAG = 'movie'
 
 
-class objectTypeFilter(LSByType):
-    TYPE = 'objectTypeFilter'
+class MpBirailSrf(NodeType):
+    TAG = 'mpBirailSrf'
 
 
-class ocean(LSByType):
-    TYPE = 'ocean'
+class MultDoubleLinear(NodeType):
+    TAG = 'multDoubleLinear'
 
 
-class oceanShader(LSByType):
-    TYPE = 'oceanShader'
+class MultMatrix(NodeType):
+    TAG = 'multMatrix'
 
 
-class offsetCos(LSByType):
-    TYPE = 'offsetCos'
+class MultilisterLight(NodeType):
+    TAG = 'multilisterLight'
 
 
-class offsetCosManip(LSByType):
-    TYPE = 'offsetCosManip'
+class MultiplyDivide(NodeType):
+    TAG = 'multiplyDivide'
 
 
-class offsetCurve(LSByType):
-    TYPE = 'offsetCurve'
+class Mute(NodeType):
+    TAG = 'mute'
 
 
-class offsetCurveManip(LSByType):
-    TYPE = 'offsetCurveManip'
+class NCloth(NodeType):
+    TAG = 'nCloth'
 
 
-class offsetSurface(LSByType):
-    TYPE = 'offsetSurface'
+class NComponent(NodeType):
+    TAG = 'nComponent'
 
 
-class offsetSurfaceManip(LSByType):
-    TYPE = 'offsetSurfaceManip'
+class NParticle(NodeType):
+    TAG = 'nParticle'
 
 
-class oldBlindDataBase(LSByType):
-    TYPE = 'oldBlindDataBase'
+class NRigid(NodeType):
+    TAG = 'nRigid'
 
 
-class oldGeometryConstraint(LSByType):
-    TYPE = 'oldGeometryConstraint'
+class NearestPointOnCurve(NodeType):
+    TAG = 'nearestPointOnCurve'
 
 
-class oldNormalConstraint(LSByType):
-    TYPE = 'oldNormalConstraint'
+class Network(NodeType):
+    TAG = 'network'
 
 
-class oldTangentConstraint(LSByType):
-    TYPE = 'oldTangentConstraint'
+class NewtonField(NodeType):
+    TAG = 'newtonField'
 
 
-class opticalFX(LSByType):
-    TYPE = 'opticalFX'
+class NewtonManip(NodeType):
+    TAG = 'newtonManip'
 
 
-class orientConstraint(LSByType):
-    TYPE = 'orientConstraint'
+class NexManip(NodeType):
+    TAG = 'nexManip'
 
 
-class orientationMarker(LSByType):
-    TYPE = 'orientationMarker'
+class NodeGraphEditorBookmarkInfo(NodeType):
+    TAG = 'nodeGraphEditorBookmarkInfo'
 
 
-class pairBlend(LSByType):
-    TYPE = 'pairBlend'
+class NodeGraphEditorBookmarks(NodeType):
+    TAG = 'nodeGraphEditorBookmarks'
 
 
-class paramDimension(LSByType):
-    TYPE = 'paramDimension'
+class NodeGraphEditorInfo(NodeType):
+    TAG = 'nodeGraphEditorInfo'
 
 
-class parentConstraint(LSByType):
-    TYPE = 'parentConstraint'
+class Noise(NodeType):
+    TAG = 'noise'
 
 
-class particle(LSByType):
-    TYPE = 'particle'
+class NonLinear(NodeType):
+    TAG = 'nonLinear'
 
 
-class particleAgeMapper(LSByType):
-    TYPE = 'particleAgeMapper'
+class NormalConstraint(NodeType):
+    TAG = 'normalConstraint'
 
 
-class particleCloud(LSByType):
-    TYPE = 'particleCloud'
+class Nucleus(NodeType):
+    TAG = 'nucleus'
 
 
-class particleColorMapper(LSByType):
-    TYPE = 'particleColorMapper'
+class NurbsCurve(NodeType):
+    TAG = 'nurbsCurve'
 
 
-class particleIncandMapper(LSByType):
-    TYPE = 'particleIncandMapper'
+class NurbsCurveToBezier(NodeType):
+    TAG = 'nurbsCurveToBezier'
 
 
-class particleSamplerInfo(LSByType):
-    TYPE = 'particleSamplerInfo'
+class NurbsSurface(NodeType):
+    TAG = 'nurbsSurface'
 
 
-class particleTranspMapper(LSByType):
-    TYPE = 'particleTranspMapper'
+class NurbsTessellate(NodeType):
+    TAG = 'nurbsTessellate'
 
 
-class partition(LSByType):
-    TYPE = 'partition'
+class NurbsToSubdiv(NodeType):
+    TAG = 'nurbsToSubdiv'
 
 
-class passContributionMap(LSByType):
-    TYPE = 'passContributionMap'
+class NurbsToSubdivProc(NodeType):
+    TAG = 'nurbsToSubdivProc'
 
 
-class passMatrix(LSByType):
-    TYPE = 'passMatrix'
+class ObjectAttrFilter(NodeType):
+    TAG = 'objectAttrFilter'
 
 
-class pfxHair(LSByType):
-    TYPE = 'pfxHair'
+class ObjectBinFilter(NodeType):
+    TAG = 'objectBinFilter'
 
 
-class pfxToon(LSByType):
-    TYPE = 'pfxToon'
+class ObjectFilter(NodeType):
+    TAG = 'objectFilter'
 
 
-class phong(LSByType):
-    TYPE = 'phong'
+class ObjectMultiFilter(NodeType):
+    TAG = 'objectMultiFilter'
 
 
-class phongE(LSByType):
-    TYPE = 'phongE'
+class ObjectNameFilter(NodeType):
+    TAG = 'objectNameFilter'
 
 
-class pivot2dManip(LSByType):
-    TYPE = 'pivot2dManip'
+class ObjectRenderFilter(NodeType):
+    TAG = 'objectRenderFilter'
 
 
-class pivotAndOrientManip(LSByType):
-    TYPE = 'pivotAndOrientManip'
+class ObjectScriptFilter(NodeType):
+    TAG = 'objectScriptFilter'
 
 
-class place2dTexture(LSByType):
-    TYPE = 'place2dTexture'
+class ObjectSet(NodeType):
+    TAG = 'objectSet'
 
 
-class place3dTexture(LSByType):
-    TYPE = 'place3dTexture'
+class ObjectTypeFilter(NodeType):
+    TAG = 'objectTypeFilter'
 
 
-class planarProjManip(LSByType):
-    TYPE = 'planarProjManip'
+class Ocean(NodeType):
+    TAG = 'ocean'
 
 
-class planarTrimSurface(LSByType):
-    TYPE = 'planarTrimSurface'
+class OceanShader(NodeType):
+    TAG = 'oceanShader'
 
 
-class plusMinusAverage(LSByType):
-    TYPE = 'plusMinusAverage'
+class OffsetCos(NodeType):
+    TAG = 'offsetCos'
 
 
-class pointConstraint(LSByType):
-    TYPE = 'pointConstraint'
+class OffsetCosManip(NodeType):
+    TAG = 'offsetCosManip'
 
 
-class pointEmitter(LSByType):
-    TYPE = 'pointEmitter'
+class OffsetCurve(NodeType):
+    TAG = 'offsetCurve'
 
 
-class pointLight(LSByType):
-    TYPE = 'pointLight'
+class OffsetCurveManip(NodeType):
+    TAG = 'offsetCurveManip'
 
 
-class pointMatrixMult(LSByType):
-    TYPE = 'pointMatrixMult'
+class OffsetSurface(NodeType):
+    TAG = 'offsetSurface'
 
 
-class pointOnCurveInfo(LSByType):
-    TYPE = 'pointOnCurveInfo'
+class OffsetSurfaceManip(NodeType):
+    TAG = 'offsetSurfaceManip'
 
 
-class pointOnCurveManip(LSByType):
-    TYPE = 'pointOnCurveManip'
+class OldBlindDataBase(NodeType):
+    TAG = 'oldBlindDataBase'
 
 
-class pointOnLineManip(LSByType):
-    TYPE = 'pointOnLineManip'
+class OldGeometryConstraint(NodeType):
+    TAG = 'oldGeometryConstraint'
 
 
-class pointOnPolyConstraint(LSByType):
-    TYPE = 'pointOnPolyConstraint'
+class OldNormalConstraint(NodeType):
+    TAG = 'oldNormalConstraint'
 
 
-class pointOnSurfManip(LSByType):
-    TYPE = 'pointOnSurfManip'
+class OldTangentConstraint(NodeType):
+    TAG = 'oldTangentConstraint'
 
 
-class pointOnSurfaceInfo(LSByType):
-    TYPE = 'pointOnSurfaceInfo'
+class OpticalFX(NodeType):
+    TAG = 'opticalFX'
 
 
-class pointOnSurfaceManip(LSByType):
-    TYPE = 'pointOnSurfaceManip'
+class OrientConstraint(NodeType):
+    TAG = 'orientConstraint'
 
 
-class poleVectorConstraint(LSByType):
-    TYPE = 'poleVectorConstraint'
+class OrientationMarker(NodeType):
+    TAG = 'orientationMarker'
 
 
-class polyAppend(LSByType):
-    TYPE = 'polyAppend'
+class PairBlend(NodeType):
+    TAG = 'pairBlend'
 
 
-class polyAppendVertex(LSByType):
-    TYPE = 'polyAppendVertex'
+class ParamDimension(NodeType):
+    TAG = 'paramDimension'
 
 
-class polyAutoProj(LSByType):
-    TYPE = 'polyAutoProj'
+class ParentConstraint(NodeType):
+    TAG = 'parentConstraint'
 
 
-class polyAutoProjManip(LSByType):
-    TYPE = 'polyAutoProjManip'
+class Particle(NodeType):
+    TAG = 'particle'
 
 
-class polyAverageVertex(LSByType):
-    TYPE = 'polyAverageVertex'
+class ParticleAgeMapper(NodeType):
+    TAG = 'particleAgeMapper'
 
 
-class polyBevel(LSByType):
-    TYPE = 'polyBevel'
+class ParticleCloud(NodeType):
+    TAG = 'particleCloud'
 
 
-class polyBevel2(LSByType):
-    TYPE = 'polyBevel2'
+class ParticleColorMapper(NodeType):
+    TAG = 'particleColorMapper'
 
 
-class polyBevel3(LSByType):
-    TYPE = 'polyBevel3'
+class ParticleIncandMapper(NodeType):
+    TAG = 'particleIncandMapper'
 
 
-class polyBlindData(LSByType):
-    TYPE = 'polyBlindData'
+class ParticleSamplerInfo(NodeType):
+    TAG = 'particleSamplerInfo'
 
 
-class polyBoolOp(LSByType):
-    TYPE = 'polyBoolOp'
+class ParticleTranspMapper(NodeType):
+    TAG = 'particleTranspMapper'
 
 
-class polyBridgeEdge(LSByType):
-    TYPE = 'polyBridgeEdge'
+class Partition(NodeType):
+    TAG = 'partition'
 
 
-class polyCBoolOp(LSByType):
-    TYPE = 'polyCBoolOp'
+class PassContributionMap(NodeType):
+    TAG = 'passContributionMap'
 
 
-class polyCaddyManip(LSByType):
-    TYPE = 'polyCaddyManip'
+class PassMatrix(NodeType):
+    TAG = 'passMatrix'
 
 
-class polyChipOff(LSByType):
-    TYPE = 'polyChipOff'
+class PfxHair(NodeType):
+    TAG = 'pfxHair'
 
 
-class polyCloseBorder(LSByType):
-    TYPE = 'polyCloseBorder'
+class PfxToon(NodeType):
+    TAG = 'pfxToon'
 
 
-class polyCollapseEdge(LSByType):
-    TYPE = 'polyCollapseEdge'
+class Phong(NodeType):
+    TAG = 'phong'
 
 
-class polyCollapseF(LSByType):
-    TYPE = 'polyCollapseF'
+class PhongE(NodeType):
+    TAG = 'phongE'
 
 
-class polyColorDel(LSByType):
-    TYPE = 'polyColorDel'
+class Pivot2dManip(NodeType):
+    TAG = 'pivot2dManip'
 
 
-class polyColorMod(LSByType):
-    TYPE = 'polyColorMod'
+class PivotAndOrientManip(NodeType):
+    TAG = 'pivotAndOrientManip'
 
 
-class polyColorPerVertex(LSByType):
-    TYPE = 'polyColorPerVertex'
+class Place2dTexture(NodeType):
+    TAG = 'place2dTexture'
 
 
-class polyCone(LSByType):
-    TYPE = 'polyCone'
+class Place3dTexture(NodeType):
+    TAG = 'place3dTexture'
 
 
-class polyConnectComponents(LSByType):
-    TYPE = 'polyConnectComponents'
+class PlanarProjManip(NodeType):
+    TAG = 'planarProjManip'
 
 
-class polyContourProj(LSByType):
-    TYPE = 'polyContourProj'
+class PlanarTrimSurface(NodeType):
+    TAG = 'planarTrimSurface'
 
 
-class polyCopyUV(LSByType):
-    TYPE = 'polyCopyUV'
+class PlusMinusAverage(NodeType):
+    TAG = 'plusMinusAverage'
 
 
-class polyCrease(LSByType):
-    TYPE = 'polyCrease'
+class PointConstraint(NodeType):
+    TAG = 'pointConstraint'
 
 
-class polyCreaseEdge(LSByType):
-    TYPE = 'polyCreaseEdge'
+class PointEmitter(NodeType):
+    TAG = 'pointEmitter'
 
 
-class polyCreateFace(LSByType):
-    TYPE = 'polyCreateFace'
+class PointLight(NodeType):
+    TAG = 'pointLight'
 
 
-class polyCreateToolManip(LSByType):
-    TYPE = 'polyCreateToolManip'
+class PointMatrixMult(NodeType):
+    TAG = 'pointMatrixMult'
 
 
-class polyCube(LSByType):
-    TYPE = 'polyCube'
+class PointOnCurveInfo(NodeType):
+    TAG = 'pointOnCurveInfo'
 
 
-class polyCut(LSByType):
-    TYPE = 'polyCut'
+class PointOnCurveManip(NodeType):
+    TAG = 'pointOnCurveManip'
 
 
-class polyCutManip(LSByType):
-    TYPE = 'polyCutManip'
+class PointOnLineManip(NodeType):
+    TAG = 'pointOnLineManip'
 
 
-class polyCutManipContainer(LSByType):
-    TYPE = 'polyCutManipContainer'
+class PointOnPolyConstraint(NodeType):
+    TAG = 'pointOnPolyConstraint'
 
 
-class polyCylProj(LSByType):
-    TYPE = 'polyCylProj'
+class PointOnSurfManip(NodeType):
+    TAG = 'pointOnSurfManip'
 
 
-class polyCylinder(LSByType):
-    TYPE = 'polyCylinder'
+class PointOnSurfaceInfo(NodeType):
+    TAG = 'pointOnSurfaceInfo'
 
 
-class polyDelEdge(LSByType):
-    TYPE = 'polyDelEdge'
+class PointOnSurfaceManip(NodeType):
+    TAG = 'pointOnSurfaceManip'
 
 
-class polyDelFacet(LSByType):
-    TYPE = 'polyDelFacet'
+class PoleVectorConstraint(NodeType):
+    TAG = 'poleVectorConstraint'
 
 
-class polyDelVertex(LSByType):
-    TYPE = 'polyDelVertex'
+class PolyAppend(NodeType):
+    TAG = 'polyAppend'
 
 
-class polyDuplicateEdge(LSByType):
-    TYPE = 'polyDuplicateEdge'
+class PolyAppendVertex(NodeType):
+    TAG = 'polyAppendVertex'
 
 
-class polyEdgeToCurve(LSByType):
-    TYPE = 'polyEdgeToCurve'
+class PolyAutoProj(NodeType):
+    TAG = 'polyAutoProj'
 
 
-class polyEditEdgeFlow(LSByType):
-    TYPE = 'polyEditEdgeFlow'
+class PolyAutoProjManip(NodeType):
+    TAG = 'polyAutoProjManip'
 
 
-class polyExtrudeEdge(LSByType):
-    TYPE = 'polyExtrudeEdge'
+class PolyAverageVertex(NodeType):
+    TAG = 'polyAverageVertex'
 
 
-class polyExtrudeFace(LSByType):
-    TYPE = 'polyExtrudeFace'
+class PolyBevel(NodeType):
+    TAG = 'polyBevel'
 
 
-class polyExtrudeVertex(LSByType):
-    TYPE = 'polyExtrudeVertex'
+class PolyBevel2(NodeType):
+    TAG = 'polyBevel2'
 
 
-class polyFlipEdge(LSByType):
-    TYPE = 'polyFlipEdge'
+class PolyBevel3(NodeType):
+    TAG = 'polyBevel3'
 
 
-class polyFlipUV(LSByType):
-    TYPE = 'polyFlipUV'
+class PolyBlindData(NodeType):
+    TAG = 'polyBlindData'
 
 
-class polyHelix(LSByType):
-    TYPE = 'polyHelix'
+class PolyBoolOp(NodeType):
+    TAG = 'polyBoolOp'
 
 
-class polyHoleFace(LSByType):
-    TYPE = 'polyHoleFace'
+class PolyBridgeEdge(NodeType):
+    TAG = 'polyBridgeEdge'
 
 
-class polyLayoutUV(LSByType):
-    TYPE = 'polyLayoutUV'
+class PolyCBoolOp(NodeType):
+    TAG = 'polyCBoolOp'
 
 
-class polyMapCut(LSByType):
-    TYPE = 'polyMapCut'
+class PolyCaddyManip(NodeType):
+    TAG = 'polyCaddyManip'
 
 
-class polyMapDel(LSByType):
-    TYPE = 'polyMapDel'
+class PolyChipOff(NodeType):
+    TAG = 'polyChipOff'
 
 
-class polyMapSew(LSByType):
-    TYPE = 'polyMapSew'
+class PolyCloseBorder(NodeType):
+    TAG = 'polyCloseBorder'
 
 
-class polyMapSewMove(LSByType):
-    TYPE = 'polyMapSewMove'
+class PolyCollapseEdge(NodeType):
+    TAG = 'polyCollapseEdge'
 
 
-class polyMappingManip(LSByType):
-    TYPE = 'polyMappingManip'
+class PolyCollapseF(NodeType):
+    TAG = 'polyCollapseF'
 
 
-class polyMergeEdge(LSByType):
-    TYPE = 'polyMergeEdge'
+class PolyColorDel(NodeType):
+    TAG = 'polyColorDel'
 
 
-class polyMergeFace(LSByType):
-    TYPE = 'polyMergeFace'
+class PolyColorMod(NodeType):
+    TAG = 'polyColorMod'
 
 
-class polyMergeUV(LSByType):
-    TYPE = 'polyMergeUV'
+class PolyColorPerVertex(NodeType):
+    TAG = 'polyColorPerVertex'
 
 
-class polyMergeVert(LSByType):
-    TYPE = 'polyMergeVert'
+class PolyCone(NodeType):
+    TAG = 'polyCone'
 
 
-class polyMergeVertsManip(LSByType):
-    TYPE = 'polyMergeVertsManip'
+class PolyConnectComponents(NodeType):
+    TAG = 'polyConnectComponents'
 
 
-class polyMirror(LSByType):
-    TYPE = 'polyMirror'
+class PolyContourProj(NodeType):
+    TAG = 'polyContourProj'
 
 
-class polyModifierManip(LSByType):
-    TYPE = 'polyModifierManip'
+class PolyCopyUV(NodeType):
+    TAG = 'polyCopyUV'
 
 
-class polyModifierManipContainer(LSByType):
-    TYPE = 'polyModifierManipContainer'
+class PolyCrease(NodeType):
+    TAG = 'polyCrease'
 
 
-class polyMoveEdge(LSByType):
-    TYPE = 'polyMoveEdge'
+class PolyCreaseEdge(NodeType):
+    TAG = 'polyCreaseEdge'
 
 
-class polyMoveFace(LSByType):
-    TYPE = 'polyMoveFace'
+class PolyCreateFace(NodeType):
+    TAG = 'polyCreateFace'
 
 
-class polyMoveFacetUV(LSByType):
-    TYPE = 'polyMoveFacetUV'
+class PolyCreateToolManip(NodeType):
+    TAG = 'polyCreateToolManip'
 
 
-class polyMoveUV(LSByType):
-    TYPE = 'polyMoveUV'
+class PolyCube(NodeType):
+    TAG = 'polyCube'
 
 
-class polyMoveUVManip(LSByType):
-    TYPE = 'polyMoveUVManip'
+class PolyCut(NodeType):
+    TAG = 'polyCut'
 
 
-class polyMoveVertex(LSByType):
-    TYPE = 'polyMoveVertex'
+class PolyCutManip(NodeType):
+    TAG = 'polyCutManip'
 
 
-class polyMoveVertexManip(LSByType):
-    TYPE = 'polyMoveVertexManip'
+class PolyCutManipContainer(NodeType):
+    TAG = 'polyCutManipContainer'
 
 
-class polyNormal(LSByType):
-    TYPE = 'polyNormal'
+class PolyCylProj(NodeType):
+    TAG = 'polyCylProj'
 
 
-class polyNormalPerVertex(LSByType):
-    TYPE = 'polyNormalPerVertex'
+class PolyCylinder(NodeType):
+    TAG = 'polyCylinder'
 
 
-class polyNormalizeUV(LSByType):
-    TYPE = 'polyNormalizeUV'
+class PolyDelEdge(NodeType):
+    TAG = 'polyDelEdge'
 
 
-class polyOptUvs(LSByType):
-    TYPE = 'polyOptUvs'
+class PolyDelFacet(NodeType):
+    TAG = 'polyDelFacet'
 
 
-class polyPassThru(LSByType):
-    TYPE = 'polyPassThru'
+class PolyDelVertex(NodeType):
+    TAG = 'polyDelVertex'
 
 
-class polyPinUV(LSByType):
-    TYPE = 'polyPinUV'
+class PolyDuplicateEdge(NodeType):
+    TAG = 'polyDuplicateEdge'
 
 
-class polyPipe(LSByType):
-    TYPE = 'polyPipe'
+class PolyEdgeToCurve(NodeType):
+    TAG = 'polyEdgeToCurve'
 
 
-class polyPlanarProj(LSByType):
-    TYPE = 'polyPlanarProj'
+class PolyEditEdgeFlow(NodeType):
+    TAG = 'polyEditEdgeFlow'
 
 
-class polyPlane(LSByType):
-    TYPE = 'polyPlane'
+class PolyExtrudeEdge(NodeType):
+    TAG = 'polyExtrudeEdge'
 
 
-class polyPlatonicSolid(LSByType):
-    TYPE = 'polyPlatonicSolid'
+class PolyExtrudeFace(NodeType):
+    TAG = 'polyExtrudeFace'
 
 
-class polyPoke(LSByType):
-    TYPE = 'polyPoke'
+class PolyExtrudeVertex(NodeType):
+    TAG = 'polyExtrudeVertex'
 
 
-class polyPokeManip(LSByType):
-    TYPE = 'polyPokeManip'
+class PolyFlipEdge(NodeType):
+    TAG = 'polyFlipEdge'
 
 
-class polyPrimitiveMisc(LSByType):
-    TYPE = 'polyPrimitiveMisc'
+class PolyFlipUV(NodeType):
+    TAG = 'polyFlipUV'
 
 
-class polyPrism(LSByType):
-    TYPE = 'polyPrism'
+class PolyHelix(NodeType):
+    TAG = 'polyHelix'
 
 
-class polyProj(LSByType):
-    TYPE = 'polyProj'
+class PolyHoleFace(NodeType):
+    TAG = 'polyHoleFace'
 
 
-class polyProjManip(LSByType):
-    TYPE = 'polyProjManip'
+class PolyLayoutUV(NodeType):
+    TAG = 'polyLayoutUV'
 
 
-class polyProjectCurve(LSByType):
-    TYPE = 'polyProjectCurve'
+class PolyMapCut(NodeType):
+    TAG = 'polyMapCut'
 
 
-class polyPyramid(LSByType):
-    TYPE = 'polyPyramid'
+class PolyMapDel(NodeType):
+    TAG = 'polyMapDel'
 
 
-class polyQuad(LSByType):
-    TYPE = 'polyQuad'
+class PolyMapSew(NodeType):
+    TAG = 'polyMapSew'
 
 
-class polyReduce(LSByType):
-    TYPE = 'polyReduce'
+class PolyMapSewMove(NodeType):
+    TAG = 'polyMapSewMove'
 
 
-class polyRemesh(LSByType):
-    TYPE = 'polyRemesh'
+class PolyMappingManip(NodeType):
+    TAG = 'polyMappingManip'
 
 
-class polySelectEditFeedbackManip(LSByType):
-    TYPE = 'polySelectEditFeedbackManip'
+class PolyMergeEdge(NodeType):
+    TAG = 'polyMergeEdge'
 
 
-class polySeparate(LSByType):
-    TYPE = 'polySeparate'
+class PolyMergeFace(NodeType):
+    TAG = 'polyMergeFace'
 
 
-class polySewEdge(LSByType):
-    TYPE = 'polySewEdge'
+class PolyMergeUV(NodeType):
+    TAG = 'polyMergeUV'
 
 
-class polySmooth(LSByType):
-    TYPE = 'polySmooth'
+class PolyMergeVert(NodeType):
+    TAG = 'polyMergeVert'
 
 
-class polySmoothFace(LSByType):
-    TYPE = 'polySmoothFace'
+class PolyMergeVertsManip(NodeType):
+    TAG = 'polyMergeVertsManip'
 
 
-class polySmoothProxy(LSByType):
-    TYPE = 'polySmoothProxy'
+class PolyMirror(NodeType):
+    TAG = 'polyMirror'
 
 
-class polySoftEdge(LSByType):
-    TYPE = 'polySoftEdge'
+class PolyModifierManip(NodeType):
+    TAG = 'polyModifierManip'
 
 
-class polySphProj(LSByType):
-    TYPE = 'polySphProj'
+class PolyModifierManipContainer(NodeType):
+    TAG = 'polyModifierManipContainer'
 
 
-class polySphere(LSByType):
-    TYPE = 'polySphere'
+class PolyMoveEdge(NodeType):
+    TAG = 'polyMoveEdge'
 
 
-class polySpinEdge(LSByType):
-    TYPE = 'polySpinEdge'
+class PolyMoveFace(NodeType):
+    TAG = 'polyMoveFace'
 
 
-class polySplit(LSByType):
-    TYPE = 'polySplit'
+class PolyMoveFacetUV(NodeType):
+    TAG = 'polyMoveFacetUV'
 
 
-class polySplitEdge(LSByType):
-    TYPE = 'polySplitEdge'
+class PolyMoveUV(NodeType):
+    TAG = 'polyMoveUV'
 
 
-class polySplitRing(LSByType):
-    TYPE = 'polySplitRing'
+class PolyMoveUVManip(NodeType):
+    TAG = 'polyMoveUVManip'
 
 
-class polySplitToolManip1(LSByType):
-    TYPE = 'polySplitToolManip1'
+class PolyMoveVertex(NodeType):
+    TAG = 'polyMoveVertex'
 
 
-class polySplitVert(LSByType):
-    TYPE = 'polySplitVert'
+class PolyMoveVertexManip(NodeType):
+    TAG = 'polyMoveVertexManip'
 
 
-class polyStraightenUVBorder(LSByType):
-    TYPE = 'polyStraightenUVBorder'
+class PolyNormal(NodeType):
+    TAG = 'polyNormal'
 
 
-class polySubdEdge(LSByType):
-    TYPE = 'polySubdEdge'
+class PolyNormalPerVertex(NodeType):
+    TAG = 'polyNormalPerVertex'
 
 
-class polySubdFace(LSByType):
-    TYPE = 'polySubdFace'
+class PolyNormalizeUV(NodeType):
+    TAG = 'polyNormalizeUV'
 
 
-class polyToSubdiv(LSByType):
-    TYPE = 'polyToSubdiv'
+class PolyOptUvs(NodeType):
+    TAG = 'polyOptUvs'
 
 
-class polyToolFeedbackManip(LSByType):
-    TYPE = 'polyToolFeedbackManip'
+class PolyPassThru(NodeType):
+    TAG = 'polyPassThru'
 
 
-class polyTorus(LSByType):
-    TYPE = 'polyTorus'
+class PolyPinUV(NodeType):
+    TAG = 'polyPinUV'
 
 
-class polyTransfer(LSByType):
-    TYPE = 'polyTransfer'
+class PolyPipe(NodeType):
+    TAG = 'polyPipe'
 
 
-class polyTriangulate(LSByType):
-    TYPE = 'polyTriangulate'
+class PolyPlanarProj(NodeType):
+    TAG = 'polyPlanarProj'
 
 
-class polyTweak(LSByType):
-    TYPE = 'polyTweak'
+class PolyPlane(NodeType):
+    TAG = 'polyPlane'
 
 
-class polyTweakUV(LSByType):
-    TYPE = 'polyTweakUV'
+class PolyPlatonicSolid(NodeType):
+    TAG = 'polyPlatonicSolid'
 
 
-class polyUVRectangle(LSByType):
-    TYPE = 'polyUVRectangle'
+class PolyPoke(NodeType):
+    TAG = 'polyPoke'
 
 
-class polyUnite(LSByType):
-    TYPE = 'polyUnite'
+class PolyPokeManip(NodeType):
+    TAG = 'polyPokeManip'
 
 
-class polyVertexNormalManip(LSByType):
-    TYPE = 'polyVertexNormalManip'
+class PolyPrimitiveMisc(NodeType):
+    TAG = 'polyPrimitiveMisc'
 
 
-class polyWedgeFace(LSByType):
-    TYPE = 'polyWedgeFace'
+class PolyPrism(NodeType):
+    TAG = 'polyPrism'
 
 
-class positionMarker(LSByType):
-    TYPE = 'positionMarker'
+class PolyProj(NodeType):
+    TAG = 'polyProj'
 
 
-class postProcessList(LSByType):
-    TYPE = 'postProcessList'
+class PolyProjManip(NodeType):
+    TAG = 'polyProjManip'
 
 
-class precompExport(LSByType):
-    TYPE = 'precompExport'
+class PolyProjectCurve(NodeType):
+    TAG = 'polyProjectCurve'
 
 
-class projectCurve(LSByType):
-    TYPE = 'projectCurve'
+class PolyPyramid(NodeType):
+    TAG = 'polyPyramid'
 
 
-class projectTangent(LSByType):
-    TYPE = 'projectTangent'
+class PolyQuad(NodeType):
+    TAG = 'polyQuad'
 
 
-class projectTangentManip(LSByType):
-    TYPE = 'projectTangentManip'
+class PolyReduce(NodeType):
+    TAG = 'polyReduce'
 
 
-class projection(LSByType):
-    TYPE = 'projection'
+class PolyRemesh(NodeType):
+    TAG = 'polyRemesh'
 
 
-class projectionManip(LSByType):
-    TYPE = 'projectionManip'
+class PolySelectEditFeedbackManip(NodeType):
+    TAG = 'polySelectEditFeedbackManip'
 
 
-class projectionMultiManip(LSByType):
-    TYPE = 'projectionMultiManip'
+class PolySeparate(NodeType):
+    TAG = 'polySeparate'
 
 
-class projectionUVManip(LSByType):
-    TYPE = 'projectionUVManip'
+class PolySewEdge(NodeType):
+    TAG = 'polySewEdge'
 
 
-class propModManip(LSByType):
-    TYPE = 'propModManip'
+class PolySmooth(NodeType):
+    TAG = 'polySmooth'
 
 
-class propMoveTriadManip(LSByType):
-    TYPE = 'propMoveTriadManip'
+class PolySmoothFace(NodeType):
+    TAG = 'polySmoothFace'
 
 
-class proxyManager(LSByType):
-    TYPE = 'proxyManager'
+class PolySmoothProxy(NodeType):
+    TAG = 'polySmoothProxy'
 
 
-class psdFileTex(LSByType):
-    TYPE = 'psdFileTex'
+class PolySoftEdge(NodeType):
+    TAG = 'polySoftEdge'
 
 
-class quadPtOnLineManip(LSByType):
-    TYPE = 'quadPtOnLineManip'
+class PolySphProj(NodeType):
+    TAG = 'polySphProj'
 
 
-class quadShadingSwitch(LSByType):
-    TYPE = 'quadShadingSwitch'
+class PolySphere(NodeType):
+    TAG = 'polySphere'
 
 
-class quatAdd(LSByType):
-    TYPE = 'quatAdd'
+class PolySpinEdge(NodeType):
+    TAG = 'polySpinEdge'
 
 
-class quatConjugate(LSByType):
-    TYPE = 'quatConjugate'
+class PolySplit(NodeType):
+    TAG = 'polySplit'
 
 
-class quatInvert(LSByType):
-    TYPE = 'quatInvert'
+class PolySplitEdge(NodeType):
+    TAG = 'polySplitEdge'
 
 
-class quatNegate(LSByType):
-    TYPE = 'quatNegate'
+class PolySplitRing(NodeType):
+    TAG = 'polySplitRing'
 
 
-class quatNormalize(LSByType):
-    TYPE = 'quatNormalize'
+class PolySplitToolManip1(NodeType):
+    TAG = 'polySplitToolManip1'
 
 
-class quatProd(LSByType):
-    TYPE = 'quatProd'
+class PolySplitVert(NodeType):
+    TAG = 'polySplitVert'
 
 
-class quatSub(LSByType):
-    TYPE = 'quatSub'
+class PolyStraightenUVBorder(NodeType):
+    TAG = 'polyStraightenUVBorder'
 
 
-class quatToEuler(LSByType):
-    TYPE = 'quatToEuler'
+class PolySubdEdge(NodeType):
+    TAG = 'polySubdEdge'
 
 
-class radialField(LSByType):
-    TYPE = 'radialField'
+class PolySubdFace(NodeType):
+    TAG = 'polySubdFace'
 
 
-class ramp(LSByType):
-    TYPE = 'ramp'
+class PolyToSubdiv(NodeType):
+    TAG = 'polyToSubdiv'
 
 
-class rampShader(LSByType):
-    TYPE = 'rampShader'
+class PolyToolFeedbackManip(NodeType):
+    TAG = 'polyToolFeedbackManip'
 
 
-class rbfSrf(LSByType):
-    TYPE = 'rbfSrf'
+class PolyTorus(NodeType):
+    TAG = 'polyTorus'
 
 
-class rbfSrfManip(LSByType):
-    TYPE = 'rbfSrfManip'
+class PolyTransfer(NodeType):
+    TAG = 'polyTransfer'
 
 
-class rebuildCurve(LSByType):
-    TYPE = 'rebuildCurve'
+class PolyTriangulate(NodeType):
+    TAG = 'polyTriangulate'
 
 
-class rebuildSurface(LSByType):
-    TYPE = 'rebuildSurface'
+class PolyTweak(NodeType):
+    TAG = 'polyTweak'
 
 
-class record(LSByType):
-    TYPE = 'record'
+class PolyTweakUV(NodeType):
+    TAG = 'polyTweakUV'
 
 
-class reference(LSByType):
-    TYPE = 'reference'
+class PolyUVRectangle(NodeType):
+    TAG = 'polyUVRectangle'
 
 
-class remapColor(LSByType):
-    TYPE = 'remapColor'
+class PolyUnite(NodeType):
+    TAG = 'polyUnite'
 
 
-class remapHsv(LSByType):
-    TYPE = 'remapHsv'
+class PolyVertexNormalManip(NodeType):
+    TAG = 'polyVertexNormalManip'
 
 
-class remapValue(LSByType):
-    TYPE = 'remapValue'
+class PolyWedgeFace(NodeType):
+    TAG = 'polyWedgeFace'
 
 
-class renderBox(LSByType):
-    TYPE = 'renderBox'
+class PositionMarker(NodeType):
+    TAG = 'positionMarker'
 
 
-class renderCone(LSByType):
-    TYPE = 'renderCone'
+class PostProcessList(NodeType):
+    TAG = 'postProcessList'
 
 
-class renderGlobals(LSByType):
-    TYPE = 'renderGlobals'
+class PrecompExport(NodeType):
+    TAG = 'precompExport'
 
 
-class renderGlobalsList(LSByType):
-    TYPE = 'renderGlobalsList'
+class ProjectCurve(NodeType):
+    TAG = 'projectCurve'
 
 
-class renderLayer(LSByType):
-    TYPE = 'renderLayer'
+class ProjectTangent(NodeType):
+    TAG = 'projectTangent'
 
 
-class renderLayerManager(LSByType):
-    TYPE = 'renderLayerManager'
+class ProjectTangentManip(NodeType):
+    TAG = 'projectTangentManip'
 
 
-class renderPass(LSByType):
-    TYPE = 'renderPass'
+class Projection(NodeType):
+    TAG = 'projection'
 
 
-class renderPassSet(LSByType):
-    TYPE = 'renderPassSet'
+class ProjectionManip(NodeType):
+    TAG = 'projectionManip'
 
 
-class renderQuality(LSByType):
-    TYPE = 'renderQuality'
+class ProjectionMultiManip(NodeType):
+    TAG = 'projectionMultiManip'
 
 
-class renderRect(LSByType):
-    TYPE = 'renderRect'
+class ProjectionUVManip(NodeType):
+    TAG = 'projectionUVManip'
 
 
-class renderSphere(LSByType):
-    TYPE = 'renderSphere'
+class PropModManip(NodeType):
+    TAG = 'propModManip'
 
 
-class renderTarget(LSByType):
-    TYPE = 'renderTarget'
+class PropMoveTriadManip(NodeType):
+    TAG = 'propMoveTriadManip'
 
 
-class renderedImageSource(LSByType):
-    TYPE = 'renderedImageSource'
+class ProxyManager(NodeType):
+    TAG = 'proxyManager'
 
 
-class resolution(LSByType):
-    TYPE = 'resolution'
+class PsdFileTex(NodeType):
+    TAG = 'psdFileTex'
 
 
-class resultCurveTimeToAngular(LSByType):
-    TYPE = 'resultCurveTimeToAngular'
+class QuadPtOnLineManip(NodeType):
+    TAG = 'quadPtOnLineManip'
 
 
-class resultCurveTimeToLinear(LSByType):
-    TYPE = 'resultCurveTimeToLinear'
+class QuadShadingSwitch(NodeType):
+    TAG = 'quadShadingSwitch'
 
 
-class resultCurveTimeToTime(LSByType):
-    TYPE = 'resultCurveTimeToTime'
+class QuatAdd(NodeType):
+    TAG = 'quatAdd'
 
 
-class resultCurveTimeToUnitless(LSByType):
-    TYPE = 'resultCurveTimeToUnitless'
+class QuatConjugate(NodeType):
+    TAG = 'quatConjugate'
 
 
-class reverse(LSByType):
-    TYPE = 'reverse'
+class QuatInvert(NodeType):
+    TAG = 'quatInvert'
 
 
-class reverseCurve(LSByType):
-    TYPE = 'reverseCurve'
+class QuatNegate(NodeType):
+    TAG = 'quatNegate'
 
 
-class reverseCurveManip(LSByType):
-    TYPE = 'reverseCurveManip'
+class QuatNormalize(NodeType):
+    TAG = 'quatNormalize'
 
 
-class reverseSurface(LSByType):
-    TYPE = 'reverseSurface'
+class QuatProd(NodeType):
+    TAG = 'quatProd'
 
 
-class reverseSurfaceManip(LSByType):
-    TYPE = 'reverseSurfaceManip'
+class QuatSub(NodeType):
+    TAG = 'quatSub'
 
 
-class revolve(LSByType):
-    TYPE = 'revolve'
+class QuatToEuler(NodeType):
+    TAG = 'quatToEuler'
 
 
-class revolveManip(LSByType):
-    TYPE = 'revolveManip'
+class RadialField(NodeType):
+    TAG = 'radialField'
 
 
-class revolvedPrimitiveManip(LSByType):
-    TYPE = 'revolvedPrimitiveManip'
+class Ramp(NodeType):
+    TAG = 'ramp'
 
 
-class rgbToHsv(LSByType):
-    TYPE = 'rgbToHsv'
+class RampShader(NodeType):
+    TAG = 'rampShader'
 
 
-class rigidBody(LSByType):
-    TYPE = 'rigidBody'
+class RbfSrf(NodeType):
+    TAG = 'rbfSrf'
 
 
-class rigidConstraint(LSByType):
-    TYPE = 'rigidConstraint'
+class RbfSrfManip(NodeType):
+    TAG = 'rbfSrfManip'
 
 
-class rigidSolver(LSByType):
-    TYPE = 'rigidSolver'
+class RebuildCurve(NodeType):
+    TAG = 'rebuildCurve'
 
 
-class rock(LSByType):
-    TYPE = 'rock'
+class RebuildSurface(NodeType):
+    TAG = 'rebuildSurface'
 
 
-class rotateHelper(LSByType):
-    TYPE = 'rotateHelper'
+class Record(NodeType):
+    TAG = 'record'
 
 
-class rotateLimitsManip(LSByType):
-    TYPE = 'rotateLimitsManip'
+class Reference(NodeType):
+    TAG = 'reference'
 
 
-class rotateManip(LSByType):
-    TYPE = 'rotateManip'
+class RemapColor(NodeType):
+    TAG = 'remapColor'
 
 
-class rotateUV2dManip(LSByType):
-    TYPE = 'rotateUV2dManip'
+class RemapHsv(NodeType):
+    TAG = 'remapHsv'
 
 
-class roundConstantRadius(LSByType):
-    TYPE = 'roundConstantRadius'
+class RemapValue(NodeType):
+    TAG = 'remapValue'
 
 
-class roundConstantRadiusManip(LSByType):
-    TYPE = 'roundConstantRadiusManip'
+class RenderBox(NodeType):
+    TAG = 'renderBox'
 
 
-class roundRadiusCrvManip(LSByType):
-    TYPE = 'roundRadiusCrvManip'
+class RenderCone(NodeType):
+    TAG = 'renderCone'
 
 
-class roundRadiusManip(LSByType):
-    TYPE = 'roundRadiusManip'
+class RenderGlobals(NodeType):
+    TAG = 'renderGlobals'
 
 
-class sampler(LSByType):
-    TYPE = 'sampler'
+class RenderGlobalsList(NodeType):
+    TAG = 'renderGlobalsList'
 
 
-class samplerInfo(LSByType):
-    TYPE = 'samplerInfo'
+class RenderLayer(NodeType):
+    TAG = 'renderLayer'
 
 
-class scaleConstraint(LSByType):
-    TYPE = 'scaleConstraint'
+class RenderLayerManager(NodeType):
+    TAG = 'renderLayerManager'
 
 
-class scaleLimitsManip(LSByType):
-    TYPE = 'scaleLimitsManip'
+class RenderPass(NodeType):
+    TAG = 'renderPass'
 
 
-class scaleManip(LSByType):
-    TYPE = 'scaleManip'
+class RenderPassSet(NodeType):
+    TAG = 'renderPassSet'
 
 
-class scaleUV2dManip(LSByType):
-    TYPE = 'scaleUV2dManip'
+class RenderQuality(NodeType):
+    TAG = 'renderQuality'
 
 
-class screenAlignedCircleManip(LSByType):
-    TYPE = 'screenAlignedCircleManip'
+class RenderRect(NodeType):
+    TAG = 'renderRect'
 
 
-class script(LSByType):
-    TYPE = 'script'
+class RenderSphere(NodeType):
+    TAG = 'renderSphere'
 
 
-class scriptManip(LSByType):
-    TYPE = 'scriptManip'
+class RenderTarget(NodeType):
+    TAG = 'renderTarget'
 
 
-class sculpt(LSByType):
-    TYPE = 'sculpt'
+class RenderedImageSource(NodeType):
+    TAG = 'renderedImageSource'
 
 
-class selectionListOperator(LSByType):
-    TYPE = 'selectionListOperator'
+class Resolution(NodeType):
+    TAG = 'resolution'
 
 
-class sequenceManager(LSByType):
-    TYPE = 'sequenceManager'
+class ResultCurveTimeToAngular(NodeType):
+    TAG = 'resultCurveTimeToAngular'
 
 
-class sequencer(LSByType):
-    TYPE = 'sequencer'
+class ResultCurveTimeToLinear(NodeType):
+    TAG = 'resultCurveTimeToLinear'
 
 
-class setRange(LSByType):
-    TYPE = 'setRange'
+class ResultCurveTimeToTime(NodeType):
+    TAG = 'resultCurveTimeToTime'
 
 
-class shaderGlow(LSByType):
-    TYPE = 'shaderGlow'
+class ResultCurveTimeToUnitless(NodeType):
+    TAG = 'resultCurveTimeToUnitless'
 
 
-class shadingEngine(LSByType):
-    TYPE = 'shadingEngine'
+class Reverse(NodeType):
+    TAG = 'reverse'
 
 
-class shadingMap(LSByType):
-    TYPE = 'shadingMap'
+class ReverseCurve(NodeType):
+    TAG = 'reverseCurve'
 
 
-class shellTessellate(LSByType):
-    TYPE = 'shellTessellate'
+class ReverseCurveManip(NodeType):
+    TAG = 'reverseCurveManip'
 
 
-class shot(LSByType):
-    TYPE = 'shot'
+class ReverseSurface(NodeType):
+    TAG = 'reverseSurface'
 
 
-class shrinkWrap(LSByType):
-    TYPE = 'shrinkWrap'
+class ReverseSurfaceManip(NodeType):
+    TAG = 'reverseSurfaceManip'
 
 
-class simpleTestNode(LSByType):
-    TYPE = 'simpleTestNode'
+class Revolve(NodeType):
+    TAG = 'revolve'
 
 
-class simpleVolumeShader(LSByType):
-    TYPE = 'simpleVolumeShader'
+class RevolveManip(NodeType):
+    TAG = 'revolveManip'
 
 
-class singleShadingSwitch(LSByType):
-    TYPE = 'singleShadingSwitch'
+class RevolvedPrimitiveManip(NodeType):
+    TAG = 'revolvedPrimitiveManip'
 
 
-class sketchPlane(LSByType):
-    TYPE = 'sketchPlane'
+class RgbToHsv(NodeType):
+    TAG = 'rgbToHsv'
 
 
-class skinBinding(LSByType):
-    TYPE = 'skinBinding'
+class RigidBody(NodeType):
+    TAG = 'rigidBody'
 
 
-class skinCluster(LSByType):
-    TYPE = 'skinCluster'
+class RigidConstraint(NodeType):
+    TAG = 'rigidConstraint'
 
 
-class smear(LSByType):
-    TYPE = 'smear'
+class RigidSolver(NodeType):
+    TAG = 'rigidSolver'
 
 
-class smoothCurve(LSByType):
-    TYPE = 'smoothCurve'
+class Rock(NodeType):
+    TAG = 'rock'
 
 
-class smoothTangentSrf(LSByType):
-    TYPE = 'smoothTangentSrf'
+class RotateHelper(NodeType):
+    TAG = 'rotateHelper'
 
 
-class snapUV2dManip(LSByType):
-    TYPE = 'snapUV2dManip'
+class RotateLimitsManip(NodeType):
+    TAG = 'rotateLimitsManip'
 
 
-class snapshot(LSByType):
-    TYPE = 'snapshot'
+class RotateManip(NodeType):
+    TAG = 'rotateManip'
 
 
-class snapshotShape(LSByType):
-    TYPE = 'snapshotShape'
+class RotateUV2dManip(NodeType):
+    TAG = 'rotateUV2dManip'
 
 
-class snow(LSByType):
-    TYPE = 'snow'
+class RoundConstantRadius(NodeType):
+    TAG = 'roundConstantRadius'
 
 
-class softMod(LSByType):
-    TYPE = 'softMod'
+class RoundConstantRadiusManip(NodeType):
+    TAG = 'roundConstantRadiusManip'
 
 
-class softModHandle(LSByType):
-    TYPE = 'softModHandle'
+class RoundRadiusCrvManip(NodeType):
+    TAG = 'roundRadiusCrvManip'
 
 
-class softModManip(LSByType):
-    TYPE = 'softModManip'
+class RoundRadiusManip(NodeType):
+    TAG = 'roundRadiusManip'
 
 
-class solidFractal(LSByType):
-    TYPE = 'solidFractal'
+class Sampler(NodeType):
+    TAG = 'sampler'
 
 
-class spBirailSrf(LSByType):
-    TYPE = 'spBirailSrf'
+class SamplerInfo(NodeType):
+    TAG = 'samplerInfo'
 
 
-class sphericalProjManip(LSByType):
-    TYPE = 'sphericalProjManip'
+class ScaleConstraint(NodeType):
+    TAG = 'scaleConstraint'
 
 
-class spotCylinderManip(LSByType):
-    TYPE = 'spotCylinderManip'
+class ScaleLimitsManip(NodeType):
+    TAG = 'scaleLimitsManip'
 
 
-class spotLight(LSByType):
-    TYPE = 'spotLight'
+class ScaleManip(NodeType):
+    TAG = 'scaleManip'
 
 
-class spotManip(LSByType):
-    TYPE = 'spotManip'
+class ScaleUV2dManip(NodeType):
+    TAG = 'scaleUV2dManip'
 
 
-class spring(LSByType):
-    TYPE = 'spring'
+class ScreenAlignedCircleManip(NodeType):
+    TAG = 'screenAlignedCircleManip'
 
 
-class squareSrf(LSByType):
-    TYPE = 'squareSrf'
+class Script(NodeType):
+    TAG = 'script'
 
 
-class squareSrfManip(LSByType):
-    TYPE = 'squareSrfManip'
+class ScriptManip(NodeType):
+    TAG = 'scriptManip'
 
 
-class stencil(LSByType):
-    TYPE = 'stencil'
+class Sculpt(NodeType):
+    TAG = 'sculpt'
 
 
-class stereoRigCamera(LSByType):
-    TYPE = 'stereoRigCamera'
+class SelectionListOperator(NodeType):
+    TAG = 'selectionListOperator'
 
 
-class stitchAsNurbsShell(LSByType):
-    TYPE = 'stitchAsNurbsShell'
+class SequenceManager(NodeType):
+    TAG = 'sequenceManager'
 
 
-class stitchSrf(LSByType):
-    TYPE = 'stitchSrf'
+class Sequencer(NodeType):
+    TAG = 'sequencer'
 
 
-class stitchSrfManip(LSByType):
-    TYPE = 'stitchSrfManip'
+class SetRange(NodeType):
+    TAG = 'setRange'
 
 
-class stroke(LSByType):
-    TYPE = 'stroke'
+class ShaderGlow(NodeType):
+    TAG = 'shaderGlow'
 
 
-class strokeGlobals(LSByType):
-    TYPE = 'strokeGlobals'
+class ShadingEngine(NodeType):
+    TAG = 'shadingEngine'
 
 
-class stucco(LSByType):
-    TYPE = 'stucco'
+class ShadingMap(NodeType):
+    TAG = 'shadingMap'
 
 
-class studioClearCoat(LSByType):
-    TYPE = 'studioClearCoat'
+class ShellTessellate(NodeType):
+    TAG = 'shellTessellate'
 
 
-class styleCurve(LSByType):
-    TYPE = 'styleCurve'
+class Shot(NodeType):
+    TAG = 'shot'
 
 
-class subCurve(LSByType):
-    TYPE = 'subCurve'
+class ShrinkWrap(NodeType):
+    TAG = 'shrinkWrap'
 
 
-class subSurface(LSByType):
-    TYPE = 'subSurface'
+class SimpleTestNode(NodeType):
+    TAG = 'simpleTestNode'
 
 
-class subdAddTopology(LSByType):
-    TYPE = 'subdAddTopology'
+class SimpleVolumeShader(NodeType):
+    TAG = 'simpleVolumeShader'
 
 
-class subdAutoProj(LSByType):
-    TYPE = 'subdAutoProj'
+class SingleShadingSwitch(NodeType):
+    TAG = 'singleShadingSwitch'
 
 
-class subdBlindData(LSByType):
-    TYPE = 'subdBlindData'
+class SketchPlane(NodeType):
+    TAG = 'sketchPlane'
 
 
-class subdCleanTopology(LSByType):
-    TYPE = 'subdCleanTopology'
+class SkinBinding(NodeType):
+    TAG = 'skinBinding'
 
 
-class subdHierBlind(LSByType):
-    TYPE = 'subdHierBlind'
+class SkinCluster(NodeType):
+    TAG = 'skinCluster'
 
 
-class subdLayoutUV(LSByType):
-    TYPE = 'subdLayoutUV'
+class Smear(NodeType):
+    TAG = 'smear'
 
 
-class subdMapCut(LSByType):
-    TYPE = 'subdMapCut'
+class SmoothCurve(NodeType):
+    TAG = 'smoothCurve'
 
 
-class subdMapSewMove(LSByType):
-    TYPE = 'subdMapSewMove'
+class SmoothTangentSrf(NodeType):
+    TAG = 'smoothTangentSrf'
 
 
-class subdMappingManip(LSByType):
-    TYPE = 'subdMappingManip'
+class SnapUV2dManip(NodeType):
+    TAG = 'snapUV2dManip'
 
 
-class subdPlanarProj(LSByType):
-    TYPE = 'subdPlanarProj'
+class Snapshot(NodeType):
+    TAG = 'snapshot'
 
 
-class subdProjManip(LSByType):
-    TYPE = 'subdProjManip'
+class SnapshotShape(NodeType):
+    TAG = 'snapshotShape'
 
 
-class subdTweak(LSByType):
-    TYPE = 'subdTweak'
+class Snow(NodeType):
+    TAG = 'snow'
 
 
-class subdTweakUV(LSByType):
-    TYPE = 'subdTweakUV'
+class SoftMod(NodeType):
+    TAG = 'softMod'
 
 
-class subdiv(LSByType):
-    TYPE = 'subdiv'
+class SoftModHandle(NodeType):
+    TAG = 'softModHandle'
 
 
-class subdivCollapse(LSByType):
-    TYPE = 'subdivCollapse'
+class SoftModManip(NodeType):
+    TAG = 'softModManip'
 
 
-class subdivComponentId(LSByType):
-    TYPE = 'subdivComponentId'
+class SolidFractal(NodeType):
+    TAG = 'solidFractal'
 
 
-class subdivReverseFaces(LSByType):
-    TYPE = 'subdivReverseFaces'
+class SpBirailSrf(NodeType):
+    TAG = 'spBirailSrf'
 
 
-class subdivSurfaceVarGroup(LSByType):
-    TYPE = 'subdivSurfaceVarGroup'
+class SphericalProjManip(NodeType):
+    TAG = 'sphericalProjManip'
 
 
-class subdivToNurbs(LSByType):
-    TYPE = 'subdivToNurbs'
+class SpotCylinderManip(NodeType):
+    TAG = 'spotCylinderManip'
 
 
-class subdivToPoly(LSByType):
-    TYPE = 'subdivToPoly'
+class SpotLight(NodeType):
+    TAG = 'spotLight'
 
 
-class substance(LSByType):
-    TYPE = 'substance'
+class SpotManip(NodeType):
+    TAG = 'spotManip'
 
 
-class substanceOutput(LSByType):
-    TYPE = 'substanceOutput'
+class Spring(NodeType):
+    TAG = 'spring'
 
 
-class surfaceEdManip(LSByType):
-    TYPE = 'surfaceEdManip'
+class SquareSrf(NodeType):
+    TAG = 'squareSrf'
 
 
-class surfaceInfo(LSByType):
-    TYPE = 'surfaceInfo'
+class SquareSrfManip(NodeType):
+    TAG = 'squareSrfManip'
 
 
-class surfaceLuminance(LSByType):
-    TYPE = 'surfaceLuminance'
+class Stencil(NodeType):
+    TAG = 'stencil'
 
 
-class surfaceShader(LSByType):
-    TYPE = 'surfaceShader'
+class StereoRigCamera(NodeType):
+    TAG = 'stereoRigCamera'
 
 
-class surfaceVarGroup(LSByType):
-    TYPE = 'surfaceVarGroup'
+class StitchAsNurbsShell(NodeType):
+    TAG = 'stitchAsNurbsShell'
 
 
-class symmetryConstraint(LSByType):
-    TYPE = 'symmetryConstraint'
+class StitchSrf(NodeType):
+    TAG = 'stitchSrf'
 
 
-class tangentConstraint(LSByType):
-    TYPE = 'tangentConstraint'
+class StitchSrfManip(NodeType):
+    TAG = 'stitchSrfManip'
 
 
-class texLattice(LSByType):
-    TYPE = 'texLattice'
+class Stroke(NodeType):
+    TAG = 'stroke'
 
 
-class texLatticeDeformManip(LSByType):
-    TYPE = 'texLatticeDeformManip'
+class StrokeGlobals(NodeType):
+    TAG = 'strokeGlobals'
 
 
-class texMoveShellManip(LSByType):
-    TYPE = 'texMoveShellManip'
+class Stucco(NodeType):
+    TAG = 'stucco'
 
 
-class texSmoothManip(LSByType):
-    TYPE = 'texSmoothManip'
+class StudioClearCoat(NodeType):
+    TAG = 'studioClearCoat'
 
 
-class texSmudgeUVManip(LSByType):
-    TYPE = 'texSmudgeUVManip'
+class StyleCurve(NodeType):
+    TAG = 'styleCurve'
 
 
-class textButtonManip(LSByType):
-    TYPE = 'textButtonManip'
+class SubCurve(NodeType):
+    TAG = 'subCurve'
 
 
-class textManip2D(LSByType):
-    TYPE = 'textManip2D'
+class SubSurface(NodeType):
+    TAG = 'subSurface'
 
 
-class texture3dManip(LSByType):
-    TYPE = 'texture3dManip'
+class SubdAddTopology(NodeType):
+    TAG = 'subdAddTopology'
 
 
-class textureBakeSet(LSByType):
-    TYPE = 'textureBakeSet'
+class SubdAutoProj(NodeType):
+    TAG = 'subdAutoProj'
 
 
-class textureDeformer(LSByType):
-    TYPE = 'textureDeformer'
+class SubdBlindData(NodeType):
+    TAG = 'subdBlindData'
 
 
-class textureDeformerHandle(LSByType):
-    TYPE = 'textureDeformerHandle'
+class SubdCleanTopology(NodeType):
+    TAG = 'subdCleanTopology'
 
 
-class textureToGeom(LSByType):
-    TYPE = 'textureToGeom'
+class SubdHierBlind(NodeType):
+    TAG = 'subdHierBlind'
 
 
-class time(LSByType):
-    TYPE = 'time'
+class SubdLayoutUV(NodeType):
+    TAG = 'subdLayoutUV'
 
 
-class timeFunction(LSByType):
-    TYPE = 'timeFunction'
+class SubdMapCut(NodeType):
+    TAG = 'subdMapCut'
 
 
-class timeToUnitConversion(LSByType):
-    TYPE = 'timeToUnitConversion'
+class SubdMapSewMove(NodeType):
+    TAG = 'subdMapSewMove'
 
 
-class timeWarp(LSByType):
-    TYPE = 'timeWarp'
+class SubdMappingManip(NodeType):
+    TAG = 'subdMappingManip'
 
 
-class toggleManip(LSByType):
-    TYPE = 'toggleManip'
+class SubdPlanarProj(NodeType):
+    TAG = 'subdPlanarProj'
 
 
-class toggleOnLineManip(LSByType):
-    TYPE = 'toggleOnLineManip'
+class SubdProjManip(NodeType):
+    TAG = 'subdProjManip'
 
 
-class toolDrawManip(LSByType):
-    TYPE = 'toolDrawManip'
+class SubdTweak(NodeType):
+    TAG = 'subdTweak'
 
 
-class toolDrawManip2D(LSByType):
-    TYPE = 'toolDrawManip2D'
+class SubdTweakUV(NodeType):
+    TAG = 'subdTweakUV'
 
 
-class toonLineAttributes(LSByType):
-    TYPE = 'toonLineAttributes'
+class Subdiv(NodeType):
+    TAG = 'subdiv'
 
 
-class towPointOnCurveManip(LSByType):
-    TYPE = 'towPointOnCurveManip'
+class SubdivCollapse(NodeType):
+    TAG = 'subdivCollapse'
 
 
-class towPointOnSurfaceManip(LSByType):
-    TYPE = 'towPointOnSurfaceManip'
+class SubdivComponentId(NodeType):
+    TAG = 'subdivComponentId'
 
 
-class trackInfoManager(LSByType):
-    TYPE = 'trackInfoManager'
+class SubdivReverseFaces(NodeType):
+    TAG = 'subdivReverseFaces'
 
 
-class trans2dManip(LSByType):
-    TYPE = 'trans2dManip'
+class SubdivSurfaceVarGroup(NodeType):
+    TAG = 'subdivSurfaceVarGroup'
 
 
-class transUV2dManip(LSByType):
-    TYPE = 'transUV2dManip'
+class SubdivToNurbs(NodeType):
+    TAG = 'subdivToNurbs'
 
 
-class transferAttributes(LSByType):
-    TYPE = 'transferAttributes'
+class SubdivToPoly(NodeType):
+    TAG = 'subdivToPoly'
 
 
-class transform(LSByType):
-    TYPE = 'transform'
+class Substance(NodeType):
+    TAG = 'substance'
 
 
-class transformGeometry(LSByType):
-    TYPE = 'transformGeometry'
+class SubstanceOutput(NodeType):
+    TAG = 'substanceOutput'
 
 
-class translateLimitsManip(LSByType):
-    TYPE = 'translateLimitsManip'
+class SurfaceEdManip(NodeType):
+    TAG = 'surfaceEdManip'
 
 
-class translateManip(LSByType):
-    TYPE = 'translateManip'
+class SurfaceInfo(NodeType):
+    TAG = 'surfaceInfo'
 
 
-class translateUVManip(LSByType):
-    TYPE = 'translateUVManip'
+class SurfaceLuminance(NodeType):
+    TAG = 'surfaceLuminance'
 
 
-class transposeMatrix(LSByType):
-    TYPE = 'transposeMatrix'
+class SurfaceShader(NodeType):
+    TAG = 'surfaceShader'
 
 
-class trim(LSByType):
-    TYPE = 'trim'
+class SurfaceVarGroup(NodeType):
+    TAG = 'surfaceVarGroup'
 
 
-class trimManip(LSByType):
-    TYPE = 'trimManip'
+class SymmetryConstraint(NodeType):
+    TAG = 'symmetryConstraint'
 
 
-class trimWithBoundaries(LSByType):
-    TYPE = 'trimWithBoundaries'
+class TangentConstraint(NodeType):
+    TAG = 'tangentConstraint'
 
 
-class triplanarProjManip(LSByType):
-    TYPE = 'triplanarProjManip'
+class TexLattice(NodeType):
+    TAG = 'texLattice'
 
 
-class tripleShadingSwitch(LSByType):
-    TYPE = 'tripleShadingSwitch'
+class TexLatticeDeformManip(NodeType):
+    TAG = 'texLatticeDeformManip'
 
 
-class trsInsertManip(LSByType):
-    TYPE = 'trsInsertManip'
+class TexMoveShellManip(NodeType):
+    TAG = 'texMoveShellManip'
 
 
-class trsManip(LSByType):
-    TYPE = 'trsManip'
+class TexSmoothManip(NodeType):
+    TAG = 'texSmoothManip'
 
 
-class turbulenceField(LSByType):
-    TYPE = 'turbulenceField'
+class TexSmudgeUVManip(NodeType):
+    TAG = 'texSmudgeUVManip'
 
 
-class turbulenceManip(LSByType):
-    TYPE = 'turbulenceManip'
+class TextButtonManip(NodeType):
+    TAG = 'textButtonManip'
 
 
-class tweak(LSByType):
-    TYPE = 'tweak'
+class TextManip2D(NodeType):
+    TAG = 'textManip2D'
 
 
-class uniformField(LSByType):
-    TYPE = 'uniformField'
+class Texture3dManip(NodeType):
+    TAG = 'texture3dManip'
 
 
-class unitConversion(LSByType):
-    TYPE = 'unitConversion'
+class TextureBakeSet(NodeType):
+    TAG = 'textureBakeSet'
 
 
-class unitToTimeConversion(LSByType):
-    TYPE = 'unitToTimeConversion'
+class TextureDeformer(NodeType):
+    TAG = 'textureDeformer'
 
 
-class unknown(LSByType):
-    TYPE = 'unknown'
+class TextureDeformerHandle(NodeType):
+    TAG = 'textureDeformerHandle'
 
 
-class unknownDag(LSByType):
-    TYPE = 'unknownDag'
+class TextureToGeom(NodeType):
+    TAG = 'textureToGeom'
 
 
-class unknownTransform(LSByType):
-    TYPE = 'unknownTransform'
+class Time(NodeType):
+    TAG = 'time'
 
 
-class untrim(LSByType):
-    TYPE = 'untrim'
+class TimeFunction(NodeType):
+    TAG = 'timeFunction'
 
 
-class useBackground(LSByType):
-    TYPE = 'useBackground'
+class TimeToUnitConversion(NodeType):
+    TAG = 'timeToUnitConversion'
 
 
-class uv2dManip(LSByType):
-    TYPE = 'uv2dManip'
+class TimeWarp(NodeType):
+    TAG = 'timeWarp'
 
 
-class uvChooser(LSByType):
-    TYPE = 'uvChooser'
+class ToggleManip(NodeType):
+    TAG = 'toggleManip'
 
 
-class vectorProduct(LSByType):
-    TYPE = 'vectorProduct'
+class ToggleOnLineManip(NodeType):
+    TAG = 'toggleOnLineManip'
 
 
-class vectorRenderGlobals(LSByType):
-    TYPE = 'vectorRenderGlobals'
+class ToolDrawManip(NodeType):
+    TAG = 'toolDrawManip'
 
 
-class vertexBakeSet(LSByType):
-    TYPE = 'vertexBakeSet'
+class ToolDrawManip2D(NodeType):
+    TAG = 'toolDrawManip2D'
 
 
-class viewColorManager(LSByType):
-    TYPE = 'viewColorManager'
+class ToonLineAttributes(NodeType):
+    TAG = 'toonLineAttributes'
 
 
-class volumeAxisField(LSByType):
-    TYPE = 'volumeAxisField'
+class TowPointOnCurveManip(NodeType):
+    TAG = 'towPointOnCurveManip'
 
 
-class volumeBindManip(LSByType):
-    TYPE = 'volumeBindManip'
+class TowPointOnSurfaceManip(NodeType):
+    TAG = 'towPointOnSurfaceManip'
 
 
-class volumeFog(LSByType):
-    TYPE = 'volumeFog'
+class TrackInfoManager(NodeType):
+    TAG = 'trackInfoManager'
 
 
-class volumeLight(LSByType):
-    TYPE = 'volumeLight'
+class Trans2dManip(NodeType):
+    TAG = 'trans2dManip'
 
 
-class volumeNoise(LSByType):
-    TYPE = 'volumeNoise'
+class TransUV2dManip(NodeType):
+    TAG = 'transUV2dManip'
 
 
-class volumeShader(LSByType):
-    TYPE = 'volumeShader'
+class TransferAttributes(NodeType):
+    TAG = 'transferAttributes'
 
 
-class vortexField(LSByType):
-    TYPE = 'vortexField'
+class Transform(NodeType):
+    TAG = 'transform'
 
 
-class water(LSByType):
-    TYPE = 'water'
+class TransformGeometry(NodeType):
+    TAG = 'transformGeometry'
 
 
-class weightGeometryFilter(LSByType):
-    TYPE = 'weightGeometryFilter'
+class TranslateLimitsManip(NodeType):
+    TAG = 'translateLimitsManip'
 
 
-class wire(LSByType):
-    TYPE = 'wire'
+class TranslateManip(NodeType):
+    TAG = 'translateManip'
 
 
-class wood(LSByType):
-    TYPE = 'wood'
+class TranslateUVManip(NodeType):
+    TAG = 'translateUVManip'
 
 
-class wrap(LSByType):
-    TYPE = 'wrap'
+class TransposeMatrix(NodeType):
+    TAG = 'transposeMatrix'
 
 
-class writeToColorBuffer(LSByType):
-    TYPE = 'writeToColorBuffer'
+class Trim(NodeType):
+    TAG = 'trim'
 
 
-class writeToDepthBuffer(LSByType):
-    TYPE = 'writeToDepthBuffer'
+class TrimManip(NodeType):
+    TAG = 'trimManip'
 
 
-class writeToLabelBuffer(LSByType):
-    TYPE = 'writeToLabelBuffer'
+class TrimWithBoundaries(NodeType):
+    TAG = 'trimWithBoundaries'
 
 
-class writeToVectorBuffer(LSByType):
-    TYPE = 'writeToVectorBuffer'
+class TriplanarProjManip(NodeType):
+    TAG = 'triplanarProjManip'
 
 
-class wtAddMatrix(LSByType):
-    TYPE = 'wtAddMatrix'
+class TripleShadingSwitch(NodeType):
+    TAG = 'tripleShadingSwitch'
 
 
-class xformManip(LSByType):
-    TYPE = 'xformManip'
+class TrsInsertManip(NodeType):
+    TAG = 'trsInsertManip'
 
 
-class xgmArchiveGuide(LSByType):
-    TYPE = 'xgmArchiveGuide'
+class TrsManip(NodeType):
+    TAG = 'trsManip'
 
 
-class xgmCardGuide(LSByType):
-    TYPE = 'xgmCardGuide'
+class TurbulenceField(NodeType):
+    TAG = 'turbulenceField'
 
 
-class xgmConnectivity(LSByType):
-    TYPE = 'xgmConnectivity'
+class TurbulenceManip(NodeType):
+    TAG = 'turbulenceManip'
 
 
-class xgmDescription(LSByType):
-    TYPE = 'xgmDescription'
+class Tweak(NodeType):
+    TAG = 'tweak'
 
 
-class xgmGuide(LSByType):
-    TYPE = 'xgmGuide'
+class UniformField(NodeType):
+    TAG = 'uniformField'
 
 
-class xgmGuideManip(LSByType):
-    TYPE = 'xgmGuideManip'
+class UnitConversion(NodeType):
+    TAG = 'unitConversion'
 
 
-class xgmGuideSculptManip(LSByType):
-    TYPE = 'xgmGuideSculptManip'
+class UnitToTimeConversion(NodeType):
+    TAG = 'unitToTimeConversion'
 
 
-class xgmMakeGuide(LSByType):
-    TYPE = 'xgmMakeGuide'
+class Unknown(NodeType):
+    TAG = 'unknown'
 
 
-class xgmNurbsPatch(LSByType):
-    TYPE = 'xgmNurbsPatch'
+class UnknownDag(NodeType):
+    TAG = 'unknownDag'
 
 
-class xgmPalette(LSByType):
-    TYPE = 'xgmPalette'
+class UnknownTransform(NodeType):
+    TAG = 'unknownTransform'
 
 
-class xgmPatch(LSByType):
-    TYPE = 'xgmPatch'
+class Untrim(NodeType):
+    TAG = 'untrim'
 
 
-class xgmPointsManip(LSByType):
-    TYPE = 'xgmPointsManip'
+class UseBackground(NodeType):
+    TAG = 'useBackground'
 
 
-class xgmPointsViewer(LSByType):
-    TYPE = 'xgmPointsViewer'
+class Uv2dManip(NodeType):
+    TAG = 'uv2dManip'
 
 
-class xgmSphereGuide(LSByType):
-    TYPE = 'xgmSphereGuide'
+class UvChooser(NodeType):
+    TAG = 'uvChooser'
 
 
-class xgmSplineGuide(LSByType):
-    TYPE = 'xgmSplineGuide'
+class VectorProduct(NodeType):
+    TAG = 'vectorProduct'
 
 
-class xgmSubdPatch(LSByType):
-    TYPE = 'xgmSubdPatch'
+class VectorRenderGlobals(NodeType):
+    TAG = 'vectorRenderGlobals'
+
+
+class VertexBakeSet(NodeType):
+    TAG = 'vertexBakeSet'
+
+
+class ViewColorManager(NodeType):
+    TAG = 'viewColorManager'
+
+
+class VolumeAxisField(NodeType):
+    TAG = 'volumeAxisField'
+
+
+class VolumeBindManip(NodeType):
+    TAG = 'volumeBindManip'
+
+
+class VolumeFog(NodeType):
+    TAG = 'volumeFog'
+
+
+class VolumeLight(NodeType):
+    TAG = 'volumeLight'
+
+
+class VolumeNoise(NodeType):
+    TAG = 'volumeNoise'
+
+
+class VolumeShader(NodeType):
+    TAG = 'volumeShader'
+
+
+class VortexField(NodeType):
+    TAG = 'vortexField'
+
+
+class Water(NodeType):
+    TAG = 'water'
+
+
+class WeightGeometryFilter(NodeType):
+    TAG = 'weightGeometryFilter'
+
+
+class Wire(NodeType):
+    TAG = 'wire'
+
+
+class Wood(NodeType):
+    TAG = 'wood'
+
+
+class Wrap(NodeType):
+    TAG = 'wrap'
+
+
+class WriteToColorBuffer(NodeType):
+    TAG = 'writeToColorBuffer'
+
+
+class WriteToDepthBuffer(NodeType):
+    TAG = 'writeToDepthBuffer'
+
+
+class WriteToLabelBuffer(NodeType):
+    TAG = 'writeToLabelBuffer'
+
+
+class WriteToVectorBuffer(NodeType):
+    TAG = 'writeToVectorBuffer'
+
+
+class WtAddMatrix(NodeType):
+    TAG = 'wtAddMatrix'
+
+
+class XformManip(NodeType):
+    TAG = 'xformManip'
+
+
+class XgmArchiveGuide(NodeType):
+    TAG = 'xgmArchiveGuide'
+
+
+class XgmCardGuide(NodeType):
+    TAG = 'xgmCardGuide'
+
+
+class XgmConnectivity(NodeType):
+    TAG = 'xgmConnectivity'
+
+
+class XgmDescription(NodeType):
+    TAG = 'xgmDescription'
+
+
+class XgmGuide(NodeType):
+    TAG = 'xgmGuide'
+
+
+class XgmGuideManip(NodeType):
+    TAG = 'xgmGuideManip'
+
+
+class XgmGuideSculptManip(NodeType):
+    TAG = 'xgmGuideSculptManip'
+
+
+class XgmMakeGuide(NodeType):
+    TAG = 'xgmMakeGuide'
+
+
+class XgmNurbsPatch(NodeType):
+    TAG = 'xgmNurbsPatch'
+
+
+class XgmPalette(NodeType):
+    TAG = 'xgmPalette'
+
+
+class XgmPatch(NodeType):
+    TAG = 'xgmPatch'
+
+
+class XgmPointsManip(NodeType):
+    TAG = 'xgmPointsManip'
+
+
+class XgmPointsViewer(NodeType):
+    TAG = 'xgmPointsViewer'
+
+
+class XgmSphereGuide(NodeType):
+    TAG = 'xgmSphereGuide'
+
+
+class XgmSplineGuide(NodeType):
+    TAG = 'xgmSplineGuide'
+
+
+class XgmSubdPatch(NodeType):
+    TAG = 'xgmSubdPatch'

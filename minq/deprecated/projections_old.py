@@ -6,7 +6,7 @@ import itertools
 import posixpath
 from collections import namedtuple
 
-from .core import Iterate
+from external.minq.minq.deprecated.core import Iterate
 from .relations import ComponentFilter
 import maya.cmds as cmds
 from .util import XYZ

@@ -1,4 +1,4 @@
-from .core import Operator, DisjointOperator, DisjointExpression
+from external.minq.minq.deprecated.core import Operator
 import maya.cmds as cmds
 
 
