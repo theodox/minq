@@ -1,14 +1,13 @@
 __author__ = 'stevet'
 import operator
-
 import maya.cmds as cmds
-from external.minq.minq.deprecated.util import XYZ
+from collections import  namedtuple
 
 
 class AttributeQuery(object):
     """
     This is a query-generation helper class.  You can use it to create (simple) attribute value tests inside a query
-    like `where` or `where_not` that takes a callable predicate.  For example:
+    like `where` that takes a callable predicate.  For example:
 
         cameras().where(item.orthographic == True))
 
@@ -48,10 +47,10 @@ class AttributeQuery(object):
     # these attribs are return as tuples-in-lists by getAttr, so we unpack them
     UNPACK_MULT = ('t', 'translate', 'r', 'rotate', 's', 'scale', 'rp', 'rotatePivot', 'sp', 'scalePivot')
 
-    def __init__(self, attribName, operator=None, comp=None, strict=False):
-        self.attrib = attribName
+    def __init__(self, attribute, operator=None, comp=None, strict=False):
+        self.attrib = attribute
         if self.attrib[0] == ".":
-            self.attrib = attribName[1:]
+            self.attrib = attribute[1:]
         self.comp = comp
         self.operator = operator
         self.strict = strict

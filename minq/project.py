@@ -1,6 +1,7 @@
 from collections import namedtuple
 import itertools
 from minq.core import Projection, get_relatives, get_list, non_empty_stream, get_history, get_connections,  get_values
+import maya.cmds as cmds
 
 __author__ = 'Steve'
 

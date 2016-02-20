@@ -165,109 +165,88 @@ class Stream(object):
         return target_type(self, *args, **kwargs)
 
 
-'''
-    def zip(self, **kwargs):
+
+    def join(self, **streams):
         """
         given a collection of named streams, return a table-like stream in which each 'row' has named values
         corresponnding to the original stream. This is used for coordinating multiple streams: for example:
 
              bones = Joints()
              bone_parents = bones.get(Parents)
+             with_parents = bones.join(parent = bone_parents)
 
+         will produce a list like
 
+            # stream: [dataRow(object=u'joint3', parent=u'joint2'), dataRow(object=u'joint2', parent=u'joint1')....]
+
+        the join process doesn't make any effort to match up the contents, however -- if the different streams have
+        different lengths enmpy 'columns' in the row will be filled with None and if the streams don't match up
+        the results are not predictable.
+
+        The primary use for join() is for doing bulk queries using Attributes:
+
+            bones = Joints().like('l_')
+            tx = bones.get(Attribute, 'tx').get(Values)
+            ty = bones.get(Attribute, 'ty').get(Values)
+            bone_translations = bones.join(x = tx, y = ty)
+            print bone_translations
+
+           # stream: [dataRow(object=u'L_Ankle', x=-5.0, y=-1.39), dataRow(object=u'L_Heel', x=-0.028, y =6.18)....]
+
+        Note in this specific case it would be faster to use `.get(Attribute, 't')` rather than querying .tx and .ty
+        separately -- but this pattern works for any arbitrary combination of attributes as long as all the objects
+        in the stream have the attribute.  In this form the query is issued to maya only once per stream, which is a big
+        advantage over individually calling getAttr many times over.
         """
-        return Zip(self, **kwargs)
-'''
+        return Join(self, **streams)
 
 
-def join(self, **streams):
-    """
-    given a collection of named streams, return a table-like stream in which each 'row' has named values
-    corresponnding to the original stream. This is used for coordinating multiple streams: for example:
-
-         bones = Joints()
-         bone_parents = bones.get(Parents)
-         with_parents = bones.join(parent = bone_parents)
-
-     will produce a list like
-
-        # stream: [dataRow(object=u'joint3', parent=u'joint2'), dataRow(object=u'joint2', parent=u'joint1')....]
-
-    the join process doesn't make any effort to match up the contents, however -- if the different streams have
-    different lengths enmpy 'columns' in the row will be filled with None and if the streams don't match up
-    the results are not predictable.
-
-    The primary use for join() is for doing bulk queries using Attributes:
-
-        bones = Joints().like('l_')
-        tx = bones.get(Attribute, 'tx').get(Values)
-        ty = bones.get(Attribute, 'ty').get(Values)
-        bone_translations = bones.join(x = tx, y = ty)
-        print bone_translations
-
-       # stream: [dataRow(object=u'L_Ankle', x=-5.0, y=-1.39), dataRow(object=u'L_Heel', x=-0.028, y =6.18)....]
-
-    Note in this specific case it would be faster to use `.get(Attribute, 't')` rather than querying .tx and .ty
-    separately -- but this pattern works for any arbitrary combination of attributes as long as all the objects
-    in the stream have the attribute.  In this form the query is issued to maya only once per stream, which is a big
-    advantage over individually calling getAttr many times over.
-    """
-    return Join(self, **streams)
+    def long(self):
+        """
+        Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in the
+        steeam will be filtered out.
+        """
+        return Long(self)
 
 
-def long(self):
-    """
-    Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in the
-    steeam will be filtered out.
-    """
-    return Long(self)
+    def uuid(self):
+        """
+        Returns a new stream containing the uuids of items in this stream. Any items which are not maya nodes in the
+        steeam will be filtered out.
+        """
+        return UUID(self)
 
 
-def uuid(self):
-    """
-    Returns a new stream containing the uuids of items in this stream. Any items which are not maya nodes in the
-    steeam will be filtered out.
-    """
-    return UUID(self)
+    # operator overloads to support set functionality
+
+    def __add__(self, other):
+        return Union(self, other)
 
 
-def __add__(self, other):
-    """
-    Returns a new stream
-    """
-    return Union(self, other)
+    def __iadd__(self, other):
+        return Union(self, other)
 
 
-def __iadd__(self, other):
-    return Union(self, other)
+    def __isub__(self, other):
+        return Difference(self, other)
 
 
-def __isub__(self, other):
-    return Difference(self, other)
+    def __sub__(self, other):
+        return Difference(self, other)
 
 
-def __sub__(self, other):
-    return Difference(self, other)
+    def __and__(self, other):
+        return Intersection(self, other)
 
 
-def __and__(self, other):
-    return Intersection(self, other)
+    def __iand__(self, other):
+        return Intersection(self, other)
 
 
-def __iand__(self, other):
-    return Intersection(self, other)
+    def __repr__(self):
+        return "Stream(%s)"  % self.execute().__repr__()
 
 
-def __gt__(self, other):
-    return self.only(other)
-
-
-def __rshift__(self, otherKlass):
-    return self.get(otherKlass)
-
-
-def __repr__(self):
-    return "stream: " + self.execute().__repr__()
 
 
 class Where(Stream):
@@ -295,7 +274,7 @@ class Like(Stream):
     """
     applies the supplied regex to all elements in the imput stream, returning items matching the regex. If the
     optional 'exact' flag is passed, the regex must be a conplete match (re.match) otherwise, partial matches are
-    allowed(re.seatch)
+    allowed(re.search)
     """
 
     def __init__(self, upstream=tuple(), regex='.', exact=False):
@@ -437,6 +416,8 @@ class NodeType(Stream):
         Shapes().like('name').only(Meshes)
 
     will filter the stream of shapes with 'name' in their names down to only meshes.
+
+    there's a complete list of pre-made NodeTypes in minq.nodes
     """
     TAG = 'node'
 
@@ -445,6 +426,8 @@ class NodeType(Stream):
 
     def __str__(self):
         return self.TAG
+
+
 
 
 class QuasiFilter(object):
@@ -467,44 +450,21 @@ class QuasiFilter(object):
         raise NotImplementedError, "override in derived class"
 
 
-class DagNodes(NodeType):
-    TAG = 'dagNode'
+class NodeTypeSet(Stream, QuasiFilter):
+    """
+    This allows you to combine several type filters into one for speed
+    """
+    def __init__(self, upstream = tuple(), *node_types):
+        super(NodeTypeSet, self).__init__(upstream)
+        self.node_types = node_types
+
+    def __iter__(self):
+        return cmds.ls(type=self.node_types)
+
+    def filter(self, stream):
+        return get_list(stream, type=self.node_types)
 
 
-class Shapes(NodeType):
-    TAG = 'shape'
-
-
-class GeometryShapes(NodeType):
-    TAG = 'geometryShape'
-
-
-class Meshes(NodeType):
-    TAG = 'mesh'
-
-
-class Transforms(NodeType):
-    TAG = 'transform'
-
-
-class Cameras(NodeType):
-    TAG = 'camera'
-
-
-class Curves(NodeType):
-    TAG = 'nurbsCurve'
-
-
-class Joints(NodeType):
-    TAG = 'joint'
-
-
-class Constraints(NodeType):
-    TAG = 'constraint'
-
-
-class Lights(NodeType):
-    TAG = 'light'
 
 
 class Selected(NodeType, QuasiFilter):
