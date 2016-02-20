@@ -54,6 +54,7 @@ class Connections(Projection):
 class Attribute(Projection):
     def __iter__(self):
 
+
         def attrib_generator():
             for item in self.incoming:
                 base = item + "."

@@ -1,7 +1,8 @@
 __author__ = 'stevet'
 import operator
 import maya.cmds as cmds
-from collections import  namedtuple
+from collections import namedtuple
+XYZ = namedtuple('xyz', 'x y z')
 
 
 class AttributeQuery(object):
@@ -9,7 +10,7 @@ class AttributeQuery(object):
     This is a query-generation helper class.  You can use it to create (simple) attribute value tests inside a query
     like `where` that takes a callable predicate.  For example:
 
-        cameras().where(item.orthographic == True))
+        Cameras().where(item.orthographic == True))
 
     will find all the scene camera with their 'orthographic' attribute set True, while
 
@@ -47,14 +48,13 @@ class AttributeQuery(object):
     # these attribs are return as tuples-in-lists by getAttr, so we unpack them
     UNPACK_MULT = ('t', 'translate', 'r', 'rotate', 's', 'scale', 'rp', 'rotatePivot', 'sp', 'scalePivot')
 
-    def __init__(self, attribute, operator=None, comp=None, strict=False):
-        self.attrib = attribute
-        if self.attrib[0] == ".":
-            self.attrib = attribute[1:]
+    def __init__(self, attribute, operator=None, comp=None):
+        self.attribute = attribute
+        if self.attribute[0] == ".":
+            self.attribute = attribute[1:]
         self.comp = comp
         self.operator = operator
-        self.strict = strict
-        self.unpack = self.attrib in self.UNPACK_MULT
+        self.unpack = self.attribute in self.UNPACK_MULT
 
     def __repr__(self):
         lookup = {
@@ -63,52 +63,42 @@ class AttributeQuery(object):
             operator.gt: ">",
             operator.le: "<=",
             operator.lt: "<",
-            operator.ne: "!=",
-            operator.rshift: None,
-            None: '?'
+            operator.ne: "!="
         }
         if lookup.get(self.operator):
-            return "{attribute: %s %s %s}" % (self.attrib, lookup[self.operator], self.comp)
+            return "{attribute: %s %s %s}" % (self.attribute, lookup[self.operator], self.comp)
         else:
-            return "%s({attribute: %s})" % (str(self.comp), self.attrib)
+            return "%s({attribute: %s})" % (str(self.comp), self.attribute)
 
-    def eval(self, maya_obj):
+    def eval(self, obj):
         try:
-            value = cmds.getAttr("{}.{}".format(maya_obj, self.attrib))
+            value = cmds.getAttr(obj + "." + self.attribute)
             if self.unpack:
-                value = XYZ(*value[0])
-            if self.operator != operator.rshift:
-                return self.operator(value, self.comp)
-            else:
-                return self.comp(value)
-        except:
-            if self.strict:
-                raise
+                value = value[0]
+            return self.operator(value, self.comp)
+        except RuntimeError:
             return False
 
     def __eq__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.eq, comp=other)
+        return AttributeQuery(self.attribute, operator=operator.eq, comp=other)
 
     def __ne__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.ne, comp=other)
+        return AttributeQuery(self.attribute, operator=operator.ne, comp=other)
 
     def __gt__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.gt, comp=other)
+        return AttributeQuery(self.attribute, operator=operator.gt, comp=other)
 
     def __ge__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.ge, comp=other)
+        return AttributeQuery(self.attribute, operator=operator.ge, comp=other)
 
     def __lt__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.lt, comp=other)
+        return AttributeQuery(self.attribute, operator=operator.lt, comp=other)
 
     def __le__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.le, comp=other)
+        return AttributeQuery(self.attribute, operator=operator.le, comp=other)
 
-    def __rshift__(self, other):
-        return AttributeQuery(self.attrib, operator=operator.rshift, comp=other)
-
-    def __call__(self, maya_obj):
-        return self.eval(maya_obj)
+    def __call__(self, value):
+        return self.eval(value)
 
 
 def attribute_factory(*args, **kwargs):

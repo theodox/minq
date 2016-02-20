@@ -103,6 +103,8 @@ class Stream(object):
         given a callable filter function, returns a new stream containing only  items  for which the filter function
         return a truth-tested value
         """
+        if hasattr(pred, 'attribute'):
+            return WhereMany(self, pred)
         return Where(self, pred)
 
     def like(self, regex, exact=False):
@@ -165,7 +167,6 @@ class Stream(object):
         return target_type(self, *args, **kwargs)
 
 
-
     def join(self, **streams):
         """
         given a collection of named streams, return a table-like stream in which each 'row' has named values
@@ -203,7 +204,8 @@ class Stream(object):
 
     def long(self):
         """
-        Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in the
+        Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in
+        the
         steeam will be filtered out.
         """
         return Long(self)
@@ -244,16 +246,14 @@ class Stream(object):
 
 
     def __repr__(self):
-        return "Stream(%s)"  % self.execute().__repr__()
-
-
+        return "Stream(%s)" % self.execute().__repr__()
 
 
 class Where(Stream):
     """
     Applies the supplied predicate to everything in the stream filtering only items that pass the predicate function
 
-    if the optional invert keyword is provided, returns only itemrs where predicate returns a False-y value
+    if the optional invert keyword is provided, returns only items where predicate returns a False-y value
     """
 
     def __init__(self, upstream=tuple(), predicate=lambda p: True, invert=False):
@@ -270,9 +270,36 @@ class Where(Stream):
         return itertools.ifilter(self.predicate, _stream)
 
 
+class WhereMany(Stream):
+    """
+    For bulk queries, this automates the process of creating a large number of attribute queries and issuing them all
+    that the same time.  This is noticeably faster than repeated `getAttr` calls.
+    """
+
+    def __init__(self, upstream=tuple(), attrib_query=None):
+        super(WhereMany, self).__init__(upstream=upstream)
+        if not hasattr(attrib_query, 'attribute') or not callable(attrib_query):
+            raise QueryError, "query object must be a callable object with a a field called 'attribute'"
+        self.attrib_query = attrib_query
+        query_string = "{0}." + attrib_query.attribute
+        self.attribute_factory = lambda p: query_string.format(p)
+
+    def __iter__(self):
+        _make_attrib = self.attribute_factory
+        op = self.attrib_query.operator
+        comp = self.attrib_query.comp
+        cached_attrs, cached_objs = itertools.tee(self.incoming, 2)
+        attrib_stream = itertools.imap(_make_attrib, cached_attrs)
+        value_stream = get_values(attrib_stream)
+
+        for obj, val in itertools.izip(cached_objs, value_stream):
+            if op(val, comp):
+                yield obj
+
+
 class Like(Stream):
     """
-    applies the supplied regex to all elements in the imput stream, returning items matching the regex. If the
+    applies the supplied regex to all elements in the input stream, returning items matching the regex. If the
     optional 'exact' flag is passed, the regex must be a conplete match (re.match) otherwise, partial matches are
     allowed(re.search)
     """
@@ -285,9 +312,9 @@ class Like(Stream):
     def __iter__(self):
         _stream = iter(self.incoming)
         if self.exact:
-            return (i for i in _stream if self.regex.match(i))
+            return itertools.ifilter(self.regex.match, _stream)
         else:
-            return (i for i in _stream if self.regex.search(i))
+            return itertools.ifilter(self.regex.search, _stream)
 
 
 class OfType(Stream):
@@ -407,7 +434,8 @@ class Sort(Stream):
 
 class NodeType(Stream):
     """
-    Base class for different types of Maya nodes.  NodeTypes can be used as filters on an existing stream or as the basis of a new stream:
+    Base class for different types of Maya nodes.  NodeTypes can be used as filters on an existing stream or as the
+    basis of a new stream:
 
         Meshes()
 
@@ -428,11 +456,10 @@ class NodeType(Stream):
         return self.TAG
 
 
-
-
 class QuasiFilter(object):
     """
-    A Mixin Base class for items which are not covered by ls -type, to make them have the same behavior as NodeTypes.  So, for example
+    A Mixin Base class for items which are not covered by ls -type, to make them have the same behavior as NodeTypes.
+     So, for example
 
         Assemblies()
 
@@ -454,7 +481,8 @@ class NodeTypeSet(Stream, QuasiFilter):
     """
     This allows you to combine several type filters into one for speed
     """
-    def __init__(self, upstream = tuple(), *node_types):
+
+    def __init__(self, upstream=tuple(), *node_types):
         super(NodeTypeSet, self).__init__(upstream)
         self.node_types = node_types
 
@@ -463,8 +491,6 @@ class NodeTypeSet(Stream, QuasiFilter):
 
     def filter(self, stream):
         return get_list(stream, type=self.node_types)
-
-
 
 
 class Selected(NodeType, QuasiFilter):
@@ -483,7 +509,8 @@ class Selected(NodeType, QuasiFilter):
 
 class Objects(NodeType, QuasiFilter):
     """
-    Applies the 'objectsOnly' filter to the current stream which will convert strings including attributes to node names.
+    Applies the 'objectsOnly' filter to the current stream which will convert strings including attributes to node
+    names.
     """
     TAG = 'objectsOnly'
 
@@ -532,6 +559,7 @@ class Projection(Stream):
     """
     Base class for operations which change the contents of the current stream
     """
+
     def __init__(self, upstream=tuple(), *args, **kwargs):
         self.incoming = upstream
         self.args = args

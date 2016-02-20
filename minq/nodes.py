@@ -6,6 +6,9 @@ to avoid typing 'of_type'
 
 from minq.core import NodeType
 
+class Transform(NodeType):
+    TAG = 'transform'
+
 
 class AbstractBaseCreate(NodeType):
     TAG = 'abstractBaseCreate'
