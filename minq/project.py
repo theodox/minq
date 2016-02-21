@@ -10,12 +10,12 @@ __author__ = 'Steve'
 
 class Parents(Projection):
     def __iter__(self):
-        return get_relatives(self.incoming, p=True, **self.kwargs)
+        return get_relatives(self.incoming, p=True, f=True, **self.kwargs)
 
 
 class Children(Projection):
     def __iter__(self):
-        return get_relatives(self.incoming, c=True, **self.kwargs)
+        return get_relatives(self.incoming, c=True, f=True, **self.kwargs)
 
 
 class AllParents(Projection):
@@ -30,12 +30,12 @@ class AllParents(Projection):
                     parents.add(path)
                     path, _, __ = path.rpartition("|")
 
-        return non_empty_stream(cmds.ls(*parents))
+        return non_empty_stream(cmds.ls(*parents, long=True))
 
 
 class AllChildren(Projection):
     def __iter__(self):
-        return get_relatives(self.incoming, ad=True, **self.kwargs)
+        return get_relatives(self.incoming, ad=True, f=True, **self.kwargs)
 
 
 class History(Projection):
@@ -54,6 +54,26 @@ class Connections(Projection):
 
 
 class Attribute(Projection):
+    """
+    Yields a stream of attribute names for the incoming streams. For example
+
+        Cameras().get(Attribute, 'orthographic')
+
+    will produce something like
+
+        Stream([u'['topShape.orthographic', 'sideShape.orthographic', ...])
+
+    This can be filtered to objects that have actually have the attribute by
+    passing it to an ObjectsOnly:
+
+        Shapes().get(Attributes, 'orthographic').only(ObjectsOnly)
+
+    is equivalent to
+
+        cmds.ls( "*.orthographic", objectsOnly = True)
+
+    You can pass multiple attributes if needed
+    """
     def __iter__(self):
 
 
@@ -71,11 +91,22 @@ class Attribute(Projection):
 
 
 class Values(Projection):
+    """
+    Returns all of the values for a stream of attributes: for example
+
+        Transforms().get(Attribute, 'tx').get(Values)
+
+    will yield a stream of all the translateX values in the scene.
+    """
     def __iter__(self):
         return get_values(self.incoming, **self.kwargs)
 
 
 class Types(Projection):
+    """
+    Returns a stream of tuples (object, nodeType) for every object in the
+    incoming stream.
+    """
     TYPE_TUPLE = namedtuple('objectType', 'object type')
 
     def __iter__(self):

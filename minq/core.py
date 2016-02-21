@@ -76,7 +76,20 @@ class Stream(object):
 
         stream1 & stream2
 
-    returns only items that are common to both streams
+    returns only items that are common to both streams.
+
+    Most streams are created by a NodeType-derived class: for example,  Meshes()  will yield all
+    of the poly meshes in the scene as a Stream, while Transforms() will yield all the transforms.
+    However you can 'initialize' a stream with a list or tuple if you already know the names
+    of nodes or objects you're looking for: for example,
+
+       Cameras()
+
+    and
+
+       Stream(['topShape', 'frontShape', 'perspShape', 'sideShape])
+
+    are functionally interchangeable in a typical maya scene.
     """
 
     def __init__(self, upstream=tuple()):
@@ -87,7 +100,7 @@ class Stream(object):
 
     def execute(self):
         """
-        invcke the chain of queries whi
+        evaluate all of the queries in this Stream and return the result as a list
         """
         return [i for i in self]
 
@@ -165,6 +178,12 @@ class Stream(object):
         if not issubclass(target_type, Projection):
             raise QueryError, "%s is not a subclass of minq.Projection"
         return target_type(self, *args, **kwargs)
+
+    def foreach(self, func):
+        """
+        Returns a stream containing the results of <func> applied to everything in the stream
+        """
+        return ForEach(self, func)
 
 
     def join(self, **streams):
@@ -352,7 +371,7 @@ class OfType(Stream):
     def __iter__(self):
         if self.delegate:
             return self.delegate(self.incoming)
-        return iter(cmds.ls(*self.incoming, type=self.types))
+        return iter(cmds.ls(*self.incoming, type=self.types, long=True))
 
 
 class Distinct(Stream):
@@ -370,6 +389,7 @@ class Distinct(Stream):
 
 class SetOp(Stream):
     """
+    Base class for set-like operations on streams.
     """
     OP = operator.or_
 
@@ -455,26 +475,35 @@ class NodeType(Stream):
 
     there's a complete list of pre-made NodeTypes in minq.nodes
     """
-
+    TAG = tuple()
 
     def __iter__(self):
 
-        return iter(get_list(self.incoming))
+        if self.incoming == tuple():
+            return iter(cmds.ls(type=self.TAG, long=True))
+        else:
+            return get_list(self.incoming, type=self.TAG, long=True)
 
     def __str__(self):
         return self.TAG
 
+class Everything(NodeType):
+    """
+    This represents the results of `ls()` on  entire maya scene. Because it returns _everything_ you probably want to start with something more restricted, like `Transforms()` or `Meshes()` but sometimes its needed as the root of a complex query.
+    """
+    TAG = tuple()
+
+
 class Scene(NodeType):
     """
-    This represents the results of `ls()` on  entire maya scene. Because it returns _everything_ you probably want to start with something more restricted, like `Transforms()` or `Meshes()` but sometimes its needed as the root of a complext query
-
+    This represents the results of `ls(type=entity)` on  entire maya scene. It includes dag nodes and nodes with a physical identity -- not shaders, for example.
     """
     TAG = 'entity'
     def __init__(self, *incoming):
         self.incoming = incoming
 
     def __iter__(self):
-        return iter(cmds.ls(*self.incoming, type ='entity'))
+        return iter(cmds.ls(*self.incoming, type ='entity',long=True))
 
 class QuasiFilter(object):
     """
@@ -507,10 +536,10 @@ class NodeTypeSet(Stream, QuasiFilter):
         self.node_types = node_types
 
     def __iter__(self):
-        return cmds.ls(type=self.node_types)
+        return cmds.ls(type=self.node_types, long=True)
 
     def filter(self, stream):
-        return get_list(stream, type=self.node_types)
+        return get_list(stream, type=self.node_types, long=True)
 
 
 class Selected(NodeType, QuasiFilter):
@@ -520,11 +549,11 @@ class Selected(NodeType, QuasiFilter):
     TAG = 'selected'
 
     def __iter__(self):
-        return iter(cmds.ls(selection=True))
+        return iter(cmds.ls(selection=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, selection=True)
+        return get_list(stream, selection=True, long=True)
 
 
 class Objects(NodeType, QuasiFilter):
@@ -535,44 +564,44 @@ class Objects(NodeType, QuasiFilter):
     TAG = 'objectsOnly'
 
     def __iter__(self):
-        return iter(get_list([None], objectsOnly=True))
+        return iter(get_list([None], objectsOnly=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, objectsOnly=True)
+        return get_list(stream, objectsOnly=True, long=True)
 
 
 class Assemblies(NodeType, QuasiFilter):
     TAG = 'assembly'
 
     def __iter__(self):
-        return iter(get_list(assemblies=True))
+        return iter(get_list(assemblies=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, assemblies=True)
+        return get_list(stream, assemblies=True, long=True)
 
 
 class Intermediates(NodeType, QuasiFilter):
     TAG = 'intermediates'
 
     def __iter__(self):
-        return iter(get_list(io=True))
+        return iter(get_list(io=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, io=True)
+        return get_list(stream, io=True, long=True)
 
 
 class NoIntermediates(NodeType, QuasiFilter):
     TAG = 'noIntermediates'
 
     def __iter__(self):
-        return non_empty_stream(cmds.ls(io=True))
+        return non_empty_stream(cmds.ls(ni=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, ni=True)
+        return get_list(stream, ni=True, long=True)
 
 
 class Projection(Stream):
@@ -584,6 +613,14 @@ class Projection(Stream):
         self.incoming = upstream
         self.args = args
         self.kwargs = kwargs
+
+class ForEach(Projection):
+    """
+    Runs an arbitrary callable function on every item in a stream
+    """
+
+    def __iter__(self):
+        return itertools.imap(self.args[0], self.incoming)
 
 
 class Zip(Stream):
@@ -597,7 +634,7 @@ class Zip(Stream):
         self.streams = streams.items()
 
     def __iter__(self):
-        names = ['object'] + [item[0] for item in self.streams]
+        names = ['index'] + [item[0] for item in self.streams]
         result_row = namedtuple('dataRow', ' '.join(names))
 
         out_streams = [self.incoming]
@@ -619,7 +656,7 @@ class Join(Projection):
 
     def __iter__(self):
 
-        names = ['object'] + [item[0] for item in self.streams]
+        names = ['index'] + [item[0] for item in self.streams]
         result_row = namedtuple('dataRow', ' '.join(names))
 
         out_streams = [self.incoming]

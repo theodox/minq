@@ -28,6 +28,12 @@ def node_type_factory(name, node_string):
         name, (NodeType,), {'TAG': node_string}
     )
 
+class Existing(NodeType):
+    """
+    This is a convenience class to be used as a sanity check on a stream, limiting
+    it to objects which are actually present in the scene.
+    """
+    TAG = 'entity'
 
 class Transforms(NodeType):
     TAG = 'transform'
@@ -335,4 +341,3 @@ class UnknownDags(NodeType):
 
 class UnknownTransforms(NodeType):
     TAG = 'unknownTransform'
-
