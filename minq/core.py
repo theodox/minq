@@ -170,7 +170,7 @@ class Stream(object):
     def join(self, **streams):
         """
         given a collection of named streams, return a table-like stream in which each 'row' has named values
-        corresponnding to the original stream. This is used for coordinating multiple streams: for example:
+        corresponding to the original stream. This is used for coordinating multiple streams: for example:
 
              bones = Joints()
              bone_parents = bones.get(Parents)
@@ -328,12 +328,19 @@ class OfType(Stream):
     def __init__(self, upstream=tuple(), *types):
         super(OfType, self).__init__(upstream=upstream)
         self.delegate = None
-        as_type = lambda p: p.TAG if hasattr(p, 'TAG') else str(p)
-        type_strings = [as_type(t) for t in types]
-        for t in type_strings:
-            if not t.isalnum():
-                raise QueryError, "invalid type name: %s" % t
-        self.types = map(as_type, types)
+
+        # support single or multiple types in a NodeType class
+        # mixed with strings
+        type_strings = []
+        for t in types:
+            if hasattr(t, 'TAG'):
+                if hasattr(t.TAG, '__iter__'):
+                    type_strings.extend(t.TAG)
+                else:
+                    type_strings.append(t.TAG)
+            else:
+                type_strings.append(str(t))
+        self.types = type_strings
 
         quasi = [q for q in types if isinstance(q, type) and issubclass(q, QuasiFilter)]
         if not quasi:
@@ -432,6 +439,7 @@ class Sort(Stream):
         return iter(_result)
 
 
+
 class NodeType(Stream):
     """
     Base class for different types of Maya nodes.  NodeTypes can be used as filters on an existing stream or as the
@@ -447,14 +455,26 @@ class NodeType(Stream):
 
     there's a complete list of pre-made NodeTypes in minq.nodes
     """
-    TAG = 'node'
+
 
     def __iter__(self):
-        return iter(cmds.ls(type=self.TAG) or [])
+
+        return iter(get_list(self.incoming))
 
     def __str__(self):
         return self.TAG
 
+class Scene(NodeType):
+    """
+    This represents the results of `ls()` on  entire maya scene. Because it returns _everything_ you probably want to start with something more restricted, like `Transforms()` or `Meshes()` but sometimes its needed as the root of a complext query
+
+    """
+    TAG = 'entity'
+    def __init__(self, *incoming):
+        self.incoming = incoming
+
+    def __iter__(self):
+        return iter(cmds.ls(*self.incoming, type ='entity'))
 
 class QuasiFilter(object):
     """
