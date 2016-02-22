@@ -106,8 +106,7 @@ class Stream(object):
 
     def cache(self):
         """
-        returns a Stream wrapped around a the cached result of this query.  This is very useful to prevent repeatedly
-        issuing the same maya queries.
+        returns a Stream wrapped around a the cached result of this query.
         """
         return Stream(self.execute())
 
@@ -224,10 +223,16 @@ class Stream(object):
     def long(self):
         """
         Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in
-        the
-        steeam will be filtered out.
+        the stream will be filtered out.
         """
         return Long(self)
+
+    def long(self):
+        """
+        Returns a new stream containing the short names of items in this stream. Any items which are not maya nodes in
+        the stream will be filtered out.
+        """
+        return Short(self)
 
 
     def uuid(self):
