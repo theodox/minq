@@ -18,12 +18,7 @@ class QueryError(ValueError):
 
 def non_empty_stream(stream):
     """yields a single None if the previous stream is exhausted"""
-    post = False
-    for item in stream:
-        yield item
-        post = True
-    if not post:
-        yield None
+    return itertools.chain(stream, (None,))
 
 
 def command_stream(stream, cmd, **kwargs):
@@ -600,6 +595,17 @@ class NoIntermediates(NodeType, QuasiFilter):
     @classmethod
     def filter(cls, stream):
         return get_list(stream, ni=True, long=True)
+
+
+class Templated(NodeType, QuasiFilter):
+    TAG = 'templated'
+
+    def __iter__(self):
+        return non_empty_stream(cmds.ls(tm=True, type='dagNode', long=True))
+
+    @classmethod
+    def filter(cls, stream):
+        return get_list(stream, tm=True, type='dagNode', long=True)
 
 
 class Projection(Stream):
