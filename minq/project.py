@@ -40,12 +40,12 @@ class AllChildren(Projection):
 
 class History(Projection):
     def __iter__(self):
-        return get_history(self.incoming, **self.kwargs)
+        return get_list(get_history(self.incoming, **self.kwargs), long=True)
 
 
 class Future(Projection):
     def __iter__(self):
-        return get_history(self.incoming, future=True, **self.kwargs)
+        return get_list(get_history(self.incoming, future=True, **self.kwargs), long=True)
 
 
 class Connections(Projection):
