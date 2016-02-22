@@ -227,7 +227,7 @@ class Stream(object):
         """
         return Long(self)
 
-    def long(self):
+    def short(self):
         """
         Returns a new stream containing the short names of items in this stream. Any items which are not maya nodes in
         the stream will be filtered out.
