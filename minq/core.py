@@ -509,23 +509,6 @@ class NodeType(Stream):
     def __str__(self):
         return self.TAG
 
-class Everything(NodeType):
-    """
-    This represents the results of `ls()` on  entire maya scene. Because it returns _everything_ you probably want to start with something more restricted, like `Transforms()` or `Meshes()` but sometimes its needed as the root of a complex query.
-    """
-    TAG = tuple()
-
-
-class Scene(NodeType):
-    """
-    This represents the results of `ls(type=entity)` on  entire maya scene. It includes dag nodes and nodes with a physical identity -- not shaders, for example.
-    """
-    TAG = 'entity'
-    def __init__(self, *incoming):
-        self.incoming = incoming
-
-    def __iter__(self):
-        return iter(cmds.ls(*self.incoming, type ='entity',long=True))
 
 class QuasiFilter(object):
     """
