@@ -29,7 +29,7 @@ def non_empty_stream(stream):
 def command_stream(stream, cmd, **kwargs):
     """convenience wrapper for commands that need non_empty_streams"""
     safe = non_empty_stream(stream)
-    return iter(cmd(*safe, **kwargs))
+    return iter(cmd(*safe, **kwargs) or [])
 
 
 def get_list(stream, **kwargs):
@@ -55,6 +55,7 @@ def get_connections(stream, **kwargs):
 def get_values(stream, **kwargs):
     """return listConnections() on <stream> without ever returning everything"""
     return command_stream(stream, cmds.getAttr, **kwargs)
+
 
 
 class Stream(object):
@@ -92,8 +93,8 @@ class Stream(object):
     are functionally interchangeable in a typical maya scene.
     """
 
-    def __init__(self, upstream=tuple()):
-        self.incoming = upstream
+    def __init__(self, upstream=None):
+        self.incoming = upstream or tuple()
 
     def __iter__(self):
         return (i for i in self.incoming)
@@ -280,6 +281,7 @@ class Stream(object):
 
     def __ixor__(self, other):
         return XOr(self, other)
+
 
     def __repr__(self):
         return "Stream(%s)" % self.execute().__repr__()

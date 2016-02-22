@@ -130,6 +130,10 @@ class TestStreamBasics(unittest.TestCase):
         for c, o in zip (cams, orthos):
             assert cmds.getAttr(c + ".orthographic") == o
 
+    def test_join(self):
+        cams = Cameras().cache()
+        cam_orthos = cams.get(Attribute, 'focalLength')
+
 def run_test():
     suite = unittest.TestLoader().loadTestsFromTestCase(TestStreamBasics)
     unittest.TextTestRunner(verbosity=2).run(suite)
