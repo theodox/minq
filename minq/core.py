@@ -185,6 +185,12 @@ class Stream(object):
         return ForEach(self, func)
 
 
+    def split(self, number_of_streams):
+        """
+        Returns multiple 'copies' of this stream which can be iterated independently without re-calling the query.
+        """
+        return itertools.imap(Stream, itertools.tee(self, number_of_streams))
+
     def join(self, **streams):
         """
         given a collection of named streams, return a table-like stream in which each 'row' has named values
@@ -268,6 +274,12 @@ class Stream(object):
     def __iand__(self, other):
         return Intersection(self, other)
 
+
+    def __xor__(self, other):
+        return XOr(self, other)
+
+    def __ixor__(self, other):
+        return XOr(self, other)
 
     def __repr__(self):
         return "Stream(%s)" % self.execute().__repr__()
@@ -417,7 +429,10 @@ class Difference(SetOp):
 
 
 class Intersection(SetOp):
-    OP = operator.iand
+    OP = operator.and_
+
+class XOr(SetOp):
+    OP = operator.xor
 
 
 class Short(Stream):

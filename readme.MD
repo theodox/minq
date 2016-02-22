@@ -28,19 +28,31 @@ results. This is both faster to execute and also cleaner to read.
 The key is that the queries are _not_ commands: they are descriptions of commands you'll run in sequence. The  simplest query is no different from an `ls()` call:
 
 ```python
-q = Scene('top*')
+q = Scene(['top'])
 ```
 
-This would produce a query object (technically a `minq.Stream` object)  -- but as of yet it has no results: it's a 
-description  of a query you  _could_ call,  not a list of objects.
+This would produce a query object (technically a `minq.Stream` object)  -- but as of yet it has no results: it's a description  of a query you  _could_ call,  not a list of objects.
 
-To get the result call it directly:
+To get the result call its `.execute()`  function:
 
 ```python
 print q.execute()
-[u'|top', u'|top|topShape']
+[u'|top']
 ```
-It's often more convenient to turn the results directly into a list or a tuple:
+
+but the main use pattern is to iterate over it: the query is automatically executed when you try to loop over it:
+
+```python
+q = Scene('top', 'front')
+for item in q:
+    print item
+
+# u'|top'
+# u'|front'
+```
+
+It's often  convenient to turn the results directly into a list or a tuple:
+
 ```python
 tuple(Cameras())
 # Result: (u'frontShape', u'perspShape', u'sideShape', u'topShape') # 
@@ -49,17 +61,21 @@ list(Scene().only('polyCreator'))
 # Result: [u'polyCube1', u'polyCube2', u'polyCube3', u'polyUnite1'] # 
 ```
 
-Iterating over the results also calls the query:
+You can also check for contents using built in python checks like `in`, `any`, or `all`:
+
 ```python
+u'|top' in Cameras()
+# True
 
-for item in Cameras():
-    print item
+u'|pCube1' in Cameras()
+# False
 
-# frontShape
-# perspShape
-# sideShape
-# topShape
+any(Meshes().like('cube'))
+# True
 ```
+
+Doing this runs the query, of course, but it's a readable way to make it clear what you're really hunting for.
+
 
 Query chaining
 -----
@@ -99,7 +115,7 @@ print cubes.execute()
 # [u'pCube1', u'pCube2']
 ```
 
-In other words a stream is not a function that returns a list: its an object that can be iterated over to perform a particular search in the maya scene.
+At the risk of being repetitive: a stream is not a function that returns a list: its an object that can be iterated over to perform a particular search in the maya scene.
 
 Filtering
 -------
@@ -152,13 +168,13 @@ will return all the camera and light nodes in `some_stream`.  Note that this is 
 cmds.ls(list_of_nodes, type =('camera', 'light'))
 ```
 
-For convenience, the submodule `minq.nodes` includes subclasses of Stream dedidcated to particular Maya node types:  `Cameras()` and `Meshes()` mentioned above are examples.  You can used these classes to start a stream containing all the objects of a particular type:
+For convenience, minq includes subclasses of Stream dedidcated to particular Maya node types:  `Cameras()` and `Meshes()` mentioned above are examples.  You can used these classes to start a stream containing all the objects of a particular type:
 
 ```python
 Meshes().like("house_mesh")
 ```
 
-or you can pass them to  the `.only()` function: thus
+or you can pass them to  the `.only()` function for use as filters: thus
 
 ```python
 some_stream.only(Meshes, Cameras)
@@ -168,6 +184,8 @@ is equivalent to
 ```python
 some_stream.only('mesh', 'camera')
 ```
+
+This is usually significantly faster than piecewise methods like checking maya's `nodeType()` function on objects one at a time.
 
 .where()
 =========
@@ -198,7 +216,7 @@ Scene().where(cmds.listConnections)
 
 because `listConnections` returns an empty list for objects with no connections, so unconnected objects won't pass the filter (it's probably not good practice to rely on this behavior here because the intent of the code is not very explicit, however).  
 
-Since calling a function on every item in a long stream can be very expensive, minq includes a facilty for doing one class of tests in bulk.  minq includes a special class called `item` (note the casing!) which generates queries on attributes.  For example:
+Since calling a function on every item in a long stream can be very expensive, minq includes a facilty for doing one common class of tests in bulk.  minq includes a special class called `item` (note the casing!) which generates queries on attributes.  For example:
 
 ```python
 tx_over_fifty = lambda p: cmds.getAttr(p + ".tx") > 50
@@ -229,25 +247,79 @@ Some operators change the data which is passing through, rather than filtering a
 
 ```python
 camera_transforms = Cameras().get(Parents)
-# Result: Stream([u'front', u'persp', u'side', u'top']) # 
+# Result: Stream([u'|front', u'|persp', u'|side', u'|top']) # 
 
 sphere_history = Meshes().like('sphere').get(History)
-# Result: Stream([u'pSphereShape1', u'polySphere1']) # 
+# Result: Stream([u'|pSphere1|pSphereShape1', u'polySphere1']) # 
 
 skinned_meshes = Scene().only('skinCluster').get(Future)
-# Result: Stream([u'characterMeshShape']) # 
+# Result: Stream([u'|characterMesh|characterMeshShape']) # 
 ```
 
-You some `get()` operations don't produce object names.  For example:
+Some `get()` operations don't produce object names.  For example:
 
 ```python
 mesh_translates = Meshes().get(Parents).get(Attribute, 't').get(Values)
 # Result: Stream([(0,0,0), (10,0,0), (0,20.2123, 11)]) # 
 ```
 
+where `Attributes` is a Stream type that turns object names into `object.attribute` names and `Values` runs a maya `getAttr` on a stream of values -- this is a fast way to query for all of the values on a particular set of attributes in bulk with a single maya call, much quicker than iterating over a list can calling `getAttr` many times.
 
-** this section needs expansion **
+You can also use the `.foreach()` function to produce streams from arbitrary functions run on a stream.  A simple but useless example might be:
 
+```python
+print Cameras().short().foreach(lambda p: p.upper())
+# Stream([u'FRONTSHAPE', u'PERSPSHAPE', u'SIDESHAPE', u'TOPSHAPE'])
+```
+
+foreach can be  used for sophisticated filtering or transformations: for example:
+
+```python
+def connected_shaders(object):
+    sgs = cmds.listConnections(object, type='shadingEngine') or []
+    return tuple(set( cmds.listConnections(*sgs, type = 'lambert') or []))
+
+print Meshes().foreach(connected_shaders)
+# Result: Stream([(u'lambert1',), (u'blinn1',), (u'lambert1', u'phong1')]) # 
+
+```
+
+Tables
+------
+Sometimes you'll want to collect information in a tabular format: list all of the object's positions by object, for collect all of the shaders attached to meshes in the previous examples.  Streams offer a tabulating function called '.join()' which allows you to merge multiple streams into a single stream of 'rows' -- as long as all of the streams line up the result is effectively a table.  
+
+For example, the `connected_shaders` function above returns the shaders for each mesh -- but not the meshes themselves.  However you can get the data in a more useful format using `.join()`:
+
+```python
+mesh_stream = Meshes()
+shader_stream = mesh_stream.foreach(connected_shaders)
+table = mesh_stream.join(shaders = shader_stream)
+for each_row in table:
+    print each_row
+
+# dataRow(index=u'|pCube1|pCubeShape1', shaders=(u'lambert1',))
+# dataRow(index=u'|pPyramid1|pPyramidShape1', shaders=(u'blinn1',))
+# dataRow(index=u'|pSphere1|pSphereShape1', shaders=(u'lambert1', u'phong1'))
+```
+
+Since the 'dataRows' are really just namedtuples, you can also convert them to dictionaries:
+
+```python
+print dict(table)
+{u'|pCube1|pCubeShape1': (u'lambert1',), u'|pPyramid1|pPyramidShape1': (u'blinn1',), u'|pSphere1|pSphereShape1': (u'lambert1', u'phong1')}
+```
+
+This example is not particularly optimized, because both `mesh_stream` and `shader_stream` will execute the original `Meshes()` query.  In performance-intensive situations you could avoid exdcuting the query again by using the `.split()` function of a Stream to split the Meshes() call into two:
+
+```python
+meshes, shaders = Meshes().split(2)
+m = meshes.join(shaders= shaders.foreach(connected_shaders))
+dict(m)
+# {u'|pCube1|pCubeShape1': (u'lambert1',), u'|pPyramid1|pPyramidShape1': (u'blinn1',), u'|pSphere1|pSphereShape1': (u'lambert1', u'phong1')}
+
+```
+
+This version will perform better because `split()` will not force multiple evaluations of the same query.
 
 Set Operations
 -------
@@ -282,8 +354,11 @@ o = Cameras().where(item.orthographic == True)  # only ortho cameras
 
 (q & o).execute() #intersection  -- in both sets
 # Result: (u'|side|sideShape', u'|top|topShape', u'|front|frontShape') # 
+
+(q ^ o).execute() # XOR : Items not in both sets
+# Result: (u'|persp|perspShape',) # 
 ```
 
-This can be an economical way of doing big operations in bulk instead of using for-loops.
+This can be an economical way of doing big operations in bulk instead of using for-loops, and it's also a clear way of expressing ideas like _I an looking for an object which is both a shape and a child of this assembly_ or _I am looking for a mesh which is not skinned and not templated_.
 
  
