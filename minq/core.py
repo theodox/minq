@@ -44,7 +44,12 @@ def get_relatives(stream, **kwargs):
 
 def get_history(stream, **kwargs):
     """return listHistory() on <stream> without ever returning everything"""
-    return command_stream(stream, cmds.listHistory, **kwargs)
+    try:
+        return command_stream(stream, cmds.listHistory, **kwargs)
+    except RuntimeError as err:
+        if err.args == (u'Found no items to list the history for.\n',):
+            return iter(tuple())
+        raise
 
 
 def get_connections(stream, **kwargs):
@@ -55,7 +60,6 @@ def get_connections(stream, **kwargs):
 def get_values(stream, **kwargs):
     """return listConnections() on <stream> without ever returning everything"""
     return command_stream(stream, cmds.getAttr, **kwargs)
-
 
 
 class Stream(object):
@@ -185,7 +189,6 @@ class Stream(object):
         """
         return ForEach(self, func)
 
-
     def split(self, number_of_streams):
         """
         Returns multiple 'copies' of this stream which can be iterated independently without re-calling the query.
@@ -226,7 +229,6 @@ class Stream(object):
         """
         return Join(self, **streams)
 
-
     def long(self):
         """
         Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in
@@ -241,7 +243,6 @@ class Stream(object):
         """
         return Short(self)
 
-
     def uuid(self):
         """
         Returns a new stream containing the uuids of items in this stream. Any items which are not maya nodes in the
@@ -249,39 +250,31 @@ class Stream(object):
         """
         return UUID(self)
 
-
     # operator overloads to support set functionality
 
     def __add__(self, other):
         return Union(self, other)
 
-
     def __iadd__(self, other):
         return Union(self, other)
-
 
     def __isub__(self, other):
         return Difference(self, other)
 
-
     def __sub__(self, other):
         return Difference(self, other)
-
 
     def __and__(self, other):
         return Intersection(self, other)
 
-
     def __iand__(self, other):
         return Intersection(self, other)
-
 
     def __xor__(self, other):
         return XOr(self, other)
 
     def __ixor__(self, other):
         return XOr(self, other)
-
 
     def __repr__(self):
         return "Stream(%s)" % self.execute().__repr__()
@@ -390,7 +383,7 @@ class OfType(Stream):
     def __iter__(self):
         if self.delegate:
             return self.delegate(self.incoming)
-        return iter(cmds.ls(*self.incoming, type=self.types, long=True))
+        return iter(get_list(self.incoming, type=self.types, long=True))
 
 
 class Distinct(Stream):
@@ -432,6 +425,7 @@ class Difference(SetOp):
 
 class Intersection(SetOp):
     OP = operator.and_
+
 
 class XOr(SetOp):
     OP = operator.xor
@@ -479,7 +473,6 @@ class Sort(Stream):
         _result = [i for i in self.incoming]
         _result.sort(key=self.key)
         return iter(_result)
-
 
 
 class NodeType(Stream):
@@ -580,7 +573,7 @@ class Assemblies(NodeType, QuasiFilter):
     TAG = 'assembly'
 
     def __iter__(self):
-        return iter(get_list(assemblies=True, long=True))
+        return iter(cmds.ls(assemblies=True, long=True))
 
     @classmethod
     def filter(cls, stream):
@@ -591,7 +584,7 @@ class Intermediates(NodeType, QuasiFilter):
     TAG = 'intermediates'
 
     def __iter__(self):
-        return iter(get_list(io=True, long=True))
+        return iter(cmds.ls(io=True, long=True))
 
     @classmethod
     def filter(cls, stream):
@@ -618,6 +611,7 @@ class Projection(Stream):
         self.incoming = upstream
         self.args = args
         self.kwargs = kwargs
+
 
 class ForEach(Projection):
     """
