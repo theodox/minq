@@ -156,7 +156,7 @@ class Stream(object):
         """
         return Sort(self, key=None)
 
-    def only(self, *pred):
+    def only(self, *pred, **kwargs):
         """
         Returns a new stream containing only items of the supplied types.  The types can be string typenames (such as
         'transforms' or 'shapes') or they can be minq.core.NodeType classes.  So
@@ -170,8 +170,10 @@ class Stream(object):
         are equivalent.
 
         A handful of NodeTypes (such as ObjectsOnly or Assemblies) can't be combined with others in a single call:
+
+        if the optional namespace keyword is passed, this limits the stream to a given namespace
         """
-        return OfType(self, *pred)
+        return OfType(self, *pred, **kwargs)
 
     def get(self, *args, **kwargs):
         """
@@ -307,8 +309,9 @@ class Append(Stream):
     def __iter__(self):
         main_stream, extension = itertools.tee(self.incoming, 2)
         target_type = self.args[0]
-        append = target_type(extension, *self.args[1:], **self.kwargs )
+        append = target_type(extension, *self.args[1:], **self.kwargs)
         return itertools.chain(main_stream, append)
+
 
 class Having(Stream):
     """
@@ -402,11 +405,24 @@ class OfType(Stream):
 
     Type arguments can be strings or minq.nodes.NodeType instances
 
+    The optional namespace argument allows you to filter responses to only a particular namespace:
+
+        no argument     return all results, regardless of namespaces
+        ''              return all results, regardless of namespaces
+        '.'             any namespace but the root
+        ':"             only objects in root namespace
+        <ns>            any namespace path including ns ns:object, xxx:ns:object
+        <:ns>           absolute namespace ns, eg :ns:object,  but not xxx:ns:object
+
+    nested namespaces can be passed directly, so  namespace  'rig'  will match |rig:object, |scene:rig:object and
+    |rig:scene:object but 'rig:scene', 'scene:rig'
     """
 
-    def __init__(self, upstream=tuple(), *types):
+    def __init__(self, upstream=tuple(), *types, **kwargs):
         super(OfType, self).__init__(upstream=upstream)
         self.delegate = None
+        self.namespace = kwargs.get('namespace', False)
+
 
         # support single or multiple types in a NodeType class
         # mixed with strings
@@ -429,9 +445,24 @@ class OfType(Stream):
         self.delegate = quasi[0].filter
 
     def __iter__(self):
+
+        output_stream = None
         if self.delegate:
-            return self.delegate(self.incoming)
-        return iter(get_list(self.incoming, type=self.types, long=True))
+            output_stream = self.delegate(self.incoming)
+        else:
+            output_stream = iter(get_list(self.incoming, type=self.types or 'entity', long=True))
+
+        if self.namespace:
+
+            if self.namespace == ':':  # returns only unrootd
+                namspace_expression = '''(.*\|)([^:]+$)'''
+            else:  # return permissive match of namespace, but trim leading / trailing colons
+                ns = re.sub('^:', '(?<=\|)', self.namespace)
+                ns = re.sub(':$', '', ns)
+                namspace_expression = """(?!:.*\|+){0}:[\w:_]*$""".format(ns)
+            output_stream = iter(Like(output_stream, namspace_expression))
+
+        return output_stream
 
 
 class Distinct(Stream):
@@ -485,7 +516,7 @@ class Short(Stream):
     """
 
     def __iter__(self):
-        return iter(cmds.ls(*self.incoming, sn=True))
+        return get_list(self.incoming, sn=True)
 
 
 class Long(Stream):

@@ -3,19 +3,22 @@ from minq import *
 import maya.cmds as cmds
 import operator
 
+
 class LSCanary(object):
     """
     Use this as a dummy stream initializer to make sure streams aren't
     issuing queries when they shouldn't
     """
+
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
+
     def __iter__(self):
         raise RuntimeError, 'this should not be called unless stream is queried'
 
-class TestStreamBasics(unittest.TestCase):
 
+class TestStreamBasics(unittest.TestCase):
     def test_stream_iterable(self):
         test = Stream('hello world'.split())
         assert any([i for i in test])
@@ -34,22 +37,22 @@ class TestStreamBasics(unittest.TestCase):
     # definition time
 
     def test_stream_only(self):
-        source = Stream(LSCanary(type = 'dagNode'))
+        source = Stream(LSCanary(type='dagNode'))
         filtered = source.only('camera')
         assert isinstance(filtered, OfType)
 
     def test_stream_where_arbitrary(self):
-        source = Stream(LSCanary(type = 'dagNode'))
-        filtered = source.where (lambda p: True)
+        source = Stream(LSCanary(type='dagNode'))
+        filtered = source.where(lambda p: True)
         assert isinstance(filtered, Where)
 
     def test_stream_whereMany(self):
-        source = Stream(LSCanary(type = 'dagNode'))
-        filtered = source.where (item.tx < 1)
+        source = Stream(LSCanary(type='dagNode'))
+        filtered = source.where(item.tx < 1)
         assert isinstance(filtered, WhereMany)
 
     def test_stream_get(self):
-        source = Stream(LSCanary(type = 'dagNode'))
+        source = Stream(LSCanary(type='dagNode'))
         parents = source.get(Parents)
         assert isinstance(parents, Parents)
 
@@ -107,7 +110,6 @@ class TestStreamBasics(unittest.TestCase):
         finally:
             cmds.delete(test_object, test_shape)
 
-
     def test_item(self):
         example = item.tx > 1
         assert example.comp == 1
@@ -122,20 +124,57 @@ class TestStreamBasics(unittest.TestCase):
     def test_get_attributes(self):
         cameras = Cameras().get(Attribute, 'orthographic').execute()
         for cam in ("|top", "|side", "|persp", "|front"):
-            assert cam + cam +  "Shape.orthographic" in cameras
+            assert cam + cam + "Shape.orthographic" in cameras
 
     def test_get_values(self):
         orthos = Cameras().get(Attribute, 'orthographic').get(Values).execute()
         cams = Cameras().execute()
-        for c, o in zip (cams, orthos):
+        for c, o in zip(cams, orthos):
             assert cmds.getAttr(c + ".orthographic") == o
 
     def test_join(self):
         cams = Cameras().cache()
         cam_orthos = cams.get(Attribute, 'focalLength')
 
+    def test_only_namespaces(self):
+        try:
+            cmds.file(new=True, force=True)
+            p1 = cmds.polyCube()
+            ns = cmds.namespace(add="test")
+            cmds.namespace(set="test")
+            p2 = cmds.polyCube()
+            assert len(Meshes().execute()) == 2
+            assert len(Meshes().only(namespace="test").execute()) == 1
+
+        finally:
+            cmds.file(new=True, force=True)
+
+    def test_only_nested_namespaces(self):
+        try:
+            cmds.file(new=True, force=True)
+            p1 = cmds.polyCube()
+            ns = cmds.namespace(add="test1")
+            cmds.namespace(set="test1")
+            p2 = cmds.polyCube()
+            ns2 = cmds.namespace(add="test2")
+            cmds.namespace(set="test2")
+            p3 = cmds.polyCube()
+
+            assert len(Meshes().only(namespace=":").execute()) == 1         # root
+            assert len(Meshes().only(namespace=":test1").execute()) == 2    # test and test2
+            assert len(Meshes().only(namespace=":test1:test2").execute()) == 1 # test2 only
+            assert len(Meshes().only(namespace="test2").execute()) == 1     # test 2 only
+            assert len(Meshes().only(namespace=":test2").execute()) == 0    # fails, test2 is not root
+            assert  len(Meshes().only(namespace=".").execute()) == 2         # all namespaces
+            assert len(Meshes().only(namespace="").execute()) == 3          # namespaces or not
+
+        finally:
+            cmds.file(new=True, force=True)
+
+
 def run_test():
     suite = unittest.TestLoader().loadTestsFromTestCase(TestStreamBasics)
     unittest.TextTestRunner(verbosity=2).run(suite)
+
 
 run_test()
