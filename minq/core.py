@@ -239,6 +239,10 @@ class Stream(object):
         """
         return Join(self, **streams)
 
+    def append(self, *args, **kwargs):
+
+        return Append(self, *args, **kwargs)
+
     def long(self):
         """
         Returns a new stream containing the long names of items in this stream. Any items which are not maya nodes in
@@ -289,6 +293,22 @@ class Stream(object):
     def __repr__(self):
         return "Stream(%s)" % self.execute().__repr__()
 
+
+class Append(Stream):
+    """
+    appends a get() on the current stream
+    """
+
+    def __init__(self, incoming, *args, **kwargs):
+        super(Append, self).__init__(incoming)
+        self.args = args
+        self.kwargs = kwargs
+
+    def __iter__(self):
+        main_stream, extension = itertools.tee(self.incoming, 2)
+        target_type = self.args[0]
+        append = target_type(extension, *self.args[1:], **self.kwargs )
+        return itertools.chain(main_stream, append)
 
 class Having(Stream):
     """
