@@ -193,6 +193,12 @@ class Stream(object):
         """
         return ForEach(self, func)
 
+    def having(self, attrib):
+        """
+        Returns a stream of objects with the supplied attribute
+        """
+        return Having(self, attrib)
+
     def split(self, number_of_streams):
         """
         Returns multiple 'copies' of this stream which can be iterated independently without re-calling the query.
@@ -282,6 +288,21 @@ class Stream(object):
 
     def __repr__(self):
         return "Stream(%s)" % self.execute().__repr__()
+
+
+class Having(Stream):
+    """
+    Returns a stream of objects with the supplied attribute; equivalent to 'ls -o'
+    """
+
+    def __init__(self, incoming, attribute):
+        super(Having, self).__init__(incoming)
+        self.attribute = "." + attribute
+
+    def __iter__(self):
+        _attr = self.attribute
+        add_attrib = lambda p: p + _attr
+        return get_list(itertools.imap(add_attrib, self.incoming), o=True, long=True)
 
 
 class Where(Stream):
