@@ -119,6 +119,15 @@ class Stream(object):
             return WhereMany(self, pred)
         return Where(self, pred)
 
+    def where_not(self, pred):
+        """
+        a convenience wrapper for 'where' that inverts the result -- useful for not having to make a lambda
+        just to invert a common function
+        """
+        if hasattr(pred, 'attribute'):
+            return WhereMany(self, pred, invert=True)
+        return Where(self, pred, invert=True)
+
     def like(self, regex, exact=False):
         """
         given a string regular expression, returns a new stream containing only items where the regex finds a match.
@@ -302,8 +311,9 @@ class WhereMany(Stream):
     that the same time.  This is noticeably faster than repeated `getAttr` calls.
     """
 
-    def __init__(self, upstream=tuple(), attrib_query=None):
+    def __init__(self, upstream=tuple(), attrib_query=None, invert=False):
         super(WhereMany, self).__init__(upstream=upstream)
+        self.invert = invert
         if not hasattr(attrib_query, 'attribute') or not callable(attrib_query):
             raise QueryError, "query object must be a callable object with a a field called 'attribute'"
         self.attrib_query = attrib_query
@@ -318,8 +328,10 @@ class WhereMany(Stream):
         attrib_stream = itertools.imap(_make_attrib, cached_attrs)
         value_stream = get_values(attrib_stream)
 
+        inverter = lambda p: operator.xor(self.invert, p)
+
         for obj, val in itertools.izip(cached_objs, value_stream):
-            if op(val, comp):
+            if inverter(op(val, comp)):
                 yield obj
 
 
@@ -598,6 +610,10 @@ class NoIntermediates(NodeType, QuasiFilter):
 
 
 class Templated(NodeType, QuasiFilter):
+    # note by default 'ls -tm' includes a lot of junk which is not actually
+    # templated.  This applies ls -type dag as well to prune that out.
+    # it does not however try to account for the difference between
+    # templated transforms and templated shapes
     TAG = 'templated'
 
     def __iter__(self):
