@@ -1,7 +1,7 @@
 import itertools
 import operator
 import re
-from collections import namedtuple
+from collections import namedtuple, Iterable
 
 import maya.cmds as cmds
 
@@ -21,10 +21,17 @@ def non_empty_stream(stream):
     return itertools.chain(stream, (None,))
 
 
+def ensure_iterable(value):
+    """ensure that the results of a command are always iterable"""
+    if isinstance(value, Iterable):
+        return value
+    return tuple((value,))
+
+
 def command_stream(stream, cmd, **kwargs):
     """convenience wrapper for commands that need non_empty_streams"""
     safe = non_empty_stream(stream)
-    return iter(cmd(*safe, **kwargs) or [])
+    return iter(ensure_iterable(cmd(*safe, **kwargs) or []))
 
 
 def get_list(stream, **kwargs):
@@ -53,9 +60,11 @@ def get_connections(stream, **kwargs):
 
 
 def get_values(stream, **kwargs):
-    """return listConnections() on <stream> without ever returning everything"""
-    return command_stream(stream, cmds.getAttr, **kwargs)
-
+    """return getAttr() on a stream of attributes, or empty iterator"""
+    try:
+        return command_stream(stream, cmds.getAttr, **kwargs)
+    except TypeError:
+        return iter(tuple())
 
 class Stream(object):
     """
