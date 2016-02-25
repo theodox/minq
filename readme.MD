@@ -117,6 +117,18 @@ print cubes.execute()
 
 At the risk of being repetitive: a stream is not a function that returns a list: its an object that can be iterated over to perform a particular search in the maya scene.
 
+Ordinarily the last item in a query chain is determines the results. For example
+
+```python
+Selected().only(Transforms)
+```
+will give you the selected transforms, but not their shapes.  The `append()` function will add the results of a new query operation to an existing stream:  So 
+
+```python
+Selected(),only(Transforms).append(AllChildren)
+```
+Will give you the selected transforms _and_ all of their children, including shapes. For more complex combinations of queries you can also use *set operations* (see below).
+
 Filtering
 -------
 
@@ -187,6 +199,23 @@ some_stream.only('mesh', 'camera')
 
 This is usually significantly faster than piecewise methods like checking maya's `nodeType()` function on objects one at a time.
 
+`only()` also supports a keyword parameter to specify a namespace. If used, it will limit the stream to only items in the supplied namespace.  You can specify a namespace using either partial or complete namespaces.  A partial namespace argument will match any namespace containing the name you supply thus:
+
+```python
+Transforms().only(namespace = 'test')
+# Stream(['|test:pCube1',  '|nested:test:pCube1'])
+```
+A complete namespace begins with a leading colon and only matches the exact namespace.  Thus:
+
+```python
+Transforms().only(namespace=':test')
+# Stream(['|test:pCube1'])  # 'nested:test is' excluded
+Transforms().only(namespace=':nested:test')
+# Stream(['|nested:test:pCube1'])  # 'test' is excluded
+```
+
+The namespace flag can be combined with other `only()` specifiers, such as `DagNodes().only('skinClusters', namespace="export")`.
+
 .where()
 =========
 
@@ -239,6 +268,7 @@ print test('pCube1')
 
 More importantly, using the item class to generate this kind of query tells minq to bundle up all of the `getAttr` commands in a single call, rather than issuing them one at a time. This significantly speeds up large queries.  When in doubt, of course,  you can still use a regular function, the item syntax is intended as a  convenience for common cases and not the answer to all possible problems.
 
+`where()` also comes in the form `where_not()`, which works in the same fashion but negates the test -- this helps you avoid writing a lambda just to invert a test function.
 
 Expanding and transforming
 --------
