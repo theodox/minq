@@ -391,4 +391,7 @@ o = Cameras().where(item.orthographic == True)  # only ortho cameras
 
 This can be an economical way of doing big operations in bulk instead of using for-loops, and it's also a clear way of expressing ideas like _I an looking for an object which is both a shape and a child of this assembly_ or _I am looking for a mesh which is not skinned and not templated_.
 
+Installation
+------------
+Minq is a standard python package with no dependencies. place the minq folder where it will be found on your python path. The module id designed to be star-imported, though you can do limited imports if you preefer.
  
