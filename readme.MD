@@ -43,7 +43,7 @@ print q.execute()
 but the main use pattern is to iterate over it: the query is automatically executed when you try to loop over it:
 
 ```python
-q = Scene('top', 'front')
+q = Scene(['top', 'front'])
 for item in q:
     print item
 
