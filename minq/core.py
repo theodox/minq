@@ -66,6 +66,7 @@ def get_values(stream, **kwargs):
     except TypeError:
         return iter(tuple())
 
+
 class Stream(object):
     """
     Represents an arbitrary stream of values.  Usually -- but not always -- this is a stream of Maya node names.
@@ -216,6 +217,12 @@ class Stream(object):
         """
         return itertools.imap(Stream, itertools.tee(self, number_of_streams))
 
+    def flatten(self):
+        """
+        turns a stream containing multiple iterables (for example, the result of a get()) into a single stream.
+        """
+        return Stream(itertools.chain.from_iterable(self))
+
     def join(self, **streams):
         """
         given a collection of named streams, return a table-like stream in which each 'row' has named values
@@ -274,6 +281,15 @@ class Stream(object):
         steeam will be filtered out.
         """
         return UUID(self)
+
+    def first(self):
+        """
+        return the first item in this stream as a single value (not a stream)
+        """
+        try:
+            return self.execute()[0]
+        except:
+            return None
 
     # operator overloads to support set functionality
 
