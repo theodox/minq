@@ -237,7 +237,7 @@ class Stream(object):
             # stream: [dataRow(object=u'joint3', parent=u'joint2'), dataRow(object=u'joint2', parent=u'joint1')....]
 
         the join process doesn't make any effort to match up the contents, however -- if the different streams have
-        different lengths enmpy 'columns' in the row will be filled with None and if the streams don't match up
+        different lengths empty 'columns' in the row will be filled with None and if the streams don't match up
         the results are not predictable.
 
         The primary use for join() is for doing bulk queries using Attributes:
@@ -256,6 +256,47 @@ class Stream(object):
         advantage over individually calling getAttr many times over.
         """
         return Join(self, **streams)
+
+    def group_by(self, selector):
+        """
+        Uses <selector> to group the incoming stream into key-value pairs where
+        the key is the result of the selector and the values are the items in the
+        stream which match that selector.
+
+        The selector can be any arbitrary function which takes a stream value and produces
+        a key value.  For convenience it can be an integer or string index into a data row as well
+
+        Thus, for simple table lookups:
+
+            cams = Cameras()
+            ortho = cams.get(Attribute, 'orthographic').get(Values)
+            table = cams.join(ortho = ortho)
+            for key, value in  table.group_by('ortho'):
+                print key, ":", value
+
+            # False : [dataRow(index=u'|persp|perspShape', ortho=False)]
+            # True : [dataRow(index=u'|front|frontShape', ortho=True), dataRow () ....]
+
+        or for more complex analysis:
+
+            def poly_class (obj):
+                count = cmds.polyEvaluate(obj, v=True)
+                if count > 512: return 'high'
+                if count > 256: return 'medium'
+                return 'low'
+
+            for k, v in Meshes().group_by(poly_class):
+                print k, ":" , v
+
+            # medium : [u'|pSphere1|pSphereShape1']
+            # low : [u'|pCube1|pCubeShape1']
+
+        Since group_by results are always key-value pairs they can be turned directly into dictionaries:
+
+            meshes_by_class = dict(Meshes().group_by(poly_class))
+
+        """
+        return GroupBy(self, selector)
 
     def append(self, *args, **kwargs):
 
@@ -783,3 +824,27 @@ class Join(Projection):
 
         for result in itertools.izip_longest(*out_streams):
             yield result_row(*result)
+
+class GroupBy (Stream):
+
+    def __init__(self, upstream, selector=0):
+        super(GroupBy, self).__init__(upstream)
+        self.selector = selector
+        self.selection_func = None
+        if callable(selector):
+            self.selection_func = lambda p: (selector(p), p)
+        elif isinstance(selector, str):
+            self.selection_func = lambda p: (getattr(p, selector), p)
+        else:
+            self.selection_func = lambda p: (p[selector], p)
+
+    def __iter__(self):
+
+        _func = self.selection_func
+        key_stream = ForEach(self.incoming, _func)
+        result = dict()
+        for k, v in key_stream:
+            if k not in result:
+                result[k] = []
+            result[k].append(v)
+        return iter(result.items())
