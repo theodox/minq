@@ -129,6 +129,15 @@ Selected(),only(Transforms).append(AllChildren)
 ```
 Will give you the selected transforms _and_ all of their children, including shapes. For more complex combinations of queries you can also use *set operations* (see below).
 
+Occasionally you'll want to start a query with one or more objects whose names you already know, In that case the `using()` function creates a stream with whatever objects you pass in explicitly. For exaample:
+
+```python
+using("character_root").get(AllChidren).only(IKHandles)
+```
+
+will return all of the ik handles under `character_root`.   `using` accepts multpile arguments if you want to start the query with multiple objects.
+
+
 Filtering
 -------
 
