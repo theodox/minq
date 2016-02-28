@@ -2,7 +2,8 @@ import itertools
 from collections import namedtuple
 
 import maya.cmds as cmds
-from minq.core import Projection, get_relatives, get_list, non_empty_stream, get_history, get_connections, get_values
+from minq.core import Projection, get_relatives, get_list, non_empty_stream, get_history, get_connections, get_values, QueryError
+
 
 __author__ = 'Steve'
 
@@ -102,6 +103,18 @@ class Values(Projection):
         return get_values(self.incoming, **self.kwargs)
 
 
+class AttribValues(Projection):
+    """
+    Combines a call to Attribute() and Values() into one operation for convenience
+
+        Transforms().get(AttribValues, 'tx')
+
+    """
+    def __iter__(self):
+        attrib_stream = Attribute(self.incoming, self.args[0])
+        return iter(Values(attrib_stream, **self.kwargs))
+
+
 class Counts(Projection):
     """
     Base class for queries which get the size of array attributes.  This
@@ -144,7 +157,7 @@ class TweakCount(Counts):
     ATTRIBUTE = 'pnts'
 
 
-class CVCoount(Counts):
+class CVCount(Counts):
     """
     Gets the cv counts on a nurbs stream
     """
