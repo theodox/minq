@@ -135,7 +135,7 @@ Filtering
 A lot of scene query involves whittling down to a smaller set of results. There are three main ways to filter a list of objects in minq:
 
 .like()
-====
+-----
 
 The `like()` function of a stream is a regex filter: it will pass every incoming value which matches the supplied text expression.
 
@@ -166,7 +166,7 @@ print Joints().like('Left(hand|foot)$')
 which will match `Character1_LeftHand`  but not `Character1_LeftHandIIndex1`.
 
 .only()
-======
+------
 
 The `.only()` function limits the contents of a stream to one or more particular kinds of Maya objects.  It's almost identical to calling `cmds.ls()` on a list of strings. Thus:
 
@@ -217,7 +217,7 @@ Transforms().only(namespace=':nested:test')
 The namespace flag can be combined with other `only()` specifiers, such as `DagNodes().only('skinClusters', namespace="export")`.
 
 .where()
-=========
+--------
 
 For more complex filtering you'll want to run tests on all of the contents in a stream. In typical Maya programs you'd do something like this:
 
@@ -351,6 +351,28 @@ dict(m)
 
 This version will perform better because `split()` will not force multiple evaluations of the same query.
 
+Grouping
+-----------
+It is often useful to be able to group the data in a stream. For example, you might have a stream containing a set of meshes and you like to sort them into high, medium and low poly-count groups.  The `group_by()` operator allows you to subset a stream into groups of related items:
+
+```python
+def poly_category(obj):
+    count = cmds.polyEvaluate(obj, v=True)
+    if count > 512: return 'high'
+    if count > 256: return 'med'
+    return 'low'
+
+for category, meshes in Meshes().group_by(poly_category):
+    print category, ":", meshes
+    
+# high : [u'|pHelix1|pHelixShape1']
+# med : [u'|pSphere1|pSphereShape1', u'|pSphere2|pSphereShape2']
+# low : [u'|pCube1|pCubeShape1']
+```
+
+If the incoming stream consists of `dataRows` you can pass an integer or string key to select based on the appropriate 'column' in the dataRows, rather than a grouping function.  
+
+
 Set Operations
 -------
 
@@ -395,3 +417,6 @@ Installation
 ------------
 Minq is a standard python package with no dependencies. place the minq folder where it will be found on your python path. The module id designed to be star-imported, though you can do limited imports if you preefer.
  
+Licensing
+-----------
+This project is provided unter the MIT license: you're free to use as you like, providing you retain the copyright information in `minq.__init__.py`
