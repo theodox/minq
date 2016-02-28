@@ -1,7 +1,8 @@
-import unittest
-from minq import *
-import maya.cmds as cmds
 import operator
+import unittest
+
+import maya.cmds as cmds
+from minq import *
 
 
 class LSCanary(object):
@@ -160,13 +161,26 @@ class TestStreamBasics(unittest.TestCase):
             cmds.namespace(set="test2")
             p3 = cmds.polyCube()
 
-            assert len(Meshes().only(namespace=":").execute()) == 1         # root
-            assert len(Meshes().only(namespace=":test1").execute()) == 2    # test and test2
-            assert len(Meshes().only(namespace=":test1:test2").execute()) == 1 # test2 only
-            assert len(Meshes().only(namespace="test2").execute()) == 1     # test 2 only
-            assert len(Meshes().only(namespace=":test2").execute()) == 0    # fails, test2 is not root
-            assert  len(Meshes().only(namespace=".").execute()) == 2         # all namespaces
-            assert len(Meshes().only(namespace="").execute()) == 3          # namespaces or not
+            assert len(Meshes().only(namespace=":").execute()) == 1  # root
+            assert len(Meshes().only(namespace=":test1").execute()) == 2  # test and test2
+            assert len(Meshes().only(namespace=":test1:test2").execute()) == 1  # test2 only
+            assert len(Meshes().only(namespace="test2").execute()) == 1  # test 2 only
+            assert len(Meshes().only(namespace=":test2").execute()) == 0  # fails, test2 is not root
+            assert len(Meshes().only(namespace=".").execute()) == 2  # all namespaces
+            assert len(Meshes().only(namespace="").execute()) == 3  # namespaces or not
+
+        finally:
+            cmds.file(new=True, force=True)
+
+    def test_having(self):
+        try:
+            cmds.file(new=True, f=True)
+            cmds.polyCube(name='no_attrib')
+            cmds.polyCube(name='has_attrib')
+            cmds.addAttr(ln='custom_attrib')
+            with_attrib = Transforms().having('custom_attrib')
+            assert '|has_attrib' in with_attrib
+            assert '|no_attrib' not in with_attrib
 
         finally:
             cmds.file(new=True, force=True)
