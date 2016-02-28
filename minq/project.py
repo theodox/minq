@@ -1,9 +1,8 @@
-from collections import namedtuple
 import itertools
+from collections import namedtuple
 
-from minq.core import Projection, get_relatives, get_list, non_empty_stream, get_history, get_connections, get_values
 import maya.cmds as cmds
-
+from minq.core import Projection, get_relatives, get_list, non_empty_stream, get_history, get_connections, get_values
 
 __author__ = 'Steve'
 
@@ -74,8 +73,8 @@ class Attribute(Projection):
 
     You can pass multiple attributes if needed
     """
-    def __iter__(self):
 
+    def __iter__(self):
 
         def attrib_generator():
             for item in self.incoming:
@@ -98,8 +97,72 @@ class Values(Projection):
 
     will yield a stream of all the translateX values in the scene.
     """
+
     def __iter__(self):
         return get_values(self.incoming, **self.kwargs)
+
+
+class Counts(Projection):
+    """
+    Base class for queries which get the size of array attributes.  This
+    uses the same bulk attribute queires as Valuess() so it is much faster
+    that running  multiple pokyEvaluates() or similar calls
+    """
+    ATTRIBUTE = 'vrts'
+
+    def __iter__(self):
+        attrib_stream = Attribute(self.incoming, self.ATTRIBUTE)
+        return iter(Values(attrib_stream, s=True))
+
+
+class VertCount(Counts):
+    """
+    Get the vertex counts of a mesh stream
+    """
+    ATTRIBUTE = 'vrts'
+
+
+class FaceCount(Counts):
+    """
+    Get the poly face counts of a mesh stream
+    """
+    ATTRIBUTE = 'face'
+
+
+class ColorCount(Counts):
+    """
+    Get color vertex count of a mesh stream
+    """
+    ATTRIBUTE = 'color'
+
+
+class TweakCount(Counts):
+    """
+    Get the number of tweakss (the .pnts attribuute) on a shape steam
+    """
+
+    ATTRIBUTE = 'pnts'
+
+
+class CVCoount(Counts):
+    """
+    Gets the cv counts on a nurbs stream
+    """
+    ATTRIBUTE = 'controlPoints'
+
+
+class UVSetCount(Counts):
+    """
+    Gets the count of uv  sets in a mesh stream
+    """
+    ATTRIBUTE = 'uvSet'
+
+
+class UVPointCount(Counts):
+    """
+    Gets the count of uv vertices in the current uv set of a mesh stream
+    """
+    ATTRIBUTE = 'uv'
 
 
 class Types(Projection):
