@@ -299,6 +299,9 @@ class Stream(object):
         return GroupBy(self, selector)
 
     def append(self, *args, **kwargs):
+        """
+        Equivalent to get(), except that the results are appended to the current stream rather than replacing it.
+        """
 
         return Append(self, *args, **kwargs)
 
@@ -825,8 +828,8 @@ class Join(Projection):
         for result in itertools.izip_longest(*out_streams):
             yield result_row(*result)
 
-class GroupBy (Stream):
 
+class GroupBy(Stream):
     def __init__(self, upstream, selector=0):
         super(GroupBy, self).__init__(upstream)
         self.selector = selector
