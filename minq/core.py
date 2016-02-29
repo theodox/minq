@@ -758,11 +758,14 @@ class Templated(NodeType, QuasiFilter):
     TAG = 'templated'
 
     def __iter__(self):
-        return non_empty_stream(cmds.ls(tm=True, type='dagNode', long=True))
+        templated = non_empty_stream(cmds.ls(tm=True, long=True))
+        return get_list(templated, type='dagNode', long=True)
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, tm=True, type='dagNode', long=True)
+        incoming = non_empty_stream(stream)
+        templated = cmds.ls(incoming, tm=True, long=True)
+        return get_list(templated, type='dagNode', long=True)
 
 
 class Projection(Stream):
