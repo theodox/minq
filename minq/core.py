@@ -1,7 +1,7 @@
 import itertools
 import operator
 import re
-from collections import namedtuple, Iterable
+from collections import namedtuple, Iterable, defaultdict
 
 import maya.cmds as cmds
 
@@ -848,9 +848,7 @@ class GroupBy(Stream):
 
         _func = self.selection_func
         key_stream = ForEach(self.incoming, _func)
-        result = dict()
+        result = defaultdict(list)
         for k, v in key_stream:
-            if k not in result:
-                result[k] = []
             result[k].append(v)
         return iter(result.items())
