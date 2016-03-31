@@ -335,6 +335,12 @@ class Stream(object):
         except:
             return None
 
+    def count(self):
+        """
+        return the number of values in this stream (not a stream)
+        """
+        return len(self.execute())
+
     # operator overloads to support set functionality
 
     def __add__(self, other):
