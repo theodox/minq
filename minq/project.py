@@ -149,6 +149,13 @@ class ColorCount(Counts):
     ATTRIBUTE = 'color'
 
 
+class ColorSetCount(Counts):
+    """
+    How many colorSets are applied to this object
+    """
+    ATTRIBUTE = 'colorSet'
+
+
 class TweakCount(Counts):
     """
     Get the number of tweakss (the .pnts attribuute) on a shape steam
