@@ -33,6 +33,15 @@ assert not any(above & below)
 # but ttogether...f
 print above + below
 
+# use sets to get an ik chain from a handle:
+def ik_chain(handle):
+    h = using(handle).get(History).cache()
+    down = h.only(Joints).append(AllChildren)
+    up = h.only(IkEffectors).append(AllParents)
+    return up & down
+
+
+
 # chained filtering
 used_to_be_cubes = Everything().only('polyCreator').like('cube').get(Future).only(Meshes)
 has_8_verts = lambda p: cmds.polyEvaluate(p, v=True) == 8
