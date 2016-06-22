@@ -67,6 +67,15 @@ def get_values(stream, **kwargs):
         return iter(tuple())
 
 
+def get_components(stream, **kwargs):
+    """
+    returns a string of component addresses, or empty iterator.
+    Components are always expanded, so no  vtx[1..50] style compressed strings.
+    """
+    components = command_stream(stream, cmds.polyListComponentConversion, **kwargs)
+    return get_list(components, flatten=True)
+
+
 class Stream(object):
     """
     Represents an arbitrary stream of values.  Usually -- but not always -- this is a stream of Maya node names.

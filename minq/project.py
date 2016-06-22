@@ -2,8 +2,9 @@ import itertools
 from collections import namedtuple
 
 import maya.cmds as cmds
-from minq.core import Projection, get_relatives, get_list, non_empty_stream, get_history, get_connections, get_values, QueryError
-
+from minq.core import Projection, get_relatives, get_list, non_empty_stream, \
+    get_history, get_connections, get_components, \
+    get_values, QueryError
 
 __author__ = 'Steve'
 
@@ -110,6 +111,7 @@ class AttribValues(Projection):
         Transforms().get(AttribValues, 'tx')
 
     """
+
     def __iter__(self):
         attrib_stream = Attribute(self.incoming, self.args[0])
         return iter(Values(attrib_stream, **self.kwargs))
@@ -200,3 +202,41 @@ class Types(Projection):
                                     itertools.islice(type_names, 1, None, 2))
 
         return itertools.imap(_tuple, out_stream)
+
+
+class Components(Projection):
+    """
+    Base class for a transform that converts incoming streams into components
+
+    This supports the 'border' and 'internal' flags from cmds.polyListComponentConversion so you can use it to
+    filter to border or internal selections
+
+    Note that `Components` itself is going to return _ALL_ of the compoents -- the verts, edges and so on -- so
+    it's not going to be used very often. `Vertices`, `Faces` and so on are the more common cases
+    """
+    COMPONENTS = {'tv': True, 'tf': True, 'te': True, 'tuv': True, 'tvd': True, 'internal': False, 'border': False}
+
+    def __iter__(self):
+        kw = self.kwargs
+        kw.update(self.COMPONENTS)
+        return get_components(self.incoming, **kw)
+
+
+class Vertices(Components):
+    COMPONENTS = {'tv': True}
+
+
+class Faces(Components):
+    COMPONENTS = {'tf': True}
+
+
+class Edges(Components):
+    COMPONENTS = {'te': True}
+
+
+class UVs(Components):
+    COMPONENTS = {'tuv': True}
+
+
+class VertexFaces(Components):
+    COMPONENTS = {'tvf': True}
