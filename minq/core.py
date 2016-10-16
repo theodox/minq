@@ -133,9 +133,16 @@ class Stream(object):
         """
         given a callable filter function, returns a new stream containing only  items  for which the filter function
         return a truth-tested value
+
+        If the predicate is a minq.items.AttributeQuery (or another callable with an attribute call 'query_type` that
+        points at the `WhereMany` class, the resulting stream will use WhereMany for speed. Otherwise it will default
+        to the slower but safer `Where` check.  WhereMany only works with Maya built-in attributes, not user-defined
+        attributes.
+
+        See minq.item_query for more details.
         """
-        if hasattr(pred, 'attribute'):
-            return WhereMany(self, pred)
+        if hasattr(pred, 'query_type'):
+            return pred.query_type(self, pred)
         return Where(self, pred)
 
     def where_not(self, pred):
@@ -143,9 +150,8 @@ class Stream(object):
         a convenience wrapper for 'where' that inverts the result -- useful for not having to make a lambda
         just to invert a common function
         """
-        if hasattr(pred, 'attribute'):
-            return WhereMany(self, pred, invert=True)
-        return Where(self, pred, invert=True)
+
+        return self.where(self, pred, invert=True)
 
     def like(self, regex, exact=False):
         """
@@ -506,7 +512,6 @@ class OfType(Stream):
         super(OfType, self).__init__(upstream=upstream)
         self.delegate = None
         self.namespace = kwargs.get('namespace', False)
-
 
         # support single or multiple types in a NodeType class
         # mixed with strings

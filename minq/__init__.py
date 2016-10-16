@@ -31,7 +31,7 @@ THE SOFTWARE.
 from .core import *
 
 # query proxy
-from .item import item
+from .item_query import item, custom
 
 # stream transformations
 from .project import *
@@ -41,7 +41,7 @@ from .nodes import *
 
 def using(*objects):
     """
-    A convenience wrapper for starting a quuery with objects you alreadh know
+    A convenience wrapper for starting a query with objects you alreadh know
 
     You can achieve the same thing with any stream class, but Streams expect an
     iterable input so you have to add extre brackets. This just makes that
