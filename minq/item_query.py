@@ -72,6 +72,7 @@ class AttributeQuery(object):
     """
     # these attribs are return as tuples-in-lists by getAttr, so we unpack them
     UNPACK_MULT = ('t', 'translate', 'r', 'rotate', 's', 'scale', 'rp', 'rotatePivot', 'sp', 'scalePivot')
+    QUERY_CLASS = Where
 
     def __init__(self, attribute, operator=None, comp=None):
         self.attribute = attribute
@@ -80,7 +81,7 @@ class AttributeQuery(object):
         self.comp = comp
         self.operator = operator
         self.unpack = self.attribute in self.UNPACK_MULT
-        self.query_type = Where
+        self.query_type = self.QUERY_CLASS
         self.strict = False
 
     def __repr__(self):
@@ -113,45 +114,44 @@ class AttributeQuery(object):
             return False
 
     def __eq__(self, other):
-        return AttributeQuery(self.attribute, operator=operator.eq, comp=other)
+        return self.__class__(self.attribute, operator=operator.eq, comp=other)
 
     def __ne__(self, other):
-        return AttributeQuery(self.attribute, operator=operator.ne, comp=other)
+        return self.__class__(self.attribute, operator=operator.ne, comp=other)
 
     def __gt__(self, other):
-        return AttributeQuery(self.attribute, operator=operator.gt, comp=other)
+        return self.__class__(self.attribute, operator=operator.gt, comp=other)
 
     def __ge__(self, other):
-        return AttributeQuery(self.attribute, operator=operator.ge, comp=other)
+        return self.__class__(self.attribute, operator=operator.ge, comp=other)
 
     def __lt__(self, other):
-        return AttributeQuery(self.attribute, operator=operator.lt, comp=other)
+        return self.__class__(self.attribute, operator=operator.lt, comp=other)
 
     def __le__(self, other):
-        return AttributeQuery(self.attribute, operator=operator.le, comp=other)
+        return self.__class__(self.attribute, operator=operator.le, comp=other)
 
     def __call__(self, value):
         return self.eval(value)
 
 
-def attribute_factory(*args, **kwargs):
-    result = AttributeQuery(args[1])
-    result.query_type = WhereMany
-    return result
+class NativeAttributeQuery(AttributeQuery):
+    QUERY_CLASS = WhereMany
 
-
-def custom_attribute_factory(*args, **kwargs):
-    result = AttributeQuery(args[1])
-    result.query_type = Where
-    return result
 
 
 class ItemMeta(type):
     def __new__(cls, name, bases, dct):
+        def attribute_factory(*args, **kwargs):
+            result = AttributeQuery(args[1])
+            return result
+
         result = type.__new__(cls, name, bases, dct)
-        factory = dct['factory']
-        setattr(result.__class__, '__getattr__', factory)
+        setattr(result.__class__, '__getattr__', attribute_factory)
         return result
+
+
+
 
 
 class item(object):
@@ -172,17 +172,6 @@ class item(object):
     attributes are or are not user-defined -- using `native` where you can will improve perf when you are working with
     built-in Maya attributes.
     """
-    factory = custom_attribute_factory
-    __metaclass__ = ItemMeta
-
-
-class native(object):
-    """
-    Like `item`, this generates a proxy query. Queries from `native` only work for built-in Maya attributes -- if you
-    run a native query against a user-defined attribute you'll get an exception.  However `native` queries will execute
-    faster than the same query using `item` or `custom`.
-    """
-    factory = attribute_factory
     __metaclass__ = ItemMeta
 
 
@@ -191,5 +180,29 @@ class custom(object):
     custom is a synonym for `item`.  It's good practice to use `custom` when you know that an attribute is user-defined,
     since it will tell other users that they can't switch in `native` without generating exceptions.
     """
-    factory = custom_attribute_factory
     __metaclass__ = ItemMeta
+
+
+
+
+class NativeMeta(type):
+    def __new__(cls, name, bases, dct):
+
+        def custom_attribute_factory(*args, **kwargs):
+            result = NativeAttributeQuery(args[1])
+            return result
+
+        result = type.__new__(cls, name, bases, dct)
+        setattr(result.__class__, '__getattr__', custom_attribute_factory)
+        return result
+
+
+
+class native(object):
+    """
+    Like `item`, this generates a proxy query. Queries from `native` only work for built-in Maya attributes -- if you
+    run a native query against a user-defined attribute you'll get an exception.  However `native` queries will execute
+    faster than the same query using `item` or `custom`.
+    """
+    __metaclass__ = NativeMeta
+

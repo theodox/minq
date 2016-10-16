@@ -31,7 +31,7 @@ THE SOFTWARE.
 from .core import *
 
 # query proxy
-from .item_query import item, custom
+from .item_query import item, custom, native
 
 # stream transformations
 from .project import *

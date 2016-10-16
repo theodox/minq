@@ -1,7 +1,5 @@
-import operator
 import unittest
 
-import maya.cmds as cmds
 from minq import *
 
 
@@ -49,8 +47,18 @@ class TestStreamBasics(unittest.TestCase):
 
     def test_stream_whereMany(self):
         source = Stream(LSCanary(type='dagNode'))
-        filtered = source.where(item.tx < 1)
+        filtered = source.where(native.tx < 1)
         assert isinstance(filtered, WhereMany)
+
+    def test_stream_itemWhere(self):
+        source = Stream(LSCanary(type='dagNode'))
+        filtered = source.where(item.tx < 1)
+        assert isinstance(filtered, Where)
+
+    def test_stream_customWhere(self):
+        source = Stream(LSCanary(type='dagNode'))
+        filtered = source.where(custom.tx < 1)
+        assert isinstance(filtered, Where)
 
     def test_stream_get(self):
         source = Stream(LSCanary(type='dagNode'))
@@ -116,6 +124,32 @@ class TestStreamBasics(unittest.TestCase):
         assert example.comp == 1
         assert example.operator == operator.gt
         assert example.attribute == 'tx'
+        assert example.strict == False
+        assert example.query_type == Where
+
+    def test_custom_query(self):
+        example = custom.user_defined == 0
+        assert example.query_type == Where
+
+    def test_native_query(self):
+        example = native.user_defined == 0
+        assert example.query_type == WhereMany
+
+    def test_strict_eval(self):
+        try:
+            test_object, test_shape = cmds.polyCube()
+            cmds.addAttr(test_object, ln='test_attr')
+            pretest = custom.test_attr == 0
+            assert pretest.eval(test_object)
+            prestest_2 = custom.dont_exist == 0
+            assert not prestest_2.eval(test_object)
+            strict_test = custom.dont_exist == 0
+            strict_test.strict = True
+            self.assertRaises(Exception, strict_test, test_object)
+
+
+        finally:
+            cmds.delete(test_object, test_shape)
 
     def test_item_eval(self):
         example = item.orthographic == True
