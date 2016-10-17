@@ -4,7 +4,7 @@ from collections import namedtuple
 import maya.cmds as cmds
 from minq.core import Projection, get_relatives, get_list, non_empty_stream, \
     get_history, get_connections, get_components, \
-    get_values, QueryError
+    get_values
 
 __author__ = 'Steve'
 
@@ -117,6 +117,69 @@ class AttribValues(Projection):
         return iter(Values(attrib_stream, **self.kwargs))
 
 
+class WorldPositions(Projection):
+    """
+    Extracts the world positions of transform nodes using their `worldMatrix` attributes.
+
+    Note this will always be in system units (ie, centimeters).  If you are using another
+    unit in your scene you'll need to scale ths value appropriately to get the correct values
+    in scene units.
+
+    Note this only works on transform nodes or shapes, not components
+    """
+    QUERYFLAG = 'wm'
+
+    def __iter__(self):
+        attrib_stream = (i for i in AttribValues(self.incoming, self.QUERYFLAG))
+        heads = [iter(attrib_stream)] * 16
+        matrices = itertools.izip(*heads)
+        positions = (i[12:15] for i in matrices)
+        return positions
+
+
+class LocalPositions(WorldPositions):
+    """
+    Extracts the local positions of transform nodes using their `worldMatrix` attributes.  This is
+    usually equivalent to get(AttribValues, "t") but  this will always be in system units
+    (ie, centimeters).  If you are using another unit in your scene you'll need to scale ths
+    value appropriately to get the correct values in scene units.
+
+    Note this only works on transform nodes or shapes, not components
+    """
+    QUERYFLAG = 'm'
+
+
+class LocalAxis(Projection):
+    """
+    Gets the local axes of the incoming stream.
+
+        Selected().get(LocalAxis, 'x')
+
+    Would return the local x-vector of the selections in world space.
+
+    You can optionally get the local rather than the world local vector:
+
+      Selected().get(LocalAxis, 'y', local=True)
+
+    would return the local (not world space) Y axis of the selection.
+
+    Note this only works on transform nodes or shapes, not components
+    """
+    AXES = {'x': (0, 3), 'y': (4, 7), 'z': (8, 11)}
+
+    def __iter__(self):
+        start, end = self.AXES.get(self.args[0].lower())
+        matrix = 'wm'
+        if self.kwargs.get('local'):
+            matrix = 'm'
+
+        attrib_stream = (i for i in AttribValues(self.incoming, matrix))
+        heads = [iter(attrib_stream)] * 16
+        matrices = itertools.izip(*heads)
+        axes = (i[start:end] for i in matrices)
+        return axes
+
+
 class Counts(Projection):
     """
     Base class for queries which get the size of array attributes.  This
@@ -160,7 +223,7 @@ class ColorSetCount(Counts):
 
 class TweakCount(Counts):
     """
-    Get the number of tweakss (the .pnts attribuute) on a shape steam
+    Get the number of tweaks (the .pnts attribuute) on a shape steam
     """
 
     ATTRIBUTE = 'pnts'
