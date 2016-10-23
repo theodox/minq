@@ -129,7 +129,7 @@ class Stream(object):
         """
         return Stream(self.execute())
 
-    def where(self, pred):
+    def where(self, pred, invert=False):
         """
         given a callable filter function, returns a new stream containing only  items  for which the filter function
         return a truth-tested value
@@ -142,8 +142,8 @@ class Stream(object):
         See minq.item_query for more details.
         """
         if hasattr(pred, 'query_type'):
-            return pred.query_type(self, pred)
-        return Where(self, pred)
+            return pred.query_type(self, pred, invert=invert)
+        return Where(self, pred, invert=invert)
 
     def where_not(self, pred):
         """
