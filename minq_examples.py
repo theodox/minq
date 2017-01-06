@@ -66,4 +66,6 @@ cmds.select(*DagNodes(original)) # note asterisk!
 print "became", cmds.rename("renamed_object")
 print  "is", original.long()
 
-
+# find empty groups
+empty_groups = Transforms().where_not(lambda p: any(using(p).get(Children)))
+print "empty groups:",  list(empty_groups)
