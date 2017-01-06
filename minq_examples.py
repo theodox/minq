@@ -69,3 +69,8 @@ print  "is", original.long()
 # find empty groups
 empty_groups = Transforms().where_not(lambda p: any(using(p).get(Children)))
 print "empty groups:",  list(empty_groups)
+
+# find nulls with no shape children
+no_shapes = Transforms().where_not(lambda p: any(using(p).get(AllChildren).only(Shapes)))
+print "no shape kids:", list(no_shapes)
+
