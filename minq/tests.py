@@ -156,6 +156,34 @@ class TestStreamBasics(unittest.TestCase):
         assert example.eval('side')
         # this will fail if for some reason the side camera is not set to orthographic
 
+    def test_item_has(self):
+        try:
+            cmds.file(new=True, f=True)
+            cmds.createNode('transform')
+            cmds.polyCube()
+            result = list(Transforms().where(item.has(Children)))
+            assert len(result) == 5
+        finally:
+            cmds.file(new=True, f=True)
+
+    def test_item_has_mot(self):
+        try:
+            cmds.file(new=True, f=True)
+            cmds.polyCube()
+            result = list(Shapes().where_not(item.has(Parents)))
+            assert len(result) == 0
+        finally:
+            cmds.file(new=True, f=True)
+
+    def test_item_has_attr(self):
+        try:
+            cmds.file(new=True, f=True)
+            cmds.polyCube()
+            result = list(Shapes().where(item.has_attr("orthographic")))
+            assert len(result) == 4
+        finally:
+            cmds.file(new=True, f=True)
+
     def test_get_attributes(self):
         cameras = Cameras().get(Attribute, 'orthographic').execute()
         for cam in ("|top", "|side", "|persp", "|front"):
