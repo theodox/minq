@@ -285,9 +285,20 @@ no_connections = DagNodes().where_not(item.has(Connections))
 ```
 `item.has` takes the same kinds of arguments as `.get()` and returns true for any object where the `get()` would find a non-empty resul; thus   `item.has(Children)` will return true for any object which has children in the outliner, and false for anything that doesn't.
 
-Related is `item.has_attr()`, which returns true for any objecth has a given attribute.  This is the same behavior as `having()`, but it can be useful for writing a cleaner query.  `having()` is faster, however, since it works in bulk
+Related is `item.has_attr()`, which returns true for any objecth has a given attribute.  This is the same behavior as `having()` _(see below)_ but it can be useful for writing a cleaner query.  `having()` is faster, however, since it works in bulk
 
 `where()` also comes in the form `where_not()`, which works in the same fashion but negates the test -- this helps you avoid writing a lambda just to invert a test function.
+
+.having()
+---------
+
+`having()` finds objects using the _existince_ of attributes (it does not, however, test their values).  For example to find all of the objects in a scene with a custom attribute called "exportable":
+
+```python
+export_set =  Transforms().having('exportable')
+```
+> Implementation note: results of `having()` are always unique (as if you'd run `query.having('attrib').distinct`
+
 
 Expanding and transforming
 --------
@@ -332,16 +343,6 @@ print Meshes().foreach(connected_shaders)
 # Result: Stream([(u'lambert1',), (u'blinn1',), (u'lambert1', u'phong1')]) # 
 
 ```
-
-.having()
----------
-
-`having()` finds objects using the _existince_ of attributes (it does not, however, test their values).  For example to find all of the objects in a scene with a custom attribute called "exportable":
-
-```python
-export_set =  Transforms().having('exportable')
-```
-> Implementation note: results of `having()` are always unique (as if you'd run `query.having('attrib').distinct`
 
 Tables
 ------
