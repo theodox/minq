@@ -277,6 +277,16 @@ print test('pCube1')
 
 More importantly, using the item class to generate this kind of query tells minq to bundle up all of the `getAttr` commands in a single call, rather than issuing them one at a time. This significantly speeds up large queries.  When in doubt, of course,  you can still use a regular function, the item syntax is intended as a  convenience for common cases and not the answer to all possible problems.
 
+`item` also allows you to do simple checks for parents, children, connections or history using this sort of idiom:
+
+```python
+has_kids =Transforms().where(item.has(Children))
+no_connections = DagNodes().where_not(item.has(Connections))
+```
+`item.has` takes the same kinds of arguments as `.get()` and returns true for any object where the `get()` would find a non-empty resul; thus   `item.has(Children)` will return true for any object which has children in the outliner, and false for anything that doesn't.
+
+Related is `item.has_attr()`, which returns true for any objecth has a given attribute.  This is the same behavior as `having()`, but it can be useful for writing a cleaner query.  `having()` is faster, however, since it works in bulk
+
 `where()` also comes in the form `where_not()`, which works in the same fashion but negates the test -- this helps you avoid writing a lambda just to invert a test function.
 
 Expanding and transforming
