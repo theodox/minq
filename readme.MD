@@ -333,6 +333,16 @@ print Meshes().foreach(connected_shaders)
 
 ```
 
+.having()
+---------
+
+`having()` finds objects using the _existince_ of attributes (it does not, however, test their values).  For example to find all of the objects in a scene with a custom attribute called "exportable":
+
+```python
+export_set =  Transforms().having('exportable')
+```
+> Implementation note: results of `having()` are always unique (as if you'd run `query.having('attrib').distinct`
+
 Tables
 ------
 Sometimes you'll want to collect information in a tabular format: list all of the object's positions by object, for collect all of the shaders attached to meshes in the previous examples.  Streams offer a tabulating function called '.join()' which allows you to merge multiple streams into a single stream of 'rows' -- as long as all of the streams line up the result is effectively a table.  
