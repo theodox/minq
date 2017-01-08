@@ -1,12 +1,13 @@
 __author__ = 'stevet'
 import operator
-from collections import namedtuple
 
 import maya.cmds as cmds
 
+from collections import namedtuple
+
 XYZ = namedtuple('xyz', 'x y z')
 
-from minq.core import Where, WhereMany
+from minq.core import Where, WhereMany, Stream
 
 
 class AttributeQuery(object):
@@ -139,7 +140,6 @@ class NativeAttributeQuery(AttributeQuery):
     QUERY_CLASS = WhereMany
 
 
-
 class ItemMeta(type):
     def __new__(cls, name, bases, dct):
         def attribute_factory(*args, **kwargs):
@@ -151,10 +151,31 @@ class ItemMeta(type):
         return result
 
 
+class QueryExtension(object):
+    """
+    Base class for 'item' query factory classes. Any methods here must be class methods
+    """
+    @classmethod
+    def has(cls, *args, **kwargs):
+        """
+        used for shorthand tests like  `item.has(Children)`
+        """
+
+        def anon(obj):
+            return any(Stream((obj,)).get(*args, **kwargs))
+        return anon
+
+    @classmethod
+    def has_attr(cls, attr):
+        """
+        used for shorthand tests like `item.has_attr("orthographic")`
+        """
+        def anon(obj):
+            return any(cmds.ls(obj + "." + attr))
+        return anon
 
 
-
-class item(object):
+class item(QueryExtension):
     """
     This stands in for attribute queries against maya objects.  When used in a stream, it generates an
     AttributeQuery in-line for you.
@@ -175,7 +196,7 @@ class item(object):
     __metaclass__ = ItemMeta
 
 
-class custom(object):
+class custom(QueryExtension):
     """
     custom is a synonym for `item`.  It's good practice to use `custom` when you know that an attribute is user-defined,
     since it will tell other users that they can't switch in `native` without generating exceptions.
@@ -183,11 +204,8 @@ class custom(object):
     __metaclass__ = ItemMeta
 
 
-
-
 class NativeMeta(type):
     def __new__(cls, name, bases, dct):
-
         def custom_attribute_factory(*args, **kwargs):
             result = NativeAttributeQuery(args[1])
             return result
@@ -197,12 +215,10 @@ class NativeMeta(type):
         return result
 
 
-
-class native(object):
+class native(QueryExtension):
     """
     Like `item`, this generates a proxy query. Queries from `native` only work for built-in Maya attributes -- if you
     run a native query against a user-defined attribute you'll get an exception.  However `native` queries will execute
     faster than the same query using `item` or `custom`.
     """
     __metaclass__ = NativeMeta
-
