@@ -74,3 +74,10 @@ print "empty groups:",  list(empty_groups)
 no_shapes = Transforms().where_not(lambda p: any(using(p).get(AllChildren).only(Shapes)))
 print "no shape kids:", list(no_shapes)
 
+# get the type of the selection, accounting for shape children too:
+selected_type = Selected().append(Children).foreach(cmds.nodeType)
+# so you can see if a mesh is selected like
+'mesh' in Selected().append(Children).foreach(cmds.nodeType)
+# True
+
+
