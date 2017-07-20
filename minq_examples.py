@@ -82,8 +82,9 @@ selected_type = Selected().append(Children).foreach(cmds.nodeType)
 
 # find meshes with multiple UV sets
 multiple_uvs = Meshes().where(lambda p: using(p).get(UVSetCount).first() > 1)
+print "meshes with multiple UVs:", list(multiple_uvs)
 
 #find meshes with no UVs
 no_uvs = Meshes().where_not(lambda p: using(p).get(UVPointCount).first())
-
+print "meshes with no uvs:", list(no_uvs)
 
