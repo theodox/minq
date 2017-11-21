@@ -125,7 +125,7 @@ Selected().only(Transforms)
 will give you the selected transforms, but not their shapes.  The `append()` function will add the results of a new query operation to an existing stream:  So 
 
 ```python
-Selected(),only(Transforms).append(AllChildren)
+Selected().only(Transforms).append(AllChildren)
 ```
 Will give you the selected transforms _and_ all of their children, including shapes. For more complex combinations of queries you can also use *set operations* (see below).
 
