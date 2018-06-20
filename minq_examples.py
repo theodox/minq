@@ -88,3 +88,17 @@ print "meshes with multiple UVs:", list(multiple_uvs)
 no_uvs = Meshes().where_not(lambda p: using(p).get(UVPointCount).first())
 print "meshes with no uvs:", list(no_uvs)
 
+# get the contents of a display layer
+plain_contents = DisplayLayers().like('layer_name').get(Future).only(DagNodes)
+
+# display layers can contain a mix of shapes and transforms; get 
+# the parents of any shapes and the children of any transforms.  This
+# will be equivalent to the _visual_ impact of the layer assignments.
+# Use the 'split' feature to branch the original query into 3 streams
+results, xforms, shapes = DisplayLayers().like('layer_name').get(Future).only(DagNodes).split(3)
+print "layer contents", list(results + xforms.get(AllChildren) + shapes.only(Shapes).get(Parents))
+
+
+
+
+
