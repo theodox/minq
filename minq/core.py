@@ -173,7 +173,7 @@ class Stream(object):
         """
         return Distinct(self)
 
-    def sort(self, key):
+    def sort(self, key=None, reverse=False):
         """
         returns a Stream which sorts the incoming stream using the default Python sort. If the optional key function
         is provided, the result will be sorted with that key.
@@ -181,7 +181,7 @@ class Stream(object):
         This operation has to exhaust the incoming stream, so it is more memory and performance intensive than other
         minq operations.
         """
-        return Sort(self, key=None)
+        return Sort(self, key=key, reverse=reverse)
 
     def only(self, *pred, **kwargs):
         """
@@ -550,8 +550,8 @@ class OfType(Stream):
             else:  # return permissive match of namespace, but trim leading / trailing colons
                 ns = re.sub('^:', '(?<=\|)', self.namespace)
                 ns = re.sub(':$', '', ns)
-                namspace_expression = """(?!:.*\|+){0}:[\w:_]*$""".format(ns)
-            output_stream = iter(Like(output_stream, namspace_expression))
+                namespace_expression = """(?!:.*\|+){0}:[\w:_]*$""".format(ns)
+            output_stream = iter(Like(output_stream, namespace_expression))
 
         return output_stream
 
@@ -635,15 +635,13 @@ class Sort(Stream):
     Note this must run all the upstream queries so it is comparatively expensive.
     """
 
-    def __init__(self, incoming, key=None):
+    def __init__(self, incoming, key=None, reverse=False):
         super(Sort, self).__init__(incoming)
         self.key = key
+        self.reverse = reverse
 
     def __iter__(self):
-        _result = [i for i in self.incoming]
-        _result.sort(key=self.key)
-        return iter(_result)
-
+        return iter(sorted(self.incoming, key=self.key, reverse=self.reverse))
 
 class NodeType(Stream):
     """
