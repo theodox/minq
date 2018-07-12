@@ -17,8 +17,7 @@ print SkinClusters().get(Future).only(Meshes).distinct()
 #skinned skeleton roots
 print SkinClusters().get(History).only(Joints).get(AllParents).only(Assemblies)
 
-
-# a table of camera focal legnths
+# a table of camera focal lengths
 cams, lengths = Cameras().split(2)
 lengths = lengths.get(Attribute, 'focalLength').get(Values)
 print dict ( cams.get(Parents).short().join(focal_length = lengths))
@@ -30,16 +29,16 @@ below = Transforms().where(item.ty < 0)
 # no intersection!
 assert not any(above & below)
 
-# but ttogether...f
+# but together...
 print above + below
 
-# use sets to get an ik chain from a handle:
+# use sets to get an ik chain from a handle.  Here we use 'cache'
+# to avoid calling the history twice
 def ik_chain(handle):
     h = using(handle).get(History).cache()
     down = h.only(Joints).append(AllChildren)
     up = h.only(IkEffectors).append(AllParents)
     return up & down
-
 
 
 # chained filtering
@@ -78,7 +77,9 @@ print "no shape kids:", list(no_shapes)
 selected_type = Selected().append(Children).foreach(cmds.nodeType)
 # so you can see if a mesh is selected like
 'mesh' in Selected().append(Children).foreach(cmds.nodeType)
-# True
+
+# ... although a better way to do the same thing would be
+any(Selected().append(Children).only(Meshes))
 
 # find meshes with multiple UV sets
 multiple_uvs = Meshes().where(lambda p: using(p).get(UVSetCount).first() > 1)
@@ -97,6 +98,26 @@ plain_contents = DisplayLayers().like('layer_name').get(Future).only(DagNodes)
 # Use the 'split' feature to branch the original query into 3 streams
 results, xforms, shapes = DisplayLayers().like('layer_name').get(Future).only(DagNodes).split(3)
 print "layer contents", list(results + xforms.get(AllChildren) + shapes.only(Shapes).get(Parents))
+
+# filter to a namespace
+Meshes().only(namespace='some_namespace')
+
+# ...or to a nested namespace:
+Meshes().only(namespace='parent:child')
+
+# ...or an absolute namespaces (starting from root)
+Meshes().only(namespace=':parent:child')
+
+# you can also specify a namespace to start a query with 'using':
+# this form supports wildcards in the namespace paths and is 
+# not inclusive, so you can get a namespace without its children
+
+using("some_namespace:*")
+using(":parent:*")   # will not get 'child'
+
+
+
+
 
 
 
