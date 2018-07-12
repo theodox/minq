@@ -349,7 +349,7 @@ class Stream(object):
         """
         try:
             return self.execute()[0]
-        except:
+        except IndexError:
             return None
 
     def count(self):
@@ -506,8 +506,8 @@ class OfType(Stream):
         <ns>            any namespace path including ns ns:object, xxx:ns:object
         <:ns>           absolute namespace ns, eg :ns:object,  but not xxx:ns:object
 
-    nested namespaces can be passed directly, so  namespace  'rig'  will match |rig:object, |scene:rig:object and
-    |rig:scene:object but 'rig:scene', 'scene:rig'
+    nested namespaces can be passed directly, so  namespace  'rig'  will match rig:object, scene:rig:object and
+    rig:scene:object but 'rig:scene' will only return rig:scene and its descendants (if any)
     """
 
     def __init__(self, upstream=tuple(), *types, **kwargs):
@@ -642,6 +642,7 @@ class Sort(Stream):
 
     def __iter__(self):
         return iter(sorted(self.incoming, key=self.key, reverse=self.reverse))
+
 
 class NodeType(Stream):
     """
