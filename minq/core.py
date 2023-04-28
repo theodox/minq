@@ -528,17 +528,13 @@ class OfType(Stream):
                 type_strings.append(str(t))
         self.types = type_strings
         
-
         quasi = [q for q in types if isinstance(q, type) and issubclass(q, QuasiFilter)]
-
-        print (f"TYPES {self.types}")
-        print (f"QUASI {quasi}")
         
-
         if not quasi:
             return
         if len(types) > 1:
             raise QueryError("%s cannot be combined with other filters" % quasi[0].__class__.__name__)
+        
         self.delegate = quasi[0].filter
 
     def __iter__(self):
