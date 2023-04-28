@@ -31,7 +31,7 @@ class AllParents(Projection):
                     parents.add(path)
                     path, _, __ = path.rpartition("|")
 
-        return non_empty_stream(cmds.ls(*parents, int=True))
+        return non_empty_stream(cmds.ls(*parents, io=True))
 
 
 class AllChildren(Projection):

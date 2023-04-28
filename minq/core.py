@@ -417,7 +417,7 @@ class Having(Stream):
     def __iter__(self):
         _attr = self.attribute
         add_attrib = lambda p: p + _attr
-        return get_list(map(add_attrib, self.incoming), o=True, int=True)
+        return get_list(map(add_attrib, self.incoming), o=True, long=True)
 
 
 class Where(Stream):
@@ -541,7 +541,7 @@ class OfType(Stream):
         if self.delegate:
             output_stream = self.delegate(self.incoming)
         else:
-            output_stream = iter(get_list(self.incoming, type=self.types or 'entity', int=True))
+            output_stream = iter(get_list(self.incoming, type=self.types or 'entity', long=True))
 
         if self.namespace:
 
@@ -616,7 +616,7 @@ class Long(Stream):
     """
 
     def __iter__(self):
-        return get_list(self.incoming, int=True)
+        return get_list(self.incoming, long=True)
 
 
 class UUID(Stream):
@@ -665,9 +665,9 @@ class NodeType(Stream):
     def __iter__(self):
 
         if self.incoming == tuple():
-            return iter(cmds.ls(type=self.TAG, int=True))
+            return iter(cmds.ls(type=self.TAG, long=True))
         else:
-            return get_list(self.incoming, type=self.TAG, int=True)
+            return get_list(self.incoming, type=self.TAG, long=True)
 
     def __str__(self):
         return self.TAG
@@ -704,10 +704,10 @@ class NodeTypeSet(Stream, QuasiFilter):
         self.node_types = node_types
 
     def __iter__(self):
-        return cmds.ls(type=self.node_types, int=True)
+        return cmds.ls(type=self.node_types, long=True)
 
     def filter(self, stream):
-        return get_list(stream, type=self.node_types, int=True)
+        return get_list(stream, type=self.node_types, long=True)
 
 
 class Selected(NodeType, QuasiFilter):
@@ -717,11 +717,11 @@ class Selected(NodeType, QuasiFilter):
     TAG = 'selected'
 
     def __iter__(self):
-        return iter(cmds.ls(selection=True, int=True))
+        return iter(cmds.ls(selection=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, selection=True, int=True)
+        return get_list(stream, selection=True, long=True)
 
 
 class Objects(NodeType, QuasiFilter):
@@ -732,44 +732,44 @@ class Objects(NodeType, QuasiFilter):
     TAG = 'objectsOnly'
 
     def __iter__(self):
-        return iter(get_list([None], objectsOnly=True, int=True))
+        return iter(get_list([None], objectsOnly=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, objectsOnly=True, int=True)
+        return get_list(stream, objectsOnly=True, long=True)
 
 
 class Assemblies(NodeType, QuasiFilter):
     TAG = 'assembly'
 
     def __iter__(self):
-        return iter(cmds.ls(assemblies=True, int=True))
+        return iter(cmds.ls(assemblies=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, assemblies=True, int=True)
+        return get_list(stream, assemblies=True, long=True)
 
 
 class Intermediates(NodeType, QuasiFilter):
     TAG = 'intermediates'
 
     def __iter__(self):
-        return iter(cmds.ls(io=True, int=True))
+        return iter(cmds.ls(io=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, io=True, int=True)
+        return get_list(stream, io=True, long=True)
 
 
 class NoIntermediates(NodeType, QuasiFilter):
     TAG = 'noIntermediates'
 
     def __iter__(self):
-        return non_empty_stream(cmds.ls(ni=True, int=True))
+        return non_empty_stream(cmds.ls(ni=True, long=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, ni=True, int=True)
+        return get_list(stream, ni=True, long=True)
 
 
 class Templated(NodeType, QuasiFilter):
@@ -780,14 +780,14 @@ class Templated(NodeType, QuasiFilter):
     TAG = 'templated'
 
     def __iter__(self):
-        templated = non_empty_stream(cmds.ls(tm=True, int=True))
-        return get_list(templated, type='dagNode', int=True)
+        templated = non_empty_stream(cmds.ls(tm=True, long=True))
+        return get_list(templated, type='dagNode', long=True)
 
     @classmethod
     def filter(cls, stream):
         incoming = non_empty_stream(stream)
-        templated = cmds.ls(incoming, tm=True, int=True)
-        return get_list(templated, type='dagNode', int=True)
+        templated = cmds.ls(incoming, tm=True, long=True)
+        return get_list(templated, type='dagNode', long=True)
 
 
 class Projection(Stream):
