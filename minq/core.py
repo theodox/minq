@@ -520,15 +520,21 @@ class OfType(Stream):
         type_strings = []
         for t in types:
             if hasattr(t, 'TAG'):
-                if hasattr(t.TAG, '__iter__'):
-                    type_strings.extend(t.TAG)
-                else:
+                if hasattr(t.TAG, 'zfill'):
                     type_strings.append(t.TAG)
+                else:
+                    type_strings.extend(t.TAG)
             else:
                 type_strings.append(str(t))
         self.types = type_strings
+        
 
         quasi = [q for q in types if isinstance(q, type) and issubclass(q, QuasiFilter)]
+
+        print (f"TYPES {self.types}")
+        print (f"QUASI {quasi}")
+        
+
         if not quasi:
             return
         if len(types) > 1:
