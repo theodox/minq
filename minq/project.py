@@ -1,3 +1,8 @@
+'''
+This module contains 'projections' (in the linq sense) which expand or tranform an incoming stream -- for example,
+taking a list of transforms and expanding it to include all of their children.
+'''
+
 import itertools
 from collections import namedtuple
 
@@ -41,12 +46,12 @@ class AllChildren(Projection):
 
 class History(Projection):
     def __iter__(self):
-        return get_list(get_history(self.incoming, **self.kwargs), int=True)
+        return get_list(get_history(self.incoming, **self.kwargs), long=True)
 
 
 class Future(Projection):
     def __iter__(self):
-        return get_list(get_history(self.incoming, future=True, **self.kwargs), int=True)
+        return get_list(get_history(self.incoming, future=True, **self.kwargs), long=True)
 
 
 class Connections(Projection):
