@@ -49,7 +49,7 @@ def get_history(stream, **kwargs):
     try:
         return command_stream(stream, cmds.listHistory, **kwargs)
     except RuntimeError as err:
-        if err.args == (u'Found no items to list the history for.\n',):
+        if err.args == ('Found no items to list the history for.\n',):
             return iter(tuple())
         raise
 
@@ -213,7 +213,7 @@ class Stream(object):
         """
         target_type, args = args[0], args[1:]
         if not issubclass(target_type, Projection):
-            raise QueryError, "%s is not a subclass of minq.Projection"
+            raise QueryError("%s is not a subclass of minq.Projection")
         return target_type(self, *args, **kwargs)
 
     def foreach(self, func):
@@ -232,7 +232,7 @@ class Stream(object):
         """
         Returns multiple 'copies' of this stream which can be iterated independently without re-calling the query.
         """
-        return itertools.imap(Stream, itertools.tee(self, number_of_streams))
+        return map(Stream, itertools.tee(self, number_of_streams))
 
     def flatten(self):
         """
@@ -417,7 +417,7 @@ class Having(Stream):
     def __iter__(self):
         _attr = self.attribute
         add_attrib = lambda p: p + _attr
-        return get_list(itertools.imap(add_attrib, self.incoming), o=True, long=True)
+        return get_list(map(add_attrib, self.incoming), o=True, int=True)
 
 
 class Where(Stream):
@@ -430,15 +430,15 @@ class Where(Stream):
     def __init__(self, upstream=tuple(), predicate=lambda p: True, invert=False):
         super(Where, self).__init__(upstream=upstream)
         if not callable(predicate):
-            raise QueryError, "%s must be a callable object" % predicate
+            raise QueryError("%s must be a callable object" % predicate)
         self.predicate = predicate
         self.invert = invert
 
     def __iter__(self):
         _stream = iter(self.incoming)
         if self.invert:
-            return itertools.ifilterfalse(self.predicate, _stream)
-        return itertools.ifilter(self.predicate, _stream)
+            return itertools.filterfalse(self.predicate, _stream)
+        return filter(self.predicate, _stream)
 
 
 class WhereMany(Stream):
@@ -451,7 +451,7 @@ class WhereMany(Stream):
         super(WhereMany, self).__init__(upstream=upstream)
         self.invert = invert
         if not hasattr(attrib_query, 'attribute') or not callable(attrib_query):
-            raise QueryError, "query object must be a callable object with a a field called 'attribute'"
+            raise QueryError("query object must be a callable object with a a field called 'attribute'")
         self.attrib_query = attrib_query
         query_string = "{0}." + attrib_query.attribute
         self.attribute_factory = lambda p: query_string.format(p)
@@ -461,12 +461,12 @@ class WhereMany(Stream):
         op = self.attrib_query.operator
         comp = self.attrib_query.comp
         cached_attrs, cached_objs = itertools.tee(self.incoming, 2)
-        attrib_stream = itertools.imap(_make_attrib, cached_attrs)
+        attrib_stream = map(_make_attrib, cached_attrs)
         value_stream = get_values(attrib_stream)
 
         inverter = lambda p: operator.xor(self.invert, p)
 
-        for obj, val in itertools.izip(cached_objs, value_stream):
+        for obj, val in zip(cached_objs, value_stream):
             if inverter(op(val, comp)):
                 yield obj
 
@@ -486,9 +486,9 @@ class Like(Stream):
     def __iter__(self):
         _stream = iter(self.incoming)
         if self.exact:
-            return itertools.ifilter(self.regex.match, _stream)
+            return filter(self.regex.match, _stream)
         else:
-            return itertools.ifilter(self.regex.search, _stream)
+            return filter(self.regex.search, _stream)
 
 
 class OfType(Stream):
@@ -532,7 +532,7 @@ class OfType(Stream):
         if not quasi:
             return
         if len(types) > 1:
-            raise QueryError, "%s cannot be combined with other filters" % quasi[0].__class__.__name__
+            raise QueryError("%s cannot be combined with other filters" % quasi[0].__class__.__name__)
         self.delegate = quasi[0].filter
 
     def __iter__(self):
@@ -541,7 +541,7 @@ class OfType(Stream):
         if self.delegate:
             output_stream = self.delegate(self.incoming)
         else:
-            output_stream = iter(get_list(self.incoming, type=self.types or 'entity', long=True))
+            output_stream = iter(get_list(self.incoming, type=self.types or 'entity', int=True))
 
         if self.namespace:
 
@@ -564,7 +564,7 @@ class Distinct(Stream):
     def __iter__(self):
         _seen = {None}
         _seen_add = _seen.add
-        for element in itertools.ifilterfalse(_seen.__contains__, self.incoming):
+        for element in itertools.filterfalse(_seen.__contains__, self.incoming):
             _seen_add(element)
             yield element
 
@@ -616,7 +616,7 @@ class Long(Stream):
     """
 
     def __iter__(self):
-        return get_list(self.incoming, long=True)
+        return get_list(self.incoming, int=True)
 
 
 class UUID(Stream):
@@ -665,9 +665,9 @@ class NodeType(Stream):
     def __iter__(self):
 
         if self.incoming == tuple():
-            return iter(cmds.ls(type=self.TAG, long=True))
+            return iter(cmds.ls(type=self.TAG, int=True))
         else:
-            return get_list(self.incoming, type=self.TAG, long=True)
+            return get_list(self.incoming, type=self.TAG, int=True)
 
     def __str__(self):
         return self.TAG
@@ -691,7 +691,7 @@ class QuasiFilter(object):
 
     @classmethod
     def filter(cls, stream):
-        raise NotImplementedError, "override in derived class"
+        raise NotImplementedError("override in derived class")
 
 
 class NodeTypeSet(Stream, QuasiFilter):
@@ -704,10 +704,10 @@ class NodeTypeSet(Stream, QuasiFilter):
         self.node_types = node_types
 
     def __iter__(self):
-        return cmds.ls(type=self.node_types, long=True)
+        return cmds.ls(type=self.node_types, int=True)
 
     def filter(self, stream):
-        return get_list(stream, type=self.node_types, long=True)
+        return get_list(stream, type=self.node_types, int=True)
 
 
 class Selected(NodeType, QuasiFilter):
@@ -717,11 +717,11 @@ class Selected(NodeType, QuasiFilter):
     TAG = 'selected'
 
     def __iter__(self):
-        return iter(cmds.ls(selection=True, long=True))
+        return iter(cmds.ls(selection=True, int=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, selection=True, long=True)
+        return get_list(stream, selection=True, int=True)
 
 
 class Objects(NodeType, QuasiFilter):
@@ -732,44 +732,44 @@ class Objects(NodeType, QuasiFilter):
     TAG = 'objectsOnly'
 
     def __iter__(self):
-        return iter(get_list([None], objectsOnly=True, long=True))
+        return iter(get_list([None], objectsOnly=True, int=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, objectsOnly=True, long=True)
+        return get_list(stream, objectsOnly=True, int=True)
 
 
 class Assemblies(NodeType, QuasiFilter):
     TAG = 'assembly'
 
     def __iter__(self):
-        return iter(cmds.ls(assemblies=True, long=True))
+        return iter(cmds.ls(assemblies=True, int=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, assemblies=True, long=True)
+        return get_list(stream, assemblies=True, int=True)
 
 
 class Intermediates(NodeType, QuasiFilter):
     TAG = 'intermediates'
 
     def __iter__(self):
-        return iter(cmds.ls(io=True, long=True))
+        return iter(cmds.ls(io=True, int=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, io=True, long=True)
+        return get_list(stream, io=True, int=True)
 
 
 class NoIntermediates(NodeType, QuasiFilter):
     TAG = 'noIntermediates'
 
     def __iter__(self):
-        return non_empty_stream(cmds.ls(ni=True, long=True))
+        return non_empty_stream(cmds.ls(ni=True, int=True))
 
     @classmethod
     def filter(cls, stream):
-        return get_list(stream, ni=True, long=True)
+        return get_list(stream, ni=True, int=True)
 
 
 class Templated(NodeType, QuasiFilter):
@@ -780,14 +780,14 @@ class Templated(NodeType, QuasiFilter):
     TAG = 'templated'
 
     def __iter__(self):
-        templated = non_empty_stream(cmds.ls(tm=True, long=True))
-        return get_list(templated, type='dagNode', long=True)
+        templated = non_empty_stream(cmds.ls(tm=True, int=True))
+        return get_list(templated, type='dagNode', int=True)
 
     @classmethod
     def filter(cls, stream):
         incoming = non_empty_stream(stream)
-        templated = cmds.ls(incoming, tm=True, long=True)
-        return get_list(templated, type='dagNode', long=True)
+        templated = cmds.ls(incoming, tm=True, int=True)
+        return get_list(templated, type='dagNode', int=True)
 
 
 class Projection(Stream):
@@ -807,7 +807,7 @@ class ForEach(Projection):
     """
 
     def __iter__(self):
-        return itertools.imap(self.args[0], self.incoming)
+        return map(self.args[0], self.incoming)
 
 
 class Zip(Stream):
@@ -818,7 +818,7 @@ class Zip(Stream):
 
     def __init__(self, upstream=tuple(), **streams):
         self.incoming = upstream
-        self.streams = streams.items()
+        self.streams = list(streams.items())
 
     def __iter__(self):
         names = ['index'] + [item[0] for item in self.streams]
@@ -828,7 +828,7 @@ class Zip(Stream):
         for k, v in self.streams:
             out_streams.append(self.incoming.get(v))
 
-        for result in itertools.izip_longest(*out_streams, fillvalue=None):
+        for result in itertools.zip_longest(*out_streams, fillvalue=None):
             yield result_row(*result)
 
 
@@ -850,7 +850,7 @@ class Join(Projection):
         for k, v in self.streams:
             out_streams.append(v)
 
-        for result in itertools.izip_longest(*out_streams):
+        for result in itertools.zip_longest(*out_streams):
             yield result_row(*result)
 
 
@@ -873,4 +873,4 @@ class GroupBy(Stream):
         result = defaultdict(list)
         for k, v in key_stream:
             result[k].append(v)
-        return iter(result.items())
+        return iter(list(result.items()))

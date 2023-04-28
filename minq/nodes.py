@@ -49,7 +49,7 @@ class Scene(NodeType):
         self.incoming = incoming
 
     def __iter__(self):
-        return iter(cmds.ls(*self.incoming, type='entity', long=True))
+        return iter(cmds.ls(*self.incoming, type='entity', int=True))
 
 
 class Existing(NodeType):

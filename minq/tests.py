@@ -14,7 +14,7 @@ class LSCanary(object):
         self.kwargs = kwargs
 
     def __iter__(self):
-        raise RuntimeError, 'this should not be called unless stream is queried'
+        raise RuntimeError('this should not be called unless stream is queried')
 
 
 class TestStreamBasics(unittest.TestCase):

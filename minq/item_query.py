@@ -175,7 +175,7 @@ class QueryExtension(object):
         return anon
 
 
-class item(QueryExtension):
+class item(QueryExtension, metaclass=ItemMeta):
     """
     This stands in for attribute queries against maya objects.  When used in a stream, it generates an
     AttributeQuery in-line for you.
@@ -193,15 +193,13 @@ class item(QueryExtension):
     attributes are or are not user-defined -- using `native` where you can will improve perf when you are working with
     built-in Maya attributes.
     """
-    __metaclass__ = ItemMeta
 
 
-class custom(QueryExtension):
+class custom(QueryExtension, metaclass=ItemMeta):
     """
     custom is a synonym for `item`.  It's good practice to use `custom` when you know that an attribute is user-defined,
     since it will tell other users that they can't switch in `native` without generating exceptions.
     """
-    __metaclass__ = ItemMeta
 
 
 class NativeMeta(type):
@@ -215,10 +213,9 @@ class NativeMeta(type):
         return result
 
 
-class native(QueryExtension):
+class native(QueryExtension, metaclass=NativeMeta):
     """
     Like `item`, this generates a proxy query. Queries from `native` only work for built-in Maya attributes -- if you
     run a native query against a user-defined attribute you'll get an exception.  However `native` queries will execute
     faster than the same query using `item` or `custom`.
     """
-    __metaclass__ = NativeMeta

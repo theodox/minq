@@ -31,7 +31,7 @@ class AllParents(Projection):
                     parents.add(path)
                     path, _, __ = path.rpartition("|")
 
-        return non_empty_stream(cmds.ls(*parents, long=True))
+        return non_empty_stream(cmds.ls(*parents, int=True))
 
 
 class AllChildren(Projection):
@@ -41,12 +41,12 @@ class AllChildren(Projection):
 
 class History(Projection):
     def __iter__(self):
-        return get_list(get_history(self.incoming, **self.kwargs), long=True)
+        return get_list(get_history(self.incoming, **self.kwargs), int=True)
 
 
 class Future(Projection):
     def __iter__(self):
-        return get_list(get_history(self.incoming, future=True, **self.kwargs), long=True)
+        return get_list(get_history(self.incoming, future=True, **self.kwargs), int=True)
 
 
 class Connections(Projection):
@@ -132,7 +132,7 @@ class WorldPositions(Projection):
     def __iter__(self):
         attrib_stream = (i for i in AttribValues(self.incoming, self.QUERYFLAG))
         heads = [iter(attrib_stream)] * 16
-        matrices = itertools.izip(*heads)
+        matrices = zip(*heads)
         positions = (i[12:15] for i in matrices)
         return positions
 
@@ -175,7 +175,7 @@ class LocalAxis(Projection):
 
         attrib_stream = (i for i in AttribValues(self.incoming, matrix))
         heads = [iter(attrib_stream)] * 16
-        matrices = itertools.izip(*heads)
+        matrices = zip(*heads)
         axes = (i[start:end] for i in matrices)
         return axes
 
@@ -261,10 +261,10 @@ class Types(Projection):
         _tuple = lambda p: self.TYPE_TUPLE(*p)
         nodes_and_types = get_list(self.incoming, showType=True)
         object_names, type_names = itertools.tee(nodes_and_types, 2)
-        out_stream = itertools.izip(itertools.islice(object_names, None, None, 2),
+        out_stream = zip(itertools.islice(object_names, None, None, 2),
                                     itertools.islice(type_names, 1, None, 2))
 
-        return itertools.imap(_tuple, out_stream)
+        return map(_tuple, out_stream)
 
 
 class Components(Projection):
